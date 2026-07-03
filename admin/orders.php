@@ -54,7 +54,7 @@ if ($order_id > 0) {
         </div>
 
         <?php if ($action_msg): ?>
-            <div class="quantity-discount-widget" style="background-color:rgba(46,204,113,0.05); border-color:rgba(46,204,113,0.3); color:var(--success-color); margin-bottom:25px;">
+            <div class="quantity-discount-widget" style="background-color:rgba(212,175,55,0.05); border-color:rgba(212,175,55,0.3); color:var(--success-color); margin-bottom:25px;">
                 ✅ <?php echo htmlspecialchars($action_msg); ?>
             </div>
         <?php endif; ?>
@@ -65,7 +65,7 @@ if ($order_id > 0) {
                 <!-- Customer info -->
                 <div class="glass-card" style="padding:25px; border-radius:8px; margin-bottom:25px;">
                     <h3 style="font-size:1.1rem; text-transform:uppercase; margin-bottom:15px; color:var(--gold-primary); border-bottom:1px solid rgba(255,255,255,0.05); padding-bottom:8px;">Customer & Shipping</h3>
-                    <table style="width:100%; font-size:0.9rem; line-height:1.6; color:#ddd;">
+                    <table style="width:100%; font-size:0.9rem; line-height:1.6; color:rgba(255,255,255,0.6);">
                         <tr>
                             <td style="color:var(--text-muted); font-weight:600; width:30%;">Name</td>
                             <td><?php echo htmlspecialchars($order['customer_name']); ?></td>
@@ -210,7 +210,7 @@ if ($order_id > 0) {
                                 <td style="font-weight:700; color:#fff;"><?php echo htmlspecialchars($ord['order_number']); ?></td>
                                 <td><?php echo date('M d, Y H:i', strtotime($ord['created_at'])); ?></td>
                                 <td>
-                                    <div style="font-weight:600; color:#ddd;"><?php echo htmlspecialchars($ord['customer_name']); ?></div>
+                                    <div style="font-weight:600; color:rgba(255,255,255,0.6);"><?php echo htmlspecialchars($ord['customer_name']); ?></div>
                                     <div style="font-size:0.75rem; color:var(--text-muted);"><?php echo htmlspecialchars($ord['customer_phone']); ?></div>
                                 </td>
                                 <td>₹<?php echo number_format($ord['total'], 2); ?></td>

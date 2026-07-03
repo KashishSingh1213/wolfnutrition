@@ -34,7 +34,7 @@ if (!$page) {
                 <?php echo htmlspecialchars($page['title']); ?>
             </h1>
             
-            <div class="cms-page-content" style="line-height:1.8; font-size:1.02rem; color:#ddd;">
+            <div class="cms-page-content" style="line-height:1.8; font-size:1.02rem; color:rgba(255,255,255,0.6);">
                 <?php echo $page['body']; ?>
             </div>
         </div>

@@ -45,7 +45,7 @@ $products = $stmt->fetchAll();
     </div>
 
     <?php if ($action_msg): ?>
-        <div class="quantity-discount-widget" style="background-color:rgba(46,204,113,0.05); border-color:rgba(46,204,113,0.3); color:var(--success-color); margin-bottom:25px;">
+        <div class="quantity-discount-widget" style="background-color:rgba(212,175,55,0.05); border-color:rgba(212,175,55,0.3); color:var(--success-color); margin-bottom:25px;">
             ✅ <?php echo htmlspecialchars($action_msg); ?>
         </div>
     <?php endif; ?>
@@ -78,7 +78,7 @@ $products = $stmt->fetchAll();
                 <h4 style="font-size:0.9rem; text-transform:uppercase; margin-bottom:12px; color:var(--gold-muted); font-weight:700; letter-spacing:0.5px;">Pack Variations & Stock</h4>
                 <div style="display:grid; grid-template-columns: repeat(auto-fit, minmax(380px, 1fr)); gap:25px;">
                     <?php foreach ($variants as $v): ?>
-                        <div style="background:rgba(255,255,255,0.02); border:1px solid rgba(212,175,55,0.15); padding:22px; border-radius:8px; box-shadow:0 8px 25px rgba(0,0,0,0.3); transition:all 0.3s;">
+                        <div style="background:rgba(255,255,255,0.02); border:1px solid rgba(212,175,55,0.15); padding:22px; border-radius:8px; box-shadow:0 8px 25px rgba(8,12,16,0.3); transition:all 0.3s;">
                             <form action="products.php" method="POST">
                                 <input type="hidden" name="variant_id" value="<?php echo $v['id']; ?>">
                                 

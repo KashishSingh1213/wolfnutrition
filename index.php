@@ -239,8 +239,8 @@ try {
         <style>
             .transformation-challenge-section {
                 padding: 100px 0;
-                background-color: #0b0c10;
-                background: radial-gradient(circle at 10% 30%, rgba(212, 175, 55, 0.03) 0%, rgba(11, 12, 16, 0) 60%);
+                background-color: #080C10;
+                background: radial-gradient(circle at 10% 30%, rgba(212, 175, 55, 0.03) 0%, rgba(8, 12, 16, 0) 60%);
             }
             .challenge-grid {
                 display: grid;
@@ -252,7 +252,7 @@ try {
                 position: relative;
                 border-radius: 28px;
                 overflow: hidden;
-                box-shadow: 0 35px 75px -15px rgba(0,0,0,0.9), 0 0 30px rgba(212,175,55,0.08);
+                box-shadow: 0 35px 75px -15px rgba(8,12,16,0.9), 0 0 30px rgba(212,175,55,0.08);
                 border: 1px solid rgba(212, 175, 55, 0.15);
             }
             .challenge-image-box img {
@@ -269,7 +269,7 @@ try {
                 position: absolute;
                 width: 250px;
                 height: 250px;
-                background: radial-gradient(circle, rgba(212, 175, 55, 0.15) 0%, rgba(0,0,0,0) 75%);
+                background: radial-gradient(circle, rgba(212, 175, 55, 0.15) 0%, rgba(8,12,16,0) 75%);
                 bottom: -50px;
                 right: -50px;
                 z-index: 1;
@@ -310,7 +310,7 @@ try {
             }
             .challenge-feat-card:hover {
                 border-color: var(--gold-primary);
-                box-shadow: 0 10px 25px rgba(0,0,0,0.4);
+                box-shadow: 0 10px 25px rgba(8,12,16,0.4);
                 transform: translateY(-3px);
             }
             .challenge-feat-icon {
@@ -412,7 +412,7 @@ try {
         <style>
             .digital-experience-section {
                 padding: 100px 0;
-                background: radial-gradient(circle at 75% 50%, rgba(212, 175, 55, 0.05) 0%, rgba(11, 12, 16, 0) 70%);
+                background: radial-gradient(circle at 75% 50%, rgba(212, 175, 55, 0.05) 0%, rgba(8,12,16, 0) 70%);
                 overflow: hidden;
             }
             .digital-experience-grid {
@@ -445,8 +445,8 @@ try {
             .phone-phys-btn {
                 position: absolute;
                 width: 4px;
-                background: linear-gradient(to bottom, #3a3a3c, #1c1c1e);
-                box-shadow: -2px 4px 10px rgba(0,0,0,0.6);
+                background: linear-gradient(to bottom, #121212, #121212);
+                box-shadow: -2px 4px 10px rgba(8,12,16,0.6);
                 z-index: 2;
             }
             .phone-phys-btn.vol-up {
@@ -466,17 +466,17 @@ try {
                 right: 36px;
                 height: 75px;
                 border-radius: 0 3px 3px 0;
-                box-shadow: 2px 4px 10px rgba(0,0,0,0.6);
+                box-shadow: 2px 4px 10px rgba(8,12,16,0.6);
             }
             /* Titanium Casing */
             .phone-mockup {
                 width: 360px;
                 height: 700px;
-                background: #000000;
-                border: 6px solid #2c2c2e; /* Titanium Outer shell */
+                background: #080C10;
+                border: 6px solid #121212; /* Titanium Outer shell */
                 padding: 10px; /* Inner bezel spacing */
                 border-radius: 50px;
-                box-shadow: 0 45px 85px -20px rgba(0,0,0,0.95), 0 0 35px rgba(212,175,55,0.08);
+                box-shadow: 0 45px 85px -20px rgba(8,12,16,0.95), 0 0 35px rgba(212,175,55,0.08);
                 position: relative;
                 overflow: hidden;
                 display: flex;
@@ -486,7 +486,7 @@ try {
             /* OLED Inner Screen Bezel */
             .phone-screen-container {
                 flex: 1;
-                background-color: #08080a;
+                background-color: #080C10;
                 border-radius: 38px;
                 position: relative;
                 overflow: hidden;
@@ -525,16 +525,16 @@ try {
             .phone-camera-lens {
                 width: 6px;
                 height: 6px;
-                background: radial-gradient(circle at 35% 35%, #464cee 0%, #0d0f2b 85%);
+                background: radial-gradient(circle at 35% 35%, rgba(212,175,55,0.5) 0%, #080C10 85%);
                 border-radius: 50%;
                 box-shadow: 0 0 2px rgba(255,255,255,0.4);
             }
             .phone-speaker-mesh {
                 width: 32px;
                 height: 3px;
-                background: #151518;
+                background: #121212;
                 border-radius: 2px;
-                box-shadow: inset 0 1px 2px rgba(0,0,0,0.8);
+                box-shadow: inset 0 1px 2px rgba(8,12,16,0.8);
             }
             .phone-screen {
                 flex: 1;
@@ -637,21 +637,21 @@ try {
                 top: 80px;
                 right: -95px;
                 width: 230px;
-                background: rgba(20, 20, 22, 0.95);
+                background: rgba(18,18,18, 0.95);
                 backdrop-filter: blur(20px);
                 border: 1px solid var(--gold-primary);
                 border-radius: 16px;
                 padding: 16px;
-                box-shadow: 0 30px 60px rgba(0,0,0,0.85);
+                box-shadow: 0 30px 60px rgba(8,12,16,0.85);
                 z-index: 15;
                 text-align: left;
                 animation: floatCardTR 5s ease-in-out infinite;
-                border-color: #ffd700;
+                border-color: #FFD700;
             }
             .floating-card-tr .ultimate-badge {
                 display: inline-block;
-                background: rgba(46,204,113,0.15);
-                color: #2ecc71;
+                background: rgba(212,175,55,0.15);
+                color: var(--gold-primary);
                 font-size: 0.6rem;
                 font-weight: 800;
                 padding: 2px 8px;
@@ -659,7 +659,7 @@ try {
                 text-transform: uppercase;
                 letter-spacing: 0.5px;
                 margin-bottom: 10px;
-                border: 1px solid rgba(46,204,113,0.2);
+                border: 1px solid rgba(212,175,55,0.2);
             }
             .floating-card-tr .prod-box {
                 display: flex;
@@ -671,7 +671,7 @@ try {
                 width: 60px;
                 height: 60px;
                 object-fit: contain;
-                filter: drop-shadow(0 8px 12px rgba(0,0,0,0.3));
+                filter: drop-shadow(0 8px 12px rgba(8,12,16,0.3));
             }
             .floating-card-tr .prod-title {
                 font-size: 0.8rem;
@@ -709,12 +709,12 @@ try {
                 bottom: 80px;
                 left: -95px;
                 width: 240px;
-                background: rgba(20, 20, 22, 0.95);
+                background: rgba(18,18,18, 0.95);
                 backdrop-filter: blur(20px);
                 border: 1px solid rgba(212, 175, 55, 0.3);
                 border-radius: 16px;
                 padding: 16px;
-                box-shadow: 0 30px 60px rgba(0,0,0,0.85);
+                box-shadow: 0 30px 60px rgba(8,12,16,0.85);
                 z-index: 15;
                 text-align: left;
                 display: flex;
@@ -887,7 +887,7 @@ try {
                             
                             <div class="phone-screen" style="display:flex; flex-direction:column; padding:35px 0 0 0;">
                                 <!-- Mock Top Status Bar -->
-                                <div class="mock-status-bar" style="display:flex; justify-content:space-between; align-items:center; padding: 2px 20px; font-size: 0.62rem; color: #666; font-weight:700; font-family:sans-serif;">
+                                <div class="mock-status-bar" style="display:flex; justify-content:space-between; align-items:center; padding: 2px 20px; font-size: 0.62rem; color: rgba(255,255,255,0.3); font-weight:700; font-family:sans-serif;">
                                     <span>09:41</span>
                                     <div style="display:flex; gap:6px; align-items:center;">
                                         <i class="fas fa-signal"></i>
@@ -902,14 +902,14 @@ try {
                                     <div class="mock-logo" style="font-size:0.9rem; font-weight:800; color:#fff; font-family:var(--font-heading); letter-spacing:0.5px;">WOLF <span>NUTRITION</span></div>
                                     <div style="position:relative; cursor:pointer;">
                                         <i class="fas fa-shopping-bag" style="color:#fff; font-size:0.85rem;"></i>
-                                        <span style="position:absolute; top:-6px; right:-6px; background:#e74c3c; color:#fff; font-size:0.5rem; width:12px; height:12px; border-radius:50%; display:flex; justify-content:center; align-items:center; font-weight:800; font-family:sans-serif;">2</span>
+                                        <span style="position:absolute; top:-6px; right:-6px; background:var(--gold-primary); color:#080C10; font-size:0.5rem; width:12px; height:12px; border-radius:50%; display:flex; justify-content:center; align-items:center; font-weight:800; font-family:sans-serif;">2</span>
                                     </div>
                                 </div>
                                 
                                 <!-- Large Product Carousel Banner (Spotlight behind floating bottle) -->
-                                <div class="mock-carousel-banner" style="height:210px; background:radial-gradient(circle at 50% 50%, rgba(212, 175, 55, 0.15) 0%, rgba(0,0,0,0) 80%), rgba(255,255,255,0.01); border:1px solid rgba(255,255,255,0.03); border-radius:18px; margin: 15px 15px 12px 15px; position:relative; overflow:hidden; display:flex; flex-direction:column; justify-content:center; align-items:center; text-align:center;">
+                                <div class="mock-carousel-banner" style="height:210px; background:radial-gradient(circle at 50% 50%, rgba(212, 175, 55, 0.15) 0%, rgba(8,12,16,0) 80%), rgba(255,255,255,0.01); border:1px solid rgba(255,255,255,0.03); border-radius:18px; margin: 15px 15px 12px 15px; position:relative; overflow:hidden; display:flex; flex-direction:column; justify-content:center; align-items:center; text-align:center;">
                                     <span style="position:absolute; top:12px; left:12px; background:var(--gold-gradient); color:#000; font-size:0.55rem; font-weight:800; padding:2px 8px; border-radius:10px; text-transform:uppercase; letter-spacing:0.5px; font-family:var(--font-heading);">Best Seller</span>
-                                    <img src="assets/images/products/wolfpack.png" alt="Wolfpack Mock Product" style="height:120px; object-fit:contain; filter:drop-shadow(0 15px 25px rgba(0,0,0,0.6)); animation:phoneProductFloat 4s ease-in-out infinite;">
+                                    <img src="assets/images/products/wolfpack.png" alt="Wolfpack Mock Product" style="height:120px; object-fit:contain; filter:drop-shadow(0 15px 25px rgba(8,12,16,0.6)); animation:phoneProductFloat 4s ease-in-out infinite;">
                                     <h4 style="font-size:0.85rem; font-weight:700; color:#fff; margin-top:8px; font-family:var(--font-heading);">WOLFPACK Vitality</h4>
                                     <!-- Dots -->
                                     <div class="mock-carousel-dots" style="position:absolute; bottom:10px; display:flex; gap:4px;">
@@ -925,41 +925,41 @@ try {
                                     <!-- Item 1: Vitality -->
                                     <div class="mock-category-item" style="display:flex; flex-direction:column; align-items:center; gap:6px; cursor:pointer;" onclick="location.href='category.php?slug=vitality'">
                                         <div class="mock-category-circle" style="width:50px; height:50px; background:rgba(255,255,255,0.02); border:1px solid rgba(212,175,55,0.15); border-radius:50%; display:flex; justify-content:center; align-items:center; padding:6px; transition:border-color 0.2s;">
-                                            <img src="assets/images/products/wolfpack.png" alt="Vitality Icon" style="width:100%; height:100%; object-fit:contain; filter:drop-shadow(0 4px 6px rgba(0,0,0,0.3));">
+                                            <img src="assets/images/products/wolfpack.png" alt="Vitality Icon" style="width:100%; height:100%; object-fit:contain; filter:drop-shadow(0 4px 6px rgba(8,12,16,0.3));">
                                         </div>
                                         <span style="font-size:0.55rem; color:var(--text-secondary); font-weight:600;">Vitality</span>
                                     </div>
                                     <!-- Item 2: Detox -->
                                     <div class="mock-category-item" style="display:flex; flex-direction:column; align-items:center; gap:6px; cursor:pointer;" onclick="location.href='category.php?slug=liver-detox'">
                                         <div class="mock-category-circle" style="width:50px; height:50px; background:rgba(255,255,255,0.02); border:1px solid rgba(212,175,55,0.15); border-radius:50%; display:flex; justify-content:center; align-items:center; padding:6px; transition:border-color 0.2s;">
-                                            <img src="assets/images/products/wolftox.png" alt="Detox Icon" style="width:100%; height:100%; object-fit:contain; filter:drop-shadow(0 4px 6px rgba(0,0,0,0.3));">
+                                            <img src="assets/images/products/wolftox.png" alt="Detox Icon" style="width:100%; height:100%; object-fit:contain; filter:drop-shadow(0 4px 6px rgba(8,12,16,0.3));">
                                         </div>
                                         <span style="font-size:0.55rem; color:var(--text-secondary); font-weight:600;">Liver Detox</span>
                                     </div>
                                     <!-- Item 3: Combos -->
                                     <div class="mock-category-item" style="display:flex; flex-direction:column; align-items:center; gap:6px; cursor:pointer;" onclick="location.href='category.php?slug=all'">
                                         <div class="mock-category-circle" style="width:50px; height:50px; background:rgba(255,255,255,0.02); border:1px solid rgba(212,175,55,0.15); border-radius:50%; display:flex; justify-content:center; align-items:center; padding:6px; transition:border-color 0.2s;">
-                                            <img src="assets/images/products/wolfpack_wolftox_combo.png" alt="Combos Icon" style="width:100%; height:100%; object-fit:contain; filter:drop-shadow(0 4px 6px rgba(0,0,0,0.3));">
+                                            <img src="assets/images/products/wolfpack_wolftox_combo.png" alt="Combos Icon" style="width:100%; height:100%; object-fit:contain; filter:drop-shadow(0 4px 6px rgba(8,12,16,0.3));">
                                         </div>
                                         <span style="font-size:0.55rem; color:var(--text-secondary); font-weight:600;">Combos</span>
                                     </div>
                                 </div>
                                 
                                 <!-- Mock App Bottom Tab Bar -->
-                                <div class="mock-tab-bar" style="display:grid; grid-template-columns:repeat(4, 1fr); padding: 12px 10px; border-top:1px solid rgba(255,255,255,0.03); background:#08080a; margin-top:auto; text-align:center; z-index:10;">
+                                <div class="mock-tab-bar" style="display:grid; grid-template-columns:repeat(4, 1fr); padding: 12px 10px; border-top:1px solid rgba(255,255,255,0.03); background:#080C10; margin-top:auto; text-align:center; z-index:10;">
                                     <div style="display:flex; flex-direction:column; align-items:center; gap:4px; color:var(--gold-primary); cursor:pointer;" onclick="location.href='index.php'">
                                         <i class="fas fa-home" style="font-size:0.8rem;"></i>
                                         <span style="font-size:0.5rem; font-weight:700;">Home</span>
                                     </div>
-                                    <div style="display:flex; flex-direction:column; align-items:center; gap:4px; color:#666; cursor:pointer;" onclick="location.href='category.php?slug=all'">
+                                    <div style="display:flex; flex-direction:column; align-items:center; gap:4px; color:rgba(255,255,255,0.4); cursor:pointer;" onclick="location.href='category.php?slug=all'">
                                         <i class="fas fa-capsules" style="font-size:0.8rem;"></i>
                                         <span style="font-size:0.5rem; font-weight:700;">Shop</span>
                                     </div>
-                                    <div style="display:flex; flex-direction:column; align-items:center; gap:4px; color:#666; cursor:pointer;" onclick="location.href='https://wa.me/919876543210'">
+                                    <div style="display:flex; flex-direction:column; align-items:center; gap:4px; color:rgba(255,255,255,0.4); cursor:pointer;" onclick="location.href='https://wa.me/919876543210'">
                                         <i class="fas fa-user-doctor" style="font-size:0.8rem;"></i>
                                         <span style="font-size:0.5rem; font-weight:700;">Consult</span>
                                     </div>
-                                    <div style="display:flex; flex-direction:column; align-items:center; gap:4px; color:#666; cursor:pointer;" onclick="location.href='my-account.php'">
+                                    <div style="display:flex; flex-direction:column; align-items:center; gap:4px; color:rgba(255,255,255,0.4); cursor:pointer;" onclick="location.href='my-account.php'">
                                         <i class="fas fa-user" style="font-size:0.8rem;"></i>
                                         <span style="font-size:0.5rem; font-weight:700;">Profile</span>
                                     </div>
@@ -1100,7 +1100,7 @@ try {
         <style>
             .loyalty-assistance-section {
                 padding: 60px 0;
-                background: linear-gradient(180deg, rgba(11, 12, 16, 0) 0%, rgba(212, 175, 55, 0.02) 50%, rgba(11, 12, 16, 0) 100%);
+                background: linear-gradient(180deg, rgba(8,12,16, 0) 0%, rgba(212, 175, 55, 0.02) 50%, rgba(8,12,16, 0) 100%);
             }
             .loyalty-grid {
                 display: grid;
@@ -1113,7 +1113,7 @@ try {
                 gap: 30px;
             }
             .loyalty-card {
-                background: #111215;
+                background: #121212;
                 border: 1px solid rgba(212, 175, 55, 0.1);
                 border-radius: 24px;
                 overflow: hidden;
@@ -1122,11 +1122,11 @@ try {
             }
             .loyalty-card:hover {
                 border-color: var(--gold-primary);
-                box-shadow: 0 15px 35px rgba(0,0,0,0.5), 0 0 15px rgba(212,175,55,0.05);
+                box-shadow: 0 15px 35px rgba(8,12,16,0.5), 0 0 15px rgba(212,175,55,0.05);
                 transform: translateY(-4px);
             }
             .loyalty-elite-card {
-                background: linear-gradient(135deg, #18191d 0%, #0c0d10 100%);
+                background: linear-gradient(135deg, #121212 0%, #080C10 100%);
                 padding: 35px;
                 display: flex;
                 flex-direction: column;
@@ -1136,7 +1136,7 @@ try {
             .loyalty-elite-card .elite-badge {
                 align-self: flex-start;
                 background: var(--gold-gradient);
-                color: #000;
+                color: #080C10;
                 font-size: 0.75rem;
                 font-weight: 800;
                 padding: 4px 12px;
@@ -1221,7 +1221,7 @@ try {
                 position: absolute;
                 width: 160px;
                 height: 160px;
-                background: radial-gradient(circle, rgba(212, 175, 55, 0.2) 0%, rgba(0,0,0,0) 70%);
+                background: radial-gradient(circle, rgba(212, 175, 55, 0.2) 0%, rgba(8,12,16,0) 70%);
                 border-radius: 50%;
                 bottom: 20px;
                 z-index: 1;

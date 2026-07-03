@@ -119,12 +119,12 @@ if (empty($gallery)) {
         </div>
 
         <?php if ($review_success): ?>
-            <div class="quantity-discount-widget" style="background-color:rgba(46,204,113,0.05); border-color:rgba(46,204,113,0.3); color:var(--success-color); margin-bottom:20px;">
+            <div class="quantity-discount-widget" style="background-color:rgba(212,175,55,0.05); border-color:rgba(212,175,55,0.3); color:var(--success-color); margin-bottom:20px;">
                 ✅ <?php echo htmlspecialchars($review_success); ?>
             </div>
         <?php endif; ?>
         <?php if ($review_error): ?>
-            <div class="quantity-discount-widget" style="background-color:rgba(231,76,60,0.05); border-color:rgba(231,76,60,0.3); color:var(--danger-color); margin-bottom:20px;">
+            <div class="quantity-discount-widget" style="background-color:rgba(255,255,255,0.05); border-color:rgba(255,255,255,0.15); color:var(--danger-color); margin-bottom:20px;">
                 ❌ <?php echo htmlspecialchars($review_error); ?>
             </div>
         <?php endif; ?>
@@ -221,7 +221,7 @@ if (empty($gallery)) {
                                 <i class="fas fa-shopping-cart"></i> Add to Cart
                             </button>
                         <?php else: ?>
-                            <button type="button" class="btn" style="background:#444; color:#888; border:none; cursor:not-allowed;" disabled>
+                            <button type="button" class="btn" style="background:rgba(255,255,255,0.2); color:rgba(255,255,255,0.4); border:none; cursor:not-allowed;" disabled>
                                 Out of Stock
                             </button>
                         <?php endif; ?>

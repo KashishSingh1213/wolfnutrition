@@ -174,7 +174,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['place_order'])) {
         </div>
 
         <?php if ($checkout_error): ?>
-            <div class="quantity-discount-widget" style="background-color:rgba(231,76,60,0.05); border-color:rgba(231,76,60,0.3); color:var(--danger-color); margin-bottom:20px;">
+            <div class="quantity-discount-widget" style="background-color:rgba(255,255,255,0.05); border-color:rgba(255,255,255,0.15); color:var(--danger-color); margin-bottom:20px;">
                 ❌ <?php echo htmlspecialchars($checkout_error); ?>
             </div>
         <?php endif; ?>
@@ -250,7 +250,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['place_order'])) {
                             </div>
                             <div class="form-group">
                                 <label>Country</label>
-                                <input type="text" class="form-control" value="India" readonly disabled style="background:#222; border-color:#333;">
+                                <input type="text" class="form-control" value="India" readonly disabled style="background:rgba(255,255,255,0.1); border-color:rgba(255,255,255,0.15);">
                             </div>
                         </div>
                     </div>

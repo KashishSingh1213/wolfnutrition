@@ -91,7 +91,7 @@ $recent_orders = $stmt->fetchAll();
                             <tr>
                                 <td style="font-weight:700; color:#fff;"><?php echo htmlspecialchars($ord['order_number']); ?></td>
                                 <td>
-                                    <div style="font-weight:600; color:#ddd;"><?php echo htmlspecialchars($ord['customer_name']); ?></div>
+                                    <div style="font-weight:600; color:rgba(255,255,255,0.6);"><?php echo htmlspecialchars($ord['customer_name']); ?></div>
                                     <div style="font-size:0.75rem; color:var(--text-muted);"><?php echo htmlspecialchars($ord['customer_phone']); ?></div>
                                 </td>
                                 <td>₹<?php echo number_format($ord['total'], 2); ?></td>

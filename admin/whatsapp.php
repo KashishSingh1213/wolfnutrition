@@ -34,7 +34,7 @@ $settings = get_whatsapp_settings();
     </div>
 
     <?php if ($action_msg): ?>
-        <div class="quantity-discount-widget" style="background-color:rgba(46,204,113,0.05); border-color:rgba(46,204,113,0.3); color:var(--success-color); margin-bottom:25px;">
+        <div class="quantity-discount-widget" style="background-color:rgba(212,175,55,0.05); border-color:rgba(212,175,55,0.3); color:var(--success-color); margin-bottom:25px;">
             ✅ <?php echo htmlspecialchars($action_msg); ?>
         </div>
     <?php endif; ?>
@@ -76,17 +76,17 @@ $settings = get_whatsapp_settings();
              <h3 style="font-size:1.25rem; color:var(--gold-primary); margin-bottom:20px; border-bottom:1px solid rgba(255,255,255,0.05); padding-bottom:10px;">
                  <i class="fab fa-whatsapp"></i> Chat Support Preview
              </h3>
-             <div style="background:#075e54; color:#fff; border-radius:8px; overflow:hidden; font-family:sans-serif; box-shadow:0 10px 25px rgba(0,0,0,0.35);">
-                 <div style="background:#075e54; padding:15px; display:flex; align-items:center; gap:10px; border-bottom:1px solid rgba(255,255,255,0.1);">
-                     <div style="width:10px; height:10px; background:#25d366; border-radius:50%;"></div>
+             <div style="background:#121212; color:#fff; border-radius:8px; overflow:hidden; font-family:sans-serif; box-shadow:0 10px 25px rgba(8,12,16,0.35); border:1px solid rgba(212,175,55,0.1);">
+                 <div style="background:#121212; padding:15px; display:flex; align-items:center; gap:10px; border-bottom:1px solid rgba(255,255,255,0.1);">
+                     <div style="width:10px; height:10px; background:#D4AF37; border-radius:50%;"></div>
                      <span style="font-weight:700; font-size:0.9rem;">Wolf Nutrition Support</span>
                  </div>
-                 <div style="background:#ece5dd; padding:20px; min-height:150px; display:flex; flex-direction:column; gap:10px;">
-                     <div style="background:#fff; color:#333; padding:10px 14px; border-radius:0 8px 8px 8px; max-width:85%; font-size:0.85rem; line-height:1.4; align-self:flex-start; box-shadow:0 1px 2px rgba(0,0,0,0.15);">
+                 <div style="background:#080C10; padding:20px; min-height:150px; display:flex; flex-direction:column; gap:10px;">
+                     <div style="background:#121212; color:rgba(255,255,255,0.85); padding:10px 14px; border-radius:0 8px 8px 8px; max-width:85%; font-size:0.85rem; line-height:1.4; align-self:flex-start; box-shadow:0 1px 2px rgba(8,12,16,0.15);">
                          Hello there! How can we help you unleash the alpha within today?
                      </div>
                      <?php if ($settings && $settings['greeting_message']): ?>
-                         <div style="background:#e1ffc7; color:#333; padding:10px 14px; border-radius:8px 8px 0 8px; max-width:85%; font-size:0.85rem; line-height:1.4; align-self:flex-end; box-shadow:0 1px 2px rgba(0,0,0,0.15); font-style:italic;">
+                         <div style="background:rgba(212,175,55,0.1); color:var(--gold-primary); padding:10px 14px; border-radius:8px 8px 0 8px; max-width:85%; font-size:0.85rem; line-height:1.4; align-self:flex-end; box-shadow:0 1px 2px rgba(8,12,16,0.15); font-style:italic; border:1px solid rgba(212,175,55,0.15);">
                              <?php echo htmlspecialchars($settings['greeting_message']); ?>
                          </div>
                      <?php endif; ?>

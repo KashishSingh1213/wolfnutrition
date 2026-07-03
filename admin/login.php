@@ -47,7 +47,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['admin_login_btn'])) {
 <body style="background-color: var(--bg-primary); min-height: 100vh; display: flex; align-items: center; justify-content: center;">
 
     <div class="container" style="max-width:520px; width:100%; padding:0 20px;">
-        <div class="glass-card" style="padding: 50px 45px; border-radius: 12px; border-top: 4px solid var(--gold-primary); box-shadow: 0 25px 60px rgba(0,0,0,0.6), 0 0 30px rgba(212,175,55,0.05);">
+        <div class="glass-card" style="padding: 50px 45px; border-radius: 12px; border-top: 4px solid var(--gold-primary); box-shadow: 0 25px 60px rgba(8,12,16,0.6), 0 0 30px rgba(212,175,55,0.05);">
             <div style="text-align:center; margin-bottom:30px;">
                 <img src="../assets/images/logo.png" alt="Wolf Logo" style="height:70px; margin-bottom:12px;">
                 <h2 style="font-size:1.8rem; text-transform:uppercase; color:#fff; letter-spacing:1px; margin-bottom:6px;">WOLF NUTRITION</h2>
@@ -55,7 +55,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['admin_login_btn'])) {
             </div>
 
             <?php if ($login_error): ?>
-                <div class="quantity-discount-widget" style="background-color:rgba(231,76,60,0.05); border-color:rgba(231,76,60,0.3); color:var(--danger-color); margin-bottom:25px; padding:12px; font-weight:600;">
+                <div class="quantity-discount-widget" style="background-color:rgba(255,255,255,0.05); border-color:rgba(255,255,255,0.15); color:var(--danger-color); margin-bottom:25px; padding:12px; font-weight:600;">
                     ❌ <?php echo htmlspecialchars($login_error); ?>
                 </div>
             <?php endif; ?>

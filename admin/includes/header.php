@@ -33,13 +33,13 @@ $admin_name = $_SESSION['admin_name'];
             min-height: calc(100vh - 75px);
         }
         .admin-sidebar {
-            background-color: #0b0c10;
+            background-color: #080C10;
             border-right: 1px solid rgba(212, 175, 55, 0.1);
             padding: 30px 18px;
             display: flex;
             flex-direction: column;
             gap: 12px;
-            box-shadow: 5px 0 25px rgba(0,0,0,0.3);
+            box-shadow: 5px 0 25px rgba(8,12,16,0.3);
         }
         .admin-sidebar-link {
             display: flex;
@@ -76,7 +76,7 @@ $admin_name = $_SESSION['admin_name'];
             color: var(--gold-primary);
             border-left: 3px solid var(--gold-primary);
             padding-left: 22px;
-            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+            box-shadow: 0 4px 15px rgba(8,12,16, 0.2);
         }
         .admin-sidebar-link.active i {
             opacity: 1;
@@ -84,7 +84,7 @@ $admin_name = $_SESSION['admin_name'];
         }
         .admin-content {
             padding: 45px 50px;
-            background-color: #0f0f12;
+            background-color: #080C10;
             overflow-y: auto;
         }
         .admin-card-grid {
@@ -94,7 +94,7 @@ $admin_name = $_SESSION['admin_name'];
             margin-bottom: 40px;
         }
         .admin-card {
-            background: rgba(26, 26, 29, 0.45);
+            background: rgba(18, 18, 18, 0.45);
             backdrop-filter: blur(12px);
             border: 1px solid rgba(212, 175, 55, 0.1);
             padding: 25px;
@@ -103,7 +103,7 @@ $admin_name = $_SESSION['admin_name'];
             position: relative;
             overflow: hidden;
             transition: all 0.4s cubic-bezier(0.165, 0.84, 0.44, 1);
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+            box-shadow: 0 10px 30px rgba(8,12,16, 0.3);
         }
         .admin-card:hover {
             transform: translateY(-5px);
@@ -140,7 +140,7 @@ $admin_name = $_SESSION['admin_name'];
             text-align: left;
         }
         .admin-table th {
-            background-color: rgba(26, 26, 29, 0.8);
+            background-color: rgba(18,18,18, 0.8);
             color: var(--gold-primary);
             font-weight: 700;
             text-transform: uppercase;
@@ -152,7 +152,7 @@ $admin_name = $_SESSION['admin_name'];
             border-bottom: 1px solid rgba(255,255,255,0.03);
             color: var(--text-secondary);
             font-size: 0.9rem;
-            background-color: rgba(26, 26, 29, 0.2);
+            background-color: rgba(18, 18, 18, 0.2);
         }
         .admin-table tr:last-child td {
             border-bottom: none;
@@ -176,14 +176,14 @@ $admin_name = $_SESSION['admin_name'];
             border: 1px solid rgba(212, 175, 55, 0.15);
         }
         .badge-completed { 
-            background-color: rgba(46, 204, 113, 0.1); 
-            color: var(--success-color); 
-            border: 1px solid rgba(46, 204, 113, 0.15);
+            background-color: rgba(212, 175, 55, 0.1); 
+            color: var(--gold-primary); 
+            border: 1px solid rgba(212, 175, 55, 0.15);
         }
         .badge-failed { 
-            background-color: rgba(231, 76, 60, 0.1); 
-            color: var(--danger-color); 
-            border: 1px solid rgba(231, 76, 60, 0.15);
+            background-color: rgba(255, 255, 255, 0.06); 
+            color: rgba(255, 255, 255, 0.7); 
+            border: 1px solid rgba(255, 255, 255, 0.1);
         }
         
         /* Admin Global Form overrides for modern clean feel */
@@ -355,11 +355,11 @@ $admin_name = $_SESSION['admin_name'];
 <body>
 
     <!-- Header bar -->
-    <header style="position:static; border-bottom:1px solid rgba(212, 175, 55, 0.1); background:#0b0c10; min-height:75px; height:auto; padding:10px 0; display:flex; align-items:center; box-shadow: 0 4px 20px rgba(0,0,0,0.25); z-index:100; position:relative;">
+    <header style="position:static; border-bottom:1px solid rgba(212, 175, 55, 0.1); background:#080C10; min-height:75px; height:auto; padding:10px 0; display:flex; align-items:center; box-shadow: 0 4px 20px rgba(8,12,16,0.25); z-index:100; position:relative;">
         <div class="container header-container" style="max-width:100%; padding:0 30px; display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:15px; width:100%;">
             <div class="logo" style="margin:0; display:flex; align-items:center; gap:12px;">
                 <img src="../assets/images/logo.png" alt="Wolf Logo" style="height:55px;">
-                <span style="font-size:0.65rem; font-weight:800; letter-spacing:1px; background:var(--gold-gradient); color:#000; padding:4px 10px; border-radius:4px; text-transform:uppercase;">ADMIN</span>
+                <span style="font-size:0.65rem; font-weight:800; letter-spacing:1px; background:var(--gold-gradient); color:#080C10; padding:4px 10px; border-radius:4px; text-transform:uppercase;">ADMIN</span>
             </div>
             
             <div style="font-weight:600; font-size:0.9rem; color:#fff; display:flex; align-items:center; gap:10px; background:rgba(255,255,255,0.03); padding:8px 16px; border-radius:30px; border:1px solid rgba(255,255,255,0.05);">

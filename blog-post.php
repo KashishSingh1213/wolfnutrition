@@ -57,7 +57,7 @@ try {
                 <?php endif; ?>
 
                 <!-- Article Content -->
-                <div class="blog-content-body" style="line-height:1.8; font-size:1.05rem; color:#ddd;">
+                <div class="blog-content-body" style="line-height:1.8; font-size:1.05rem; color:rgba(255,255,255,0.6);">
                     <?php echo $post['body']; ?>
                 </div>
             </article>
@@ -82,7 +82,7 @@ try {
                 <?php endif; ?>
 
                 <!-- Promotional banner inside blog -->
-                <div class="glass-card" style="padding:25px; border-radius:8px; text-align:center; background:linear-gradient(135deg, rgba(212,175,55,0.05) 0%, rgba(0,0,0,0.9) 100%);">
+                <div class="glass-card" style="padding:25px; border-radius:8px; text-align:center; background:linear-gradient(135deg, rgba(212,175,55,0.05) 0%, rgba(8,12,16,0.9) 100%);">
                     <h4 style="font-size:1.2rem; text-transform:uppercase; margin-bottom:10px; color:var(--gold-primary);">Wolfpack Supplement</h4>
                     <p style="font-size:0.85rem; margin-bottom:15px;">Increase testosterone, stamina & peak vitality naturally.</p>
                     <a href="product.php?slug=wolfpack-unleash-the-alpha-within" class="btn-gold" style="padding:8px 20px; font-size:0.8rem;">View Pack</a>

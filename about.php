@@ -8,7 +8,7 @@ require_once __DIR__ . '/includes/header.php';
     .about-hero {
         position: relative;
         height: 380px;
-        background: linear-gradient(rgba(0,0,0,0.85), rgba(0,0,0,0.85)), url('assets/images/hero2.png') no-repeat center center/cover;
+        background: linear-gradient(rgba(8,12,16,0.85), rgba(8,12,16,0.85)), url('assets/images/hero2.png') no-repeat center center/cover;
         display: flex;
         align-items: center;
         justify-content: center;
@@ -66,7 +66,7 @@ require_once __DIR__ . '/includes/header.php';
         display: flex;
         align-items: center;
         justify-content: center;
-        box-shadow: 0 20px 50px rgba(0,0,0,0.5);
+        box-shadow: 0 20px 50px rgba(8,12,16,0.5);
         overflow: hidden;
     }
     .about-image-card::after {
@@ -109,7 +109,7 @@ require_once __DIR__ . '/includes/header.php';
         border-radius: 12px;
         padding: 45px 30px;
         text-align: center;
-        box-shadow: 0 15px 35px rgba(0, 0, 0, 0.35);
+        box-shadow: 0 15px 35px rgba(8,12,16, 0.35);
     }
     .stat-box h4 {
         font-size: 2.6rem;
@@ -137,7 +137,7 @@ require_once __DIR__ . '/includes/header.php';
         margin-top: 50px;
     }
     .pillar-card {
-        background: rgba(26, 26, 29, 0.4);
+        background: rgba(18,18,18, 0.4);
         backdrop-filter: blur(10px);
         border: 1px solid rgba(212, 175, 55, 0.12);
         border-radius: 12px;
@@ -149,7 +149,7 @@ require_once __DIR__ . '/includes/header.php';
         transform: translateY(-8px);
         border-color: var(--gold-primary);
         box-shadow: 0 15px 35px rgba(212, 175, 55, 0.18);
-        background: rgba(26, 26, 29, 0.6);
+        background: rgba(18,18,18, 0.6);
     }
     .pillar-card i {
         font-size: 2.3rem;
@@ -225,8 +225,8 @@ require_once __DIR__ . '/includes/header.php';
         
         <!-- Interactive Glowing Bottle Frame -->
         <div class="about-image-card" style="height: 380px; position: relative;">
-            <img src="assets/images/products/about_wolfpack.png" alt="Wolfpack Vitality" style="height: 280px; position: absolute; left: 12%; bottom: 12%; z-index: 3; filter: drop-shadow(0 15px 30px rgba(0,0,0,0.75)); animation: aboutFloatLeft 6s ease-in-out infinite;">
-            <img src="assets/images/products/about_wolftox.png" alt="Wolftox Detox" style="height: 250px; position: absolute; right: 12%; top: 12%; z-index: 2; filter: drop-shadow(0 15px 30px rgba(0,0,0,0.75)); animation: aboutFloatRight 6s ease-in-out infinite;">
+            <img src="assets/images/products/about_wolfpack.png" alt="Wolfpack Vitality" style="height: 280px; position: absolute; left: 12%; bottom: 12%; z-index: 3; filter: drop-shadow(0 15px 30px rgba(8,12,16,0.75)); animation: aboutFloatLeft 6s ease-in-out infinite;">
+            <img src="assets/images/products/about_wolftox.png" alt="Wolftox Detox" style="height: 250px; position: absolute; right: 12%; top: 12%; z-index: 2; filter: drop-shadow(0 15px 30px rgba(8,12,16,0.75)); animation: aboutFloatRight 6s ease-in-out infinite;">
         </div>
     </div>
 
@@ -288,7 +288,7 @@ require_once __DIR__ . '/includes/header.php';
     </div>
 
     <!-- Closing Call-To-Action (CTA) Banner -->
-    <div class="glass-card" style="padding: 50px; border-radius: 15px; text-align: center; background: linear-gradient(135deg, rgba(212,175,55,0.06) 0%, rgba(0,0,0,0.85) 100%); margin-top: 80px; border: 1px solid rgba(212,175,55,0.15); box-shadow: 0 20px 40px rgba(0,0,0,0.4);">
+    <div class="glass-card" style="padding: 50px; border-radius: 15px; text-align: center; background: linear-gradient(135deg, rgba(212,175,55,0.06) 0%, rgba(8,12,16,0.85) 100%); margin-top: 80px; border: 1px solid rgba(212,175,55,0.15); box-shadow: 0 20px 40px rgba(8,12,16,0.4);">
         <h3 style="font-size: 1.8rem; text-transform: uppercase; margin-bottom: 15px; color: #fff; font-family: var(--font-heading); font-weight: 700; letter-spacing: 0.5px;">Take Command of Your Health</h3>
         <p style="margin-bottom: 30px; font-size: 1.05rem; color: var(--text-secondary); max-width: 700px; margin-left: auto; margin-right: auto; line-height: 1.6;">
             Explore our clinically validated formulations. From physical endurance stacks to complete toxin cleanses, select the targeted support your body deserves.

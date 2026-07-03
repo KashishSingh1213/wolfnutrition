@@ -158,7 +158,7 @@ $totals = get_cart_totals();
                     <form action="cart.php" method="POST" style="border-top:1px solid var(--border-color); border-bottom:1px solid var(--border-color); padding:15px 0; margin:15px 0;">
                         <label style="font-size:0.85rem; font-weight:600; display:block; margin-bottom:8px;">Have a Promo Code?</label>
                         <?php if (isset($_SESSION['coupon'])): ?>
-                            <div style="display:flex; justify-content:space-between; align-items:center; background:rgba(46,204,113,0.1); padding:8px 12px; border-radius:4px; border:1px solid rgba(46,204,113,0.2);">
+                            <div style="display:flex; justify-content:space-between; align-items:center; background:rgba(212,175,55,0.1); padding:8px 12px; border-radius:4px; border:1px solid rgba(212,175,55,0.2);">
                                 <span style="font-weight:700; color:var(--success-color);"><?php echo htmlspecialchars($_SESSION['coupon']['code']); ?></span>
                                 <button type="submit" name="remove_coupon_btn" style="background:none; border:none; color:var(--danger-color); cursor:pointer; font-weight:700;">Remove</button>
                             </div>

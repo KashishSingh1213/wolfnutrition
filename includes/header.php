@@ -157,8 +157,13 @@ if ($active_page === 'product.php' && isset($_GET['slug'])) {
                 </button>
 
                 <!-- My Account Icon -->
-                <a href="<?php echo is_logged_in() ? 'my-account.php' : 'login.php'; ?>" class="header-icon" aria-label="My Account">
-                    <i class="fas fa-user-circle"></i>
+                <a href="<?php echo is_logged_in() ? 'my-account.php' : 'login.php'; ?>" class="header-icon" aria-label="My Account" style="position:relative; text-decoration:none;">
+                    <?php if (is_logged_in()): ?>
+                        <i class="fas fa-user-circle" style="color: var(--gold-primary);"></i>
+                        <span style="position:absolute; top:-4px; right:-4px; width:8px; height:8px; background:var(--gold-primary); border-radius:50%; border:2px solid var(--bg-primary);"></span>
+                    <?php else: ?>
+                        <i class="fas fa-user-circle"></i>
+                    <?php endif; ?>
                 </a>
 
                 <!-- Cart Icon -->

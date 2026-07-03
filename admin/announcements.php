@@ -51,7 +51,7 @@ $announcements = $stmt->fetchAll();
     </div>
 
     <?php if ($action_msg): ?>
-        <div class="quantity-discount-widget" style="background-color:rgba(46,204,113,0.05); border-color:rgba(46,204,113,0.3); color:var(--success-color); margin-bottom:25px;">
+        <div class="quantity-discount-widget" style="background-color:rgba(212,175,55,0.05); border-color:rgba(212,175,55,0.3); color:var(--success-color); margin-bottom:25px;">
             ✅ <?php echo htmlspecialchars($action_msg); ?>
         </div>
     <?php endif; ?>
@@ -80,7 +80,7 @@ $announcements = $stmt->fetchAll();
                         <?php foreach ($announcements as $ann): ?>
                             <tr>
                                 <td><strong style="color:#fff;"><?php echo $ann['display_order']; ?></strong></td>
-                                <td><span style="font-size:0.9rem; color:#eee;"><?php echo htmlspecialchars($ann['message']); ?></span></td>
+                                <td><span style="font-size:0.9rem; color:rgba(255,255,255,0.7);"><?php echo htmlspecialchars($ann['message']); ?></span></td>
                                 <td style="font-size:0.8rem; color:var(--text-muted);"><?php echo htmlspecialchars($ann['link'] ? $ann['link'] : '#'); ?></td>
                                 <td>
                                     <span class="admin-badge <?php echo $ann['status'] ? 'badge-completed' : 'badge-pending'; ?>">
@@ -128,7 +128,7 @@ $announcements = $stmt->fetchAll();
     </div>
 
     <!-- Admin Guide Panel -->
-    <div class="glass-card" style="padding:25px; border-radius:8px; margin-top:35px; border-left:4px solid var(--gold-primary); box-shadow: 0 10px 30px rgba(0,0,0,0.3);">
+    <div class="glass-card" style="padding:25px; border-radius:8px; margin-top:35px; border-left:4px solid var(--gold-primary); box-shadow: 0 10px 30px rgba(8,12,16,0.3);">
         <h3 style="font-size:1.1rem; color:var(--gold-primary); margin-bottom:10px; text-transform:uppercase; letter-spacing:0.5px; font-weight:700;">
             <i class="fas fa-lightbulb" style="margin-right:8px;"></i> Announcement Copywriting Best Practices
         </h3>

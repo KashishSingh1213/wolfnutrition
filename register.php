@@ -96,7 +96,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['register_btn'])) {
 ?>
 
     <div class="container" style="margin-top: 60px; margin-bottom: 90px; max-width:480px;">
-        <div class="glass-card" style="padding: 45px 35px; border-radius: 16px; border: 1px solid rgba(212,175,55,0.15); box-shadow: 0 15px 35px rgba(0,0,0,0.4); background: rgba(15,16,20,0.65); backdrop-filter: blur(12px);">
+        <div class="glass-card" style="padding: 45px 35px; border-radius: 16px; border: 1px solid rgba(212,175,55,0.15); box-shadow: 0 15px 35px rgba(8,12,16,0.4); background: rgba(18,18,18,0.65); backdrop-filter: blur(12px);">
             <div style="text-align: center; margin-bottom: 30px;">
                 <img src="assets/images/logo.png" alt="Wolf Nutrition Logo" style="height: 65px; margin-bottom: 15px;">
                 <h2 style="font-size:1.9rem; text-transform:uppercase; color:var(--text-primary); font-family:var(--font-heading); font-weight:800; letter-spacing:0.5px; margin:0;">
@@ -108,7 +108,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['register_btn'])) {
             </div>
 
             <?php if ($register_error): ?>
-                <div class="quantity-discount-widget" style="background-color:rgba(231,76,60,0.08); border: 1px solid rgba(231,76,60,0.25); color:#ff6b6b; padding:12px 15px; border-radius:8px; margin-bottom:20px; font-size:0.9rem; font-weight:600; display:flex; align-items:center; gap:8px;">
+                <div class="quantity-discount-widget" style="background-color:rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.12); color:rgba(255,255,255,0.8); padding:12px 15px; border-radius:8px; margin-bottom:20px; font-size:0.9rem; font-weight:600; display:flex; align-items:center; gap:8px;">
                     <i class="fas fa-exclamation-circle" style="font-size: 1.1rem;"></i> <span><?php echo htmlspecialchars($register_error); ?></span>
                 </div>
             <?php endif; ?>
@@ -122,13 +122,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['register_btn'])) {
                 <div class="form-group" style="margin-bottom: 20px;">
                     <label for="email" style="font-size: 0.88rem; text-transform: uppercase; letter-spacing: 0.5px; font-weight: 700; color: var(--text-secondary); margin-bottom: 8px;">Email Address</label>
                     <input type="email" name="email" id="email" class="form-control" placeholder="e.g. yuvek@gmail.com" required style="border-radius: 8px; border-color: rgba(255,255,255,0.08); font-size: 0.95rem; height: auto; padding: 13px 16px;">
-                    <small id="email-error" style="color:#ff6b6b; display:none; margin-top:6px; font-weight:600; font-size:0.8rem;"></small>
+                    <small id="email-error" style="color:rgba(255,255,255,0.6); display:none; margin-top:6px; font-weight:600; font-size:0.8rem;"></small>
                 </div>
 
                 <div class="form-group" style="margin-bottom: 20px;">
                     <label for="phone" style="font-size: 0.88rem; text-transform: uppercase; letter-spacing: 0.5px; font-weight: 700; color: var(--text-secondary); margin-bottom: 8px;">Phone Number</label>
                     <input type="text" name="phone" id="phone" class="form-control" placeholder="10-digit mobile number" maxlength="10" required style="border-radius: 8px; border-color: rgba(255,255,255,0.08); font-size: 0.95rem; height: auto; padding: 13px 16px;">
-                    <small id="phone-error" style="color:#ff6b6b; display:none; margin-top:6px; font-weight:600; font-size:0.8rem;"></small>
+                    <small id="phone-error" style="color:rgba(255,255,255,0.6); display:none; margin-top:6px; font-weight:600; font-size:0.8rem;"></small>
                 </div>
 
                 <div class="form-group" style="margin-bottom: 25px;">
@@ -141,7 +141,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['register_btn'])) {
                     </div>
                     
                     <!-- Real-Time Password Checklist -->
-                    <div id="password-checklist" style="margin-top: 12px; display: grid; grid-template-columns: 1fr 1fr; gap: 8px 15px; background: rgba(0,0,0,0.18); padding: 12px 15px; border-radius: 8px; border: 1px solid rgba(255,255,255,0.03);">
+                    <div id="password-checklist" style="margin-top: 12px; display: grid; grid-template-columns: 1fr 1fr; gap: 8px 15px; background: rgba(8,12,16,0.18); padding: 12px 15px; border-radius: 8px; border: 1px solid rgba(255,255,255,0.03);">
                         <div id="rule-length" style="font-size: 0.78rem; color: var(--text-muted); display: flex; align-items: center; gap: 6px; transition: color 0.2s;">
                             <i class="far fa-circle" id="icon-length"></i> 8+ Characters
                         </div>
@@ -302,9 +302,9 @@ document.addEventListener('DOMContentLoaded', function() {
             const ruleEl = document.getElementById(ruleId);
             const iconEl = document.getElementById(iconId);
             if (isValid) {
-                ruleEl.style.color = '#2ecc71';
+                ruleEl.style.color = '#D4AF37';
                 iconEl.className = 'fas fa-check-circle';
-                iconEl.style.color = '#2ecc71';
+                iconEl.style.color = '#D4AF37';
             } else {
                 ruleEl.style.color = 'var(--text-muted)';
                 iconEl.className = 'far fa-circle';

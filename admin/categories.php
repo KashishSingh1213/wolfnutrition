@@ -38,7 +38,7 @@ $categories = $stmt->fetchAll();
     </div>
 
     <?php if ($action_msg): ?>
-        <div class="quantity-discount-widget" style="background-color:rgba(46,204,113,0.05); border-color:rgba(46,204,113,0.3); color:var(--success-color); margin-bottom:25px;">
+        <div class="quantity-discount-widget" style="background-color:rgba(212,175,55,0.05); border-color:rgba(212,175,55,0.3); color:var(--success-color); margin-bottom:25px;">
             ✅ <?php echo htmlspecialchars($action_msg); ?>
         </div>
     <?php endif; ?>

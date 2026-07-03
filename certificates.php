@@ -41,7 +41,7 @@ $certs = get_certificates();
                     </tr>
                     <tr style="border-bottom:1px solid rgba(255,255,255,0.05);">
                         <td style="padding:12px 10px; color:var(--text-muted); font-weight:600;">Premises Address</td>
-                        <td style="padding:12px 10px; color:#ddd;">Kaki Pind, Hoshiarpur Road, Rama Mandi, Jalandhar, Ramamandi, Jalandhar-2, Jalandhar, Punjab - 144005</td>
+                        <td style="padding:12px 10px; color:rgba(255,255,255,0.6);">Kaki Pind, Hoshiarpur Road, Rama Mandi, Jalandhar, Ramamandi, Jalandhar-2, Jalandhar, Punjab - 144005</td>
                     </tr>
                     <tr style="border-bottom:1px solid rgba(255,255,255,0.05);">
                         <td style="padding:12px 10px; color:var(--text-muted); font-weight:600;">Kind of Business</td>
@@ -65,9 +65,9 @@ $certs = get_certificates();
     </div>
 
     <!-- Modal for certificate viewing -->
-    <div id="cert-modal" style="position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.9); z-index:1000; opacity:0; pointer-events:none; transition:0.3s; display:flex; flex-direction:column; align-items:center; justify-content:center; padding:20px;">
+    <div id="cert-modal" style="position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(8,12,16,0.9); z-index:1000; opacity:0; pointer-events:none; transition:0.3s; display:flex; flex-direction:column; align-items:center; justify-content:center; padding:20px;">
         <div style="position:absolute; top:30px; right:40px; font-size:2rem; color:#fff; cursor:pointer;" onclick="closeCertModal()">&times;</div>
-        <img id="cert-modal-img" src="" alt="Enlarged Certificate" style="max-width:90%; max-height:80%; border-radius:4px; box-shadow:0 0 30px rgba(0,0,0,0.8); border:1px solid var(--border-color);">
+        <img id="cert-modal-img" src="" alt="Enlarged Certificate" style="max-width:90%; max-height:80%; border-radius:4px; box-shadow:0 0 30px rgba(8,12,16,0.8); border:1px solid var(--border-color);">
         <h3 id="cert-modal-title" style="margin-top:20px; color:#fff;"></h3>
     </div>
 

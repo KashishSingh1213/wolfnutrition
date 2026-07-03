@@ -46,7 +46,7 @@ $reviews = $stmt->fetchAll();
     </div>
 
     <?php if ($action_msg): ?>
-        <div class="quantity-discount-widget" style="background-color:rgba(46,204,113,0.05); border-color:rgba(46,204,113,0.3); color:var(--success-color); margin-bottom:25px;">
+        <div class="quantity-discount-widget" style="background-color:rgba(212,175,55,0.05); border-color:rgba(212,175,55,0.3); color:var(--success-color); margin-bottom:25px;">
             ✅ <?php echo htmlspecialchars($action_msg); ?>
         </div>
     <?php endif; ?>
@@ -71,7 +71,7 @@ $reviews = $stmt->fetchAll();
                         <tr>
                             <td><strong style="color:#fff;"><?php echo htmlspecialchars($rev['p_name']); ?></strong></td>
                             <td>
-                                <div style="font-weight:600; color:#ddd;"><?php echo htmlspecialchars($rev['user_name']); ?></div>
+                                <div style="font-weight:600; color:rgba(255,255,255,0.6);"><?php echo htmlspecialchars($rev['user_name']); ?></div>
                                 <div style="font-size:0.75rem; color:var(--text-muted);"><?php echo date('M d, Y', strtotime($rev['created_at'])); ?></div>
                             </td>
                             <td style="color:var(--gold-light);">
@@ -80,7 +80,7 @@ $reviews = $stmt->fetchAll();
                                 <?php endfor; ?>
                             </td>
                             <td style="max-width:300px;">
-                                <div style="font-weight:700; color:#eee;"><?php echo htmlspecialchars($rev['title']); ?></div>
+                                <div style="font-weight:700; color:rgba(255,255,255,0.7);"><?php echo htmlspecialchars($rev['title']); ?></div>
                                 <div style="font-size:0.85rem; color:var(--text-secondary); margin-top:4px;"><?php echo htmlspecialchars($rev['review_text']); ?></div>
                             </td>
                             <td>

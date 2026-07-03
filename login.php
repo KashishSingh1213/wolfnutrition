@@ -80,7 +80,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['login_btn'])) {
 ?>
 
     <div class="container" style="margin-top: 60px; margin-bottom: 90px; max-width:480px;">
-        <div class="glass-card" style="padding: 45px 35px; border-radius: 16px; border: 1px solid rgba(212,175,55,0.15); box-shadow: 0 15px 35px rgba(0,0,0,0.4); background: rgba(15,16,20,0.65); backdrop-filter: blur(12px);">
+        <div class="glass-card" style="padding: 45px 35px; border-radius: 16px; border: 1px solid rgba(212,175,55,0.15); box-shadow: 0 15px 35px rgba(8,12,16,0.4); background: rgba(18,18,18,0.65); backdrop-filter: blur(12px);">
             <div style="text-align: center; margin-bottom: 30px;">
                 <img src="assets/images/logo.png" alt="Wolf Nutrition Logo" style="height: 65px; margin-bottom: 15px;">
                 <h2 style="font-size:1.9rem; text-transform:uppercase; color:var(--text-primary); font-family:var(--font-heading); font-weight:800; letter-spacing:0.5px; margin:0;">
@@ -92,7 +92,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['login_btn'])) {
             </div>
 
             <?php if ($login_error): ?>
-                <div class="quantity-discount-widget" style="background-color:rgba(231,76,60,0.08); border: 1px solid rgba(231,76,60,0.25); color:#ff6b6b; padding:12px 15px; border-radius:8px; margin-bottom:20px; font-size:0.9rem; font-weight:600; display:flex; align-items:center; gap:8px;">
+                <div class="quantity-discount-widget" style="background-color:rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.12); color:rgba(255,255,255,0.8); padding:12px 15px; border-radius:8px; margin-bottom:20px; font-size:0.9rem; font-weight:600; display:flex; align-items:center; gap:8px;">
                     <i class="fas fa-exclamation-circle" style="font-size: 1.1rem;"></i> <span><?php echo htmlspecialchars($login_error); ?></span>
                 </div>
             <?php endif; ?>

@@ -74,7 +74,7 @@ if ($est['valid']) {
                     <div style="font-weight:700; color:#fff; margin-bottom:15px;"><?php echo htmlspecialchars($order['customer_name']); ?> (<?php echo htmlspecialchars($order['customer_phone']); ?>)</div>
 
                     <div style="font-size:0.85rem; color:var(--text-muted); text-transform:uppercase; margin-bottom:5px;">Shipping Address</div>
-                    <div style="font-size:0.9rem; line-height:1.4; color:#ddd;"><?php echo htmlspecialchars($order['shipping_address']); ?></div>
+                    <div style="font-size:0.9rem; line-height:1.4; color:rgba(255,255,255,0.6);"><?php echo htmlspecialchars($order['shipping_address']); ?></div>
                 </div>
             </div>
 

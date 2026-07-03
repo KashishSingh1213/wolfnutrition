@@ -79,7 +79,7 @@ try {
         margin-bottom: 40px;
         overflow: hidden;
         border: 1px solid rgba(212, 175, 55, 0.15);
-        box-shadow: 0 15px 35px rgba(0,0,0,0.4);
+        box-shadow: 0 15px 35px rgba(8,12,16,0.4);
         display: flex;
         align-items: center;
         justify-content: space-between;
@@ -88,16 +88,16 @@ try {
     }
     
     .hero-liver-detox {
-        background: linear-gradient(135deg, #14120f 0%, #0d0d11 60%, #2a2215 100%);
+        background: linear-gradient(135deg, #121212 0%, #080C10 60%, rgba(212,175,55,0.08) 100%);
         border-left: 5px solid var(--gold-primary);
     }
     .hero-vitality {
-        background: linear-gradient(135deg, #1d1403 0%, #0d0d11 60%, #3a2905 100%);
+        background: linear-gradient(135deg, rgba(212,175,55,0.1) 0%, #080C10 60%, rgba(212,175,55,0.12) 100%);
         border-left: 5px solid var(--gold-primary);
     }
     .hero-all {
-        background: linear-gradient(135deg, #0d0d11 0%, #181920 100%);
-        border-left: 5px solid var(--gold-muted);
+        background: linear-gradient(135deg, #080C10 0%, #121212 100%);
+        border-left: 5px solid var(--gold-primary);
     }
     
     .cat-hero-text h1 {
@@ -159,7 +159,7 @@ try {
         max-height: 200px;
         object-fit: contain;
         z-index: 2;
-        filter: drop-shadow(0 15px 25px rgba(0,0,0,0.7));
+        filter: drop-shadow(0 15px 25px rgba(8,12,16,0.7));
         animation: catFloat 5s ease-in-out infinite;
     }
     
@@ -184,7 +184,7 @@ try {
         display: flex;
         align-items: center;
         gap: 15px;
-        box-shadow: 0 5px 15px rgba(0,0,0,0.15);
+        box-shadow: 0 5px 15px rgba(8,12,16,0.15);
         transition: border-color 0.3s;
     }
     .benefit-item:hover {
@@ -430,7 +430,7 @@ try {
                                                 <i class="fas fa-shopping-cart"></i> Quick Add
                                             </button>
                                         <?php else: ?>
-                                            <button class="btn-gold" style="width: 100%; background: #444; border:none; cursor:not-allowed; box-shadow:none; color:#888;" disabled>
+                                            <button class="btn-gold" style="width: 100%; background: rgba(255,255,255,0.2); border:none; cursor:not-allowed; box-shadow:none; color:rgba(255,255,255,0.4);" disabled>
                                                 Out of Stock
                                             </button>
                                         <?php endif; ?>
