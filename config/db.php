@@ -17,6 +17,16 @@ try {
             PDO::ATTR_EMULATE_PREPARES => false,
         ]
     );
+    
+    // Auto-create rate limiter table if missing
+    $pdo->exec("
+        CREATE TABLE IF NOT EXISTS login_attempts (
+            id INT AUTO_INCREMENT PRIMARY KEY,
+            ip_address VARCHAR(45) NOT NULL,
+            email VARCHAR(255) NOT NULL,
+            attempt_time TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+        ) ENGINE=InnoDB;
+    ");
 } catch (PDOException $e) {
     die("Database connection failed: " . $e->getMessage());
 }

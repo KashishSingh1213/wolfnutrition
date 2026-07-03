@@ -357,9 +357,9 @@ $admin_name = $_SESSION['admin_name'];
     <!-- Header bar -->
     <header style="position:static; border-bottom:1px solid rgba(212, 175, 55, 0.1); background:#0b0c10; min-height:75px; height:auto; padding:10px 0; display:flex; align-items:center; box-shadow: 0 4px 20px rgba(0,0,0,0.25); z-index:100; position:relative;">
         <div class="container header-container" style="max-width:100%; padding:0 30px; display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:15px; width:100%;">
-            <div class="logo" style="margin:0;">
-                <img src="../assets/images/logo.png" alt="Wolf Logo" style="height:45px;">
-                <div class="logo-text" style="font-size:1.3rem; font-family:var(--font-heading); font-weight:800; color:#fff;">WOLF <span style="color:var(--gold-primary);">NUTRITION</span> <small style="font-size:0.65rem; font-weight:800; letter-spacing:1px; background:var(--gold-gradient); color:#000; padding:2px 8px; border-radius:4px; margin-left:10px; text-transform:uppercase;">ADMIN</small></div>
+            <div class="logo" style="margin:0; display:flex; align-items:center; gap:12px;">
+                <img src="../assets/images/logo.png" alt="Wolf Logo" style="height:55px;">
+                <span style="font-size:0.65rem; font-weight:800; letter-spacing:1px; background:var(--gold-gradient); color:#000; padding:4px 10px; border-radius:4px; text-transform:uppercase;">ADMIN</span>
             </div>
             
             <div style="font-weight:600; font-size:0.9rem; color:#fff; display:flex; align-items:center; gap:10px; background:rgba(255,255,255,0.03); padding:8px 16px; border-radius:30px; border:1px solid rgba(255,255,255,0.05);">

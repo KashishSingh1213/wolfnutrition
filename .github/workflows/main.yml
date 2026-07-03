@@ -1,0 +1,53 @@
+name: Wolf Nutrition CI/CD Pipeline
+
+on:
+  push:
+    branches: [ main, master ]
+  pull_request:
+    branches: [ main, master ]
+
+jobs:
+  lint-and-test:
+    name: Code Quality & Linting (CI)
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout Code
+      uses: actions/checkout@v3
+
+    - name: Set up PHP
+      uses: shivammathur/setup-php@v2
+      with:
+        php-version: '8.1'
+        extensions: pdo, pdo_mysql, mysqli, mbstring, json, xml
+
+    - name: Syntax Check (Lint PHP)
+      run: |
+        find . -name "*.php" ! -path "./vendor/*" ! -path "./.gemini/*" -type f -print0 | xargs -0 -n 1 -P 4 php -l
+
+  deploy:
+    name: Automated Deployment (CD)
+    needs: lint-and-test
+    runs-on: ubuntu-latest
+    if: github.ref == 'refs/heads/main' || github.ref == 'refs/heads/master'
+
+    steps:
+    - name: Checkout Code
+      uses: actions/checkout@v3
+
+    # Automated SFTP/FTP Deployment
+    # Configure secrets in your GitHub repository: Settings > Secrets and variables > Actions
+    - name: FTP/SFTP Deploy Action
+      uses: SamKirkland/FTP-Deploy-Action@v4.3.4
+      with:
+        server: ${{ secrets.FTP_SERVER }}
+        username: ${{ secrets.FTP_USERNAME }}
+        password: ${{ secrets.FTP_PASSWORD }}
+        server-dir: ${{ secrets.FTP_TARGET_DIR || '/public_html/' }}
+        exclude: |
+          **/.git*
+          **/.git*/**
+          **/.gemini/**
+          **/scratch/**
+          **/database/**
+          **/README.md

@@ -5,13 +5,107 @@ require_once __DIR__ . '/functions.php';
 $announcements = get_announcements();
 $cart_count = get_cart_count();
 $active_page = basename($_SERVER['PHP_SELF']);
+
+// Dynamic SEO & Metatag Engine
+$seo_title = "Wolf Nutrition | Premium Ayurvedic Performance & Vitality Stacks";
+$seo_desc = "Wolf Nutrition merges ancient Ayurvedic wisdom with modern sports science. Buy certified Shilajit, Ashwagandha, and Kutki stacks for stamina and liver support.";
+$seo_keywords = "wolf nutrition, ayurvedic stamina gainer, shilajit capsules india, liver support kutki, wolftox liver detox, test boost ayurvedic";
+$canonical_url = "http://" . $_SERVER['HTTP_HOST'] . $_SERVER['REQUEST_URI'];
+
+if ($active_page === 'product.php' && isset($_GET['slug'])) {
+    $prod_slug = $_GET['slug'];
+    $db = get_db_connection();
+    $stmt = $db->prepare("SELECT name, short_description FROM products WHERE slug = ?");
+    $stmt->execute([$prod_slug]);
+    $prod_seo = $stmt->fetch(PDO::FETCH_ASSOC);
+    if ($prod_seo) {
+        $seo_title = htmlspecialchars($prod_seo['name']) . " | Buy Online | Wolf Nutrition";
+        $seo_desc = htmlspecialchars(strip_tags($prod_seo['short_description']));
+        $seo_keywords = htmlspecialchars(strtolower($prod_seo['name'])) . ", buy online, ayurvedic premium performance";
+    }
+} elseif ($active_page === 'category.php' && isset($_GET['slug'])) {
+    $cat_slug = $_GET['slug'];
+    if ($cat_slug === 'vitality') {
+        $seo_title = "Ayurvedic Performance & Vitality Supplements | Wolf Nutrition";
+        $seo_desc = "Shop premium Ayurvedic vitality capsules containing pure Himalayan Shilajit, Ashwagandha, Gokshura, and Safed Musli extracts.";
+    } elseif ($cat_slug === 'liver-detox') {
+        $seo_title = "Liver Support & Detox Stacks | Wolf Nutrition";
+        $seo_desc = "Protect your liver enzymes and cleanse toxins. Shop Kutki, Milk Thistle, and Kalmegh Ayurvedic liver support capsules.";
+    }
+} elseif ($active_page === 'about.php') {
+    $seo_title = "Our Brand Story & Philosophy | Wolf Nutrition";
+    $seo_desc = "Discover how Wolf Nutrition bridges the gap between ancient Ayurvedic botanicals and the rigorous demands of modern active life.";
+} elseif ($active_page === 'contact.php') {
+    $seo_title = "Contact Us & Expert Support | Wolf Nutrition";
+    $seo_desc = "Get in touch with Wolf Nutrition. Ask questions about your stacks, shipping, or book your free dietitian Ayurvedic call.";
+}
 ?>
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Wolf Nutrition | Premium Ayurvedic Performance & Vitality</title>
+    
+    <!-- SEO Meta Tags -->
+    <title><?php echo $seo_title; ?></title>
+    <meta name="description" content="<?php echo $seo_desc; ?>">
+    <meta name="keywords" content="<?php echo $seo_keywords; ?>">
+    <meta name="robots" content="index, follow">
+    <link rel="canonical" href="<?php echo $canonical_url; ?>">
+
+    <!-- Open Graph / Facebook / Instagram -->
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="<?php echo $canonical_url; ?>">
+    <meta property="og:title" content="<?php echo $seo_title; ?>">
+    <meta property="og:description" content="<?php echo $seo_desc; ?>">
+    <meta property="og:image" content="http://<?php echo $_SERVER['HTTP_HOST']; ?>/wolfnutrition/assets/images/logo.png">
+
+    <!-- Twitter -->
+    <meta property="twitter:card" content="summary_large_image">
+    <meta property="twitter:url" content="<?php echo $canonical_url; ?>">
+    <meta property="twitter:title" content="<?php echo $seo_title; ?>">
+    <meta property="twitter:description" content="<?php echo $seo_desc; ?>">
+    <meta property="twitter:image" content="http://<?php echo $_SERVER['HTTP_HOST']; ?>/wolfnutrition/assets/images/logo.png">
+
+    <!-- JSON-LD Structured Data for Search Engine rich snippets -->
+    <script type="application/ld+json">
+    <?php
+    if ($active_page === 'product.php' && isset($prod_seo)) {
+        echo json_encode([
+            "@context" => "https://schema.org/",
+            "@type" => "Product",
+            "name" => $prod_seo['name'],
+            "image" => "http://" . $_SERVER['HTTP_HOST'] . "/wolfnutrition/assets/images/logo.png",
+            "description" => $seo_desc,
+            "brand" => [
+                "@type" => "Brand",
+                "name" => "Wolf Nutrition"
+            ],
+            "offers" => [
+                "@type" => "AggregateOffer",
+                "url" => $canonical_url,
+                "priceCurrency" => "INR",
+                "lowPrice" => "899.00",
+                "highPrice" => "1999.00",
+                "offerCount" => "1"
+            ]
+        ], JSON_UNESCAPED_SLASHES | JSON_PRETTY_PRINT);
+    } else {
+        echo json_encode([
+            "@context" => "https://schema.org",
+            "@type" => "Organization",
+            "name" => "Wolf Nutrition",
+            "url" => "http://" . $_SERVER['HTTP_HOST'] . "/wolfnutrition",
+            "logo" => "http://" . $_SERVER['HTTP_HOST'] . "/wolfnutrition/assets/images/logo.png",
+            "sameAs" => [
+                "https://facebook.com/wolfnutrition",
+                "https://instagram.com/wolfnutrition"
+            ]
+        ], JSON_UNESCAPED_SLASHES | JSON_PRETTY_PRINT);
+    }
+    ?>
+    </script>
+
     <!-- FontAwesome for Icons -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <!-- Main Style CSS -->
@@ -42,7 +136,6 @@ $active_page = basename($_SERVER['PHP_SELF']);
             <!-- Brand Logo -->
             <a href="index.php" class="logo">
                 <img src="assets/images/logo.png" alt="Wolf Nutrition Logo">
-                <div class="logo-text">WOLF <span>NUTRITION</span></div>
             </a>
 
             <!-- Navigation Links -->

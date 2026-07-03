@@ -25,7 +25,14 @@ function get_logged_in_user() {
     if (!is_logged_in()) return null;
     $stmt = $pdo->prepare("SELECT id, name, email, phone, role, is_active FROM users WHERE id = ?");
     $stmt->execute([$_SESSION['user_id']]);
-    return $stmt->fetch();
+    $user = $stmt->fetch();
+    if (!$user) {
+        unset($_SESSION['user_id']);
+        unset($_SESSION['user_name']);
+        unset($_SESSION['user_role']);
+        return null;
+    }
+    return $user;
 }
 
 function is_admin_logged_in() {

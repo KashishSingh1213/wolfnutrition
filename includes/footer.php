@@ -23,7 +23,6 @@ $whatsapp = get_whatsapp_settings();
                 <div class="footer-about">
                     <a href="index.php" class="logo" style="margin-bottom: 15px;">
                         <img src="assets/images/logo.png" alt="Wolf Nutrition Logo">
-                        <div class="logo-text" style="font-size:1.2rem;">WOLF <span>NUTRITION</span></div>
                     </a>
                     <p>Ancient Ayurvedic wisdom engineered for modern male peak performance. Clean, raw formulations with zero hidden fillers.</p>
                 </div>
