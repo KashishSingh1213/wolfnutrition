@@ -1,5 +1,31 @@
 <?php
 // register.php
+require_once __DIR__ . '/config/db.php';
+
+// Handle Real-Time AJAX validations (runs before header to avoid HTML output corruption)
+if (isset($_GET['check_field']) && isset($_GET['value'])) {
+    header('Content-Type: application/json');
+    $field = $_GET['check_field'];
+    $val = trim($_GET['value']);
+    $response = ['exists' => false];
+    
+    if ($field === 'email' && filter_var($val, FILTER_VALIDATE_EMAIL)) {
+        $stmt = $pdo->prepare("SELECT id FROM users WHERE email = ?");
+        $stmt->execute([$val]);
+        if ($stmt->fetch()) {
+            $response['exists'] = true;
+        }
+    } elseif ($field === 'phone' && preg_match('/^[6-9][0-9]{9}$/', $val)) {
+        $stmt = $pdo->prepare("SELECT id FROM users WHERE phone = ?");
+        $stmt->execute([$val]);
+        if ($stmt->fetch()) {
+            $response['exists'] = true;
+        }
+    }
+    echo json_encode($response);
+    exit();
+}
+
 require_once __DIR__ . '/includes/header.php';
 
 if (is_logged_in()) {
@@ -96,22 +122,42 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['register_btn'])) {
                 <div class="form-group" style="margin-bottom: 20px;">
                     <label for="email" style="font-size: 0.88rem; text-transform: uppercase; letter-spacing: 0.5px; font-weight: 700; color: var(--text-secondary); margin-bottom: 8px;">Email Address</label>
                     <input type="email" name="email" id="email" class="form-control" placeholder="e.g. yuvek@gmail.com" required style="border-radius: 8px; border-color: rgba(255,255,255,0.08); font-size: 0.95rem; height: auto; padding: 13px 16px;">
+                    <small id="email-error" style="color:#ff6b6b; display:none; margin-top:6px; font-weight:600; font-size:0.8rem;"></small>
                 </div>
 
                 <div class="form-group" style="margin-bottom: 20px;">
                     <label for="phone" style="font-size: 0.88rem; text-transform: uppercase; letter-spacing: 0.5px; font-weight: 700; color: var(--text-secondary); margin-bottom: 8px;">Phone Number</label>
-                    <input type="text" name="phone" id="phone" class="form-control" placeholder="10-digit mobile number" maxlength="10" required pattern="^[6-9][0-9]{9}$" title="Please enter a valid 10-digit India mobile number starting with 6, 7, 8, or 9." style="border-radius: 8px; border-color: rgba(255,255,255,0.08); font-size: 0.95rem; height: auto; padding: 13px 16px;">
+                    <input type="text" name="phone" id="phone" class="form-control" placeholder="10-digit mobile number" maxlength="10" required style="border-radius: 8px; border-color: rgba(255,255,255,0.08); font-size: 0.95rem; height: auto; padding: 13px 16px;">
+                    <small id="phone-error" style="color:#ff6b6b; display:none; margin-top:6px; font-weight:600; font-size:0.8rem;"></small>
                 </div>
 
                 <div class="form-group" style="margin-bottom: 25px;">
                     <label for="password" style="font-size: 0.88rem; text-transform: uppercase; letter-spacing: 0.5px; font-weight: 700; color: var(--text-secondary); margin-bottom: 8px;">Password</label>
                     <div style="position: relative; display: flex; align-items: center; width: 100%;">
-                        <input type="password" name="password" id="password" class="form-control" placeholder="Min 8 characters" required pattern="^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$" title="Password must be at least 8 characters, with 1 uppercase letter, 1 lowercase letter, 1 digit, and 1 special character." style="border-radius: 8px; border-color: rgba(255,255,255,0.08); font-size: 0.95rem; height: auto; padding: 13px 45px 13px 16px; width: 100%;">
+                        <input type="password" name="password" id="password" class="form-control" placeholder="Min 8 characters" required style="border-radius: 8px; border-color: rgba(255,255,255,0.08); font-size: 0.95rem; height: auto; padding: 13px 45px 13px 16px; width: 100%;">
                         <button type="button" onclick="togglePasswordVisibility('password', 'togglePasswordIcon')" style="position: absolute; right: 16px; background: none; border: none; color: var(--text-muted); cursor: pointer; padding: 0; outline: none; display: flex; align-items: center; justify-content: center; z-index: 10;">
                             <i id="togglePasswordIcon" class="far fa-eye" style="font-size: 1.15rem; transition: color 0.2s;"></i>
                         </button>
                     </div>
-                    <small style="color: var(--text-muted); display: block; margin-top: 6px; font-size: 0.78rem;">Must contain at least 8 characters, 1 uppercase, 1 lowercase, 1 digit, and 1 special symbol (@$!%*?&).</small>
+                    
+                    <!-- Real-Time Password Checklist -->
+                    <div id="password-checklist" style="margin-top: 12px; display: grid; grid-template-columns: 1fr 1fr; gap: 8px 15px; background: rgba(0,0,0,0.18); padding: 12px 15px; border-radius: 8px; border: 1px solid rgba(255,255,255,0.03);">
+                        <div id="rule-length" style="font-size: 0.78rem; color: var(--text-muted); display: flex; align-items: center; gap: 6px; transition: color 0.2s;">
+                            <i class="far fa-circle" id="icon-length"></i> 8+ Characters
+                        </div>
+                        <div id="rule-upper" style="font-size: 0.78rem; color: var(--text-muted); display: flex; align-items: center; gap: 6px; transition: color 0.2s;">
+                            <i class="far fa-circle" id="icon-upper"></i> 1 Uppercase
+                        </div>
+                        <div id="rule-lower" style="font-size: 0.78rem; color: var(--text-muted); display: flex; align-items: center; gap: 6px; transition: color 0.2s;">
+                            <i class="far fa-circle" id="icon-lower"></i> 1 Lowercase
+                        </div>
+                        <div id="rule-number" style="font-size: 0.78rem; color: var(--text-muted); display: flex; align-items: center; gap: 6px; transition: color 0.2s;">
+                            <i class="far fa-circle" id="icon-number"></i> 1 Number
+                        </div>
+                        <div id="rule-special" style="font-size: 0.78rem; color: var(--text-muted); display: flex; align-items: center; gap: 6px; transition: color 0.2s; grid-column: span 2;">
+                            <i class="far fa-circle" id="icon-special"></i> 1 Special Icon (@$!%*?&)
+                        </div>
+                    </div>
                 </div>
 
                 <button type="submit" name="register_btn" class="btn-gold" style="width:100%; margin-top:5px; padding:14px; font-weight: 700; font-size: 1rem; border-radius: 30px; letter-spacing: 0.5px; box-shadow: 0 4px 15px rgba(212,175,55,0.2);">
@@ -144,6 +190,143 @@ function togglePasswordVisibility(fieldId, iconId) {
         toggleIcon.style.color = 'var(--text-muted)';
     }
 }
+
+document.addEventListener('DOMContentLoaded', function() {
+    const nameInput = document.getElementById('name');
+    const emailInput = document.getElementById('email');
+    const phoneInput = document.getElementById('phone');
+    const passwordInput = document.getElementById('password');
+    const submitBtn = document.querySelector('button[name="register_btn"]');
+    
+    const emailError = document.getElementById('email-error');
+    const phoneError = document.getElementById('phone-error');
+    
+    let isEmailValid = false;
+    let isPhoneValid = false;
+    let isPasswordValid = false;
+    
+    function validateFormState() {
+        if (nameInput.value.trim() !== '' && isEmailValid && isPhoneValid && isPasswordValid) {
+            submitBtn.removeAttribute('disabled');
+            submitBtn.style.opacity = '1';
+            submitBtn.style.cursor = 'pointer';
+        } else {
+            submitBtn.setAttribute('disabled', 'true');
+            submitBtn.style.opacity = '0.5';
+            submitBtn.style.cursor = 'not-allowed';
+        }
+    }
+    
+    let emailTimeout = null;
+    let phoneTimeout = null;
+    
+    // Real-Time Email Check
+    emailInput.addEventListener('input', function() {
+        const email = emailInput.value.trim();
+        emailError.style.display = 'none';
+        isEmailValid = false;
+        validateFormState();
+        
+        if (emailTimeout) clearTimeout(emailTimeout);
+        
+        if (email === '') return;
+        
+        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+        if (!emailRegex.test(email)) {
+            emailError.textContent = "Please enter a valid email address.";
+            emailError.style.display = 'block';
+            return;
+        }
+        
+        emailTimeout = setTimeout(() => {
+            fetch(`register.php?check_field=email&value=${encodeURIComponent(email)}`)
+                .then(res => res.json())
+                .then(data => {
+                    if (data.exists) {
+                        emailError.textContent = "This email is already registered.";
+                        emailError.style.display = 'block';
+                        isEmailValid = false;
+                    } else {
+                        isEmailValid = true;
+                    }
+                    validateFormState();
+                });
+        }, 350);
+    });
+    
+    // Real-Time Phone Check
+    phoneInput.addEventListener('input', function() {
+        const phone = phoneInput.value.trim();
+        phoneError.style.display = 'none';
+        isPhoneValid = false;
+        validateFormState();
+        
+        if (phoneTimeout) clearTimeout(phoneTimeout);
+        
+        if (phone === '') return;
+        
+        const phoneRegex = /^[6-9][0-9]{9}$/;
+        if (!phoneRegex.test(phone)) {
+            phoneError.textContent = "Please enter a valid 10-digit Indian phone number.";
+            phoneError.style.display = 'block';
+            return;
+        }
+        
+        phoneTimeout = setTimeout(() => {
+            fetch(`register.php?check_field=phone&value=${encodeURIComponent(phone)}`)
+                .then(res => res.json())
+                .then(data => {
+                    if (data.exists) {
+                        phoneError.textContent = "This phone number is already registered.";
+                        phoneError.style.display = 'block';
+                        isPhoneValid = false;
+                    } else {
+                        isPhoneValid = true;
+                    }
+                    validateFormState();
+                });
+        }, 350);
+    });
+    
+    // Real-Time Password Strength Checker
+    passwordInput.addEventListener('input', function() {
+        const val = passwordInput.value;
+        
+        const hasLength = val.length >= 8;
+        const hasUpper = /[A-Z]/.test(val);
+        const hasLower = /[a-z]/.test(val);
+        const hasNumber = /[0-9]/.test(val);
+        const hasSpecial = /[@$!%*?&]/.test(val);
+        
+        function toggleRuleState(ruleId, iconId, isValid) {
+            const ruleEl = document.getElementById(ruleId);
+            const iconEl = document.getElementById(iconId);
+            if (isValid) {
+                ruleEl.style.color = '#2ecc71';
+                iconEl.className = 'fas fa-check-circle';
+                iconEl.style.color = '#2ecc71';
+            } else {
+                ruleEl.style.color = 'var(--text-muted)';
+                iconEl.className = 'far fa-circle';
+                iconEl.style.color = 'var(--text-muted)';
+            }
+        }
+        
+        toggleRuleState('rule-length', 'icon-length', hasLength);
+        toggleRuleState('rule-upper', 'icon-upper', hasUpper);
+        toggleRuleState('rule-lower', 'icon-lower', hasLower);
+        toggleRuleState('rule-number', 'icon-number', hasNumber);
+        toggleRuleState('rule-special', 'icon-special', hasSpecial);
+        
+        isPasswordValid = hasLength && hasUpper && hasLower && hasNumber && hasSpecial;
+        validateFormState();
+    });
+    
+    nameInput.addEventListener('input', validateFormState);
+    
+    // Initial State Check
+    validateFormState();
+});
 </script>
 
 <?php require_once __DIR__ . '/includes/footer.php'; ?>
