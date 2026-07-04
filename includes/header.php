@@ -14,8 +14,7 @@ $canonical_url = "http://" . $_SERVER['HTTP_HOST'] . $_SERVER['REQUEST_URI'];
 
 if ($active_page === 'product.php' && isset($_GET['slug'])) {
     $prod_slug = $_GET['slug'];
-    $db = get_db_connection();
-    $stmt = $db->prepare("SELECT name, short_description FROM products WHERE slug = ?");
+    $stmt = $pdo->prepare("SELECT name, short_description FROM products WHERE slug = ?");
     $stmt->execute([$prod_slug]);
     $prod_seo = $stmt->fetch(PDO::FETCH_ASSOC);
     if ($prod_seo) {
@@ -113,69 +112,78 @@ if ($active_page === 'product.php' && isset($_GET['slug'])) {
 </head>
 <body>
 
-    <!-- Rotating Announcement Bar -->
+    <!-- Premium Announcement Bar -->
     <div class="announcement-bar">
-        <?php if (!empty($announcements)): ?>
-            <?php foreach ($announcements as $index => $ann): ?>
-                <div class="announcement-item <?php echo $index === 0 ? 'active' : ''; ?>">
-                    <a href="<?php echo htmlspecialchars($ann['link'] ? $ann['link'] : '#'); ?>">
-                        <?php echo htmlspecialchars($ann['message']); ?>
-                    </a>
-                </div>
-            <?php endforeach; ?>
-        <?php else: ?>
-            <div class="announcement-item active">
-                <a href="#">🌿 100% Ayurvedic Sourced | FSSAI Certified Wholesaler | Veggie Capsules</a>
-            </div>
-        <?php endif; ?>
+        <div class="announcement-item active">
+            <a href="#"><i class="fas fa-truck-fast" style="color:var(--gold-primary);"></i> FREE Shipping on all prepaid orders — Limited time only!</a>
+        </div>
+        <div class="announcement-item">
+            <a href="#"><i class="fas fa-tags" style="color:var(--gold-primary);"></i> Wolfpack Combo Offer: Buy 2 products together, Save 10% automatically!</a>
+        </div>
+        <div class="announcement-item">
+            <a href="#"><i class="fas fa-leaf" style="color:var(--gold-primary);"></i> 100% Ayurvedic Sourced | FSSAI Certified Wholesaler | Veggie Capsules</a>
+        </div>
     </div>
 
-    <!-- Sticky Header -->
-    <header>
+    <!-- Premium Navbar -->
+    <header id="mainHeader">
         <div class="container header-container">
-            <!-- Brand Logo -->
+            <!-- Logo -->
             <a href="index.php" class="logo">
-                <img src="assets/images/logo.png" alt="Wolf Nutrition Logo">
+                <img src="assets/images/logo.png" alt="Wolf Nutrition">
+                <div class="logo-text">WOLF <span>NUTRITION</span></div>
             </a>
 
-            <!-- Navigation Links -->
+            <!-- Navigation -->
             <nav>
                 <ul>
-                    <li class="<?php echo $active_page === 'index.php' ? 'active' : ''; ?>"><a href="index.php">Home</a></li>
-                    <li class="<?php echo ($active_page === 'category.php' && isset($_GET['slug']) && $_GET['slug'] === 'vitality') ? 'active' : ''; ?>"><a href="category.php?slug=vitality">Supplements</a></li>
-                    <li class="<?php echo ($active_page === 'category.php' && isset($_GET['slug']) && $_GET['slug'] === 'liver-detox') ? 'active' : ''; ?>"><a href="category.php?slug=liver-detox">Liver & Detox</a></li>
-                    <li class="<?php echo $active_page === 'about.php' ? 'active' : ''; ?>"><a href="about.php">About Us</a></li>
-                    <li class="<?php echo $active_page === 'contact.php' ? 'active' : ''; ?>"><a href="contact.php">Contact Us</a></li>
+                    <li class="<?php echo $active_page === 'index.php' ? 'active' : ''; ?>">
+                        <a href="index.php">Home</a>
+                    </li>
+                    <li class="<?php echo ($active_page === 'category.php' && isset($_GET['slug']) && $_GET['slug'] === 'vitality') ? 'active' : ''; ?>">
+                        <a href="category.php?slug=vitality">Supplements</a>
+                    </li>
+                    <li class="<?php echo ($active_page === 'category.php' && isset($_GET['slug']) && $_GET['slug'] === 'liver-detox') ? 'active' : ''; ?>">
+                        <a href="category.php?slug=liver-detox">Liver & Detox</a>
+                    </li>
+                    <li class="<?php echo $active_page === 'about.php' ? 'active' : ''; ?>">
+                        <a href="about.php">About Us</a>
+                    </li>
+                    <li class="<?php echo $active_page === 'contact.php' ? 'active' : ''; ?>">
+                        <a href="contact.php">Contact</a>
+                    </li>
                 </ul>
             </nav>
 
-            <!-- Actions Icons -->
+            <!-- Right Actions -->
             <div class="header-actions">
-                <!-- Search Icon -->
-                <button class="header-icon search-trigger" aria-label="Search Products">
+                <button class="header-icon search-trigger" aria-label="Search">
                     <i class="fas fa-search"></i>
+                    <span class="icon-label">Search</span>
                 </button>
-
-                <!-- My Account Icon -->
-                <a href="<?php echo is_logged_in() ? 'my-account.php' : 'login.php'; ?>" class="header-icon" aria-label="My Account" style="position:relative; text-decoration:none;">
+                <a href="<?php echo is_logged_in() ? 'my-account.php' : 'login.php'; ?>" class="header-icon" aria-label="Account">
+                    <i class="fas fa-user-circle"></i>
                     <?php if (is_logged_in()): ?>
-                        <i class="fas fa-user-circle" style="color: var(--gold-primary);"></i>
-                        <span style="position:absolute; top:-4px; right:-4px; width:8px; height:8px; background:var(--gold-primary); border-radius:50%; border:2px solid var(--bg-primary);"></span>
-                    <?php else: ?>
-                        <i class="fas fa-user-circle"></i>
+                        <span class="logged-dot"></span>
                     <?php endif; ?>
+                    <span class="icon-label"><?php echo is_logged_in() ? 'Account' : 'Login'; ?></span>
                 </a>
-
-                <!-- Cart Icon -->
-                <button class="header-icon cart-drawer-trigger" aria-label="Open Cart">
+                <button class="header-icon cart-drawer-trigger" aria-label="Cart">
                     <i class="fas fa-shopping-bag"></i>
                     <span class="cart-badge" style="<?php echo $cart_count > 0 ? 'display:flex;' : 'display:none;'; ?>">
                         <?php echo $cart_count; ?>
                     </span>
+                    <span class="icon-label">Cart</span>
+                </button>
+                <!-- Mobile Menu Toggle -->
+                <button class="mobile-menu-toggle" aria-label="Menu" onclick="document.querySelector('nav').classList.toggle('open'); document.querySelector('.mobile-menu-overlay').classList.toggle('active');">
+                    <span></span><span></span><span></span>
                 </button>
             </div>
         </div>
     </header>
+    <!-- Mobile Menu Overlay -->
+    <div class="mobile-menu-overlay" onclick="document.querySelector('nav').classList.remove('open'); this.classList.remove('active');"></div>
 
     <!-- Search Overlay -->
     <div class="search-overlay">

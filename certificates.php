@@ -22,46 +22,6 @@ $certs = get_certificates();
                 <?php endforeach; ?>
             </div>
         <?php endif; ?>
-
-        <!-- FSSAI Details Transcript Table -->
-        <div class="glass-card" style="padding: 40px; border-radius: 12px; max-width: 900px; margin: 0 auto;">
-            <h3 style="font-size:1.4rem; text-transform:uppercase; margin-bottom:20px; color:var(--gold-primary); text-align:center; border-bottom:1px solid var(--border-color); padding-bottom:12px;">
-                FSSAI Registration Details (Transcribed)
-            </h3>
-            
-            <table style="width:100%; border-collapse:collapse; text-align:left; font-size:0.95rem; line-height:1.6;">
-                <tbody>
-                    <tr style="border-bottom:1px solid rgba(255,255,255,0.05);">
-                        <td style="padding:12px 10px; color:var(--text-muted); font-weight:600; width:30%;">Registration Number</td>
-                        <td style="padding:12px 10px; color:#fff; font-weight:700; font-size:1.1rem; letter-spacing:0.5px;">22126022000063</td>
-                    </tr>
-                    <tr style="border-bottom:1px solid rgba(255,255,255,0.05);">
-                        <td style="padding:12px 10px; color:var(--text-muted); font-weight:600;">FBO Name</td>
-                        <td style="padding:12px 10px; color:#fff;">WOLF NUTRITION</td>
-                    </tr>
-                    <tr style="border-bottom:1px solid rgba(255,255,255,0.05);">
-                        <td style="padding:12px 10px; color:var(--text-muted); font-weight:600;">Premises Address</td>
-                        <td style="padding:12px 10px; color:rgba(255,255,255,0.6);">Kaki Pind, Hoshiarpur Road, Rama Mandi, Jalandhar, Ramamandi, Jalandhar-2, Jalandhar, Punjab - 144005</td>
-                    </tr>
-                    <tr style="border-bottom:1px solid rgba(255,255,255,0.05);">
-                        <td style="padding:12px 10px; color:var(--text-muted); font-weight:600;">Kind of Business</td>
-                        <td style="padding:12px 10px; color:#fff;">Wholesaler</td>
-                    </tr>
-                    <tr style="border-bottom:1px solid rgba(255,255,255,0.05);">
-                        <td style="padding:12px 10px; color:var(--text-muted); font-weight:600;">Authority State</td>
-                        <td style="padding:12px 10px; color:#fff;">Government of Punjab, Department of Food Safety</td>
-                    </tr>
-                    <tr style="border-bottom:1px solid rgba(255,255,255,0.05);">
-                        <td style="padding:12px 10px; color:var(--text-muted); font-weight:600;">Date Issued</td>
-                        <td style="padding:12px 10px; color:#fff;">06-02-2026</td>
-                    </tr>
-                    <tr>
-                        <td style="padding:12px 10px; color:var(--text-muted); font-weight:600;">Validity Period</td>
-                        <td style="padding:12px 10px; color:var(--success-color); font-weight:700;">06-02-2026 to 05-02-2031 (Valid)</td>
-                    </tr>
-                </tbody>
-            </table>
-        </div>
     </div>
 
     <!-- Modal for certificate viewing -->

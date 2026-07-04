@@ -1,10 +1,12 @@
 <?php
-// Database Configuration
+// Database Configuration — loads from .env
 
-define('DB_HOST', 'localhost');
-define('DB_NAME', 'wolfnutrition');
-define('DB_USER', 'root');
-define('DB_PASS', '');
+require_once __DIR__ . '/env.php';
+
+define('DB_HOST', getenv('DB_HOST') ?: 'localhost');
+define('DB_NAME', getenv('DB_NAME') ?: 'wolfnutrition');
+define('DB_USER', getenv('DB_USER') ?: 'root');
+define('DB_PASS', getenv('DB_PASS') ?: '');
 
 try {
     $pdo = new PDO(
@@ -17,7 +19,7 @@ try {
             PDO::ATTR_EMULATE_PREPARES => false,
         ]
     );
-    
+
     // Auto-create rate limiter table if missing
     $pdo->exec("
         CREATE TABLE IF NOT EXISTS login_attempts (
@@ -30,4 +32,3 @@ try {
 } catch (PDOException $e) {
     die("Database connection failed: " . $e->getMessage());
 }
-?>

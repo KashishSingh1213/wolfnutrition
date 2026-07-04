@@ -1,1369 +1,727 @@
 <?php
-// index.php
 require_once __DIR__ . '/includes/header.php';
-
-// Fetch all active categories
-try {
-    $stmt = $pdo->prepare("SELECT * FROM categories WHERE is_active = 1 ORDER BY display_order ASC");
-    $stmt->execute();
-    $categories = $stmt->fetchAll();
-} catch (PDOException $e) {
-    $categories = [];
-}
-
-// Fetch products for tabbed grid
+try { $stmt = $pdo->prepare("SELECT * FROM categories WHERE is_active = 1 ORDER BY display_order ASC"); $stmt->execute(); $categories = $stmt->fetchAll(); } catch (PDOException $e) { $categories = []; }
 $products_by_category = [];
 foreach ($categories as $cat) {
-    $stmt = $pdo->prepare("
-        SELECT p.*, MIN(pv.price) as max_mrp, MIN(pv.sale_price) as min_price, pv.id as default_variant_id
-        FROM products p
-        JOIN product_variants pv ON p.id = pv.product_id
-        WHERE p.category_id = ? AND p.is_active = 1 AND pv.is_default = 1
-        GROUP BY p.id
-    ");
-    $stmt->execute([$cat['id']]);
-    $products_by_category[$cat['slug']] = $stmt->fetchAll();
+    $stmt = $pdo->prepare("SELECT p.*, MIN(pv.price) as max_mrp, MIN(pv.sale_price) as min_price, pv.id as default_variant_id FROM products p JOIN product_variants pv ON p.id = pv.product_id WHERE p.category_id = ? AND p.is_active = 1 AND pv.is_default = 1 GROUP BY p.id");
+    $stmt->execute([$cat['id']]); $products_by_category[$cat['slug']] = $stmt->fetchAll();
 }
-
-// Fetch bundle info (Combo Pack)
-try {
-    $stmt = $pdo->prepare("SELECT * FROM bundles WHERE status = 1 LIMIT 1");
-    $stmt->execute();
-    $bundle = $stmt->fetch();
-} catch (PDOException $e) {
-    $bundle = null;
-}
-
-// Fetch certificates
+try { $stmt = $pdo->prepare("SELECT * FROM bundles WHERE status = 1 LIMIT 1"); $stmt->execute(); $bundle = $stmt->fetch(); } catch (PDOException $e) { $bundle = null; }
 $certs = get_certificates();
-
-// Fetch latest blog posts
-try {
-    $stmt = $pdo->prepare("SELECT * FROM blog_posts WHERE status = 1 ORDER BY published_at DESC LIMIT 3");
-    $stmt->execute();
-    $blogs = $stmt->fetchAll();
-} catch (PDOException $e) {
-    $blogs = [];
-}
+try { $stmt = $pdo->prepare("SELECT * FROM blog_posts WHERE status = 1 ORDER BY published_at DESC LIMIT 3"); $stmt->execute(); $blogs = $stmt->fetchAll(); } catch (PDOException $e) { $blogs = []; }
 ?>
 
-    <!-- Hero Banner Slider -->
-    <section class="hero-slider">
-        <!-- Slide 1: Wolftox (Fuel Your Strength) -->
-        <div class="hero-slide active">
-            <a href="product.php?slug=wolftox-liver-support-detox">
-                <img src="assets/images/hero1.png" alt="WolfTox Liver Support & Detox Banners">
-            </a>
-        </div>
-        <!-- Slide 2: Wolfpack (Unleash the Beast) -->
-        <div class="hero-slide">
-            <a href="product.php?slug=wolfpack-unleash-the-alpha-within">
-                <img src="assets/images/hero2.png" alt="Wolfpack Stamina & Strength Banners">
-            </a>
-        </div>
-        <!-- Slide 3: Wolfpack (Natural Ingredients) -->
-        <div class="hero-slide">
-            <a href="product.php?slug=wolfpack-unleash-the-alpha-within">
-                <img src="assets/images/hero3.png" alt="Wolfpack Performance & Vitality Banners">
-            </a>
-        </div>
-        <!-- Slide 4: Wolftox (Healthy Liver) -->
-        <div class="hero-slide">
-            <a href="product.php?slug=wolftox-liver-support-detox">
-                <img src="assets/images/hero4.png" alt="WolfTox Detox & Immunity Banners">
-            </a>
-        </div>
-    </section>
+<style>
+#goldParticles{position:fixed;top:0;left:0;width:100%;height:100%;pointer-events:none;z-index:0;opacity:0.35;}
 
-    <!-- Category Tile Grid -->
-    <section class="container" style="margin-top: 60px;">
-        <div class="section-header">
-            <h2>Shop By Health Need</h2>
-            <p>Select a specialized category to find your targeted wellness solution</p>
-        </div>
-        <div class="category-tiles-grid">
-            <a href="category.php?slug=vitality" class="category-tile">
-                <img src="assets/images/products/wolfpack.png" alt="Men's Vitality Category">
-            </a>
-            <a href="category.php?slug=liver-detox" class="category-tile">
-                <img src="assets/images/products/wolftox.png" alt="Liver & Detox Category">
-            </a>
-            <a href="category.php?slug=all" class="category-tile">
-                <img src="assets/images/products/wolfpack_wolftox_combo.png" alt="Shop All Category">
-            </a>
-        </div>
-    </section>
+/* ── Hero Rings ── */
+.hero-rings{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);pointer-events:none;}
+.hero-ring{position:absolute;border-radius:50%;border:1px solid rgba(212,175,55,0.06);top:50%;left:50%;}
+.hero-ring:nth-child(1){width:400px;height:400px;margin:-200px 0 0 -200px;animation:ringRotate 25s linear infinite;}
+.hero-ring:nth-child(2){width:550px;height:550px;margin:-275px 0 0 -275px;animation:ringRotate 35s linear infinite reverse;border-style:dashed;}
+.hero-ring:nth-child(3){width:700px;height:700px;margin:-350px 0 0 -350px;animation:ringRotate 45s linear infinite;border-color:rgba(212,175,55,0.03);}
+@keyframes ringRotate{from{transform:rotate(0deg)}to{transform:rotate(360deg)}}
 
-    <!-- Tabbed Product Grid -->
-    <section class="container" style="margin-bottom: 60px;">
-        <div class="section-header">
-            <h2>Range of Products</h2>
-            <p>Raw, natural, and scientifically balanced formulations</p>
+/* ── Hero ── */
+.hero-section{position:relative;overflow:hidden;}
+.hero-section .hero-slider{position:relative;}
+.hero-section .hero-slide{position:absolute;width:100%;top:0;left:0;opacity:0;transition:opacity 1s ease-in-out;z-index:1;}
+.hero-section .hero-slide.active{opacity:1;position:relative;z-index:2;}
+.hero-section .hero-slide img{width:100%;height:auto;display:block;}
+
+/* ── Marquee ── */
+@keyframes marqueeScroll{0%{transform:translateX(0)}100%{transform:translateX(-50%)}}
+
+/* ── Statement ── */
+.statement-section{text-align:center;padding:100px 0;position:relative;overflow:hidden;}
+.statement-section::before{content:'';position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);width:600px;height:600px;background:radial-gradient(circle,rgba(212,175,55,0.05) 0%,transparent 60%);pointer-events:none;}
+.statement-text{font-size:clamp(2rem,5vw,3.8rem);font-family:var(--font-heading);font-weight:800;text-transform:uppercase;line-height:1.1;color:#fff;position:relative;z-index:2;}
+.statement-text .gold{background:var(--gold-gradient);-webkit-background-clip:text;-webkit-text-fill-color:transparent;}
+.statement-sub{font-size:1.05rem;color:rgba(255,255,255,0.6);margin-top:20px;max-width:600px;margin-left:auto;margin-right:auto;line-height:1.8;position:relative;z-index:2;}
+
+/* ── Counters ── */
+.counter-row{display:grid;grid-template-columns:repeat(4,1fr);gap:22px;padding:50px 0;}
+.counter-item{text-align:center;padding:30px 16px;background:rgba(255,255,255,0.02);border:1px solid rgba(212,175,55,0.08);border-radius:18px;transition:all 0.4s;position:relative;overflow:hidden;}
+.counter-item:hover{border-color:var(--gold-primary);transform:translateY(-4px);box-shadow:0 12px 30px rgba(8,12,16,0.4);}
+.counter-item::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;background:var(--gold-gradient);opacity:0;transition:opacity 0.3s;}
+.counter-item:hover::before{opacity:1;}
+.counter-num{font-size:2.6rem;font-weight:800;font-family:var(--font-heading);background:var(--gold-gradient);-webkit-background-clip:text;-webkit-text-fill-color:transparent;line-height:1;}
+.counter-label{font-size:0.72rem;color:rgba(255,255,255,0.5);text-transform:uppercase;letter-spacing:1.2px;margin-top:8px;font-weight:600;}
+
+/* ── Category Tiles ── */
+.category-tile{position:relative;overflow:hidden;border-radius:16px;}
+.category-tile::before{content:'';position:absolute;inset:0;background:linear-gradient(135deg,rgba(212,175,55,0.15) 0%,transparent 50%);opacity:0;transition:opacity 0.4s;z-index:1;}
+.category-tile:hover::before{opacity:1;}
+.category-tile img{transition:transform 0.6s cubic-bezier(0.25,0.8,0.25,1);}
+.category-tile:hover img{transform:scale(1.1) rotate(1deg);}
+
+/* ── Product Card ── */
+.product-card{position:relative;transition:all 0.4s cubic-bezier(0.25,0.8,0.25,1);}
+.product-card:hover{transform:translateY(-8px);border-color:var(--gold-primary);box-shadow:0 20px 50px rgba(8,12,16,0.5),0 0 40px rgba(212,175,55,0.08);}
+.product-card::after{content:'';position:absolute;bottom:0;left:50%;transform:translateX(-50%);width:0;height:2px;background:var(--gold-gradient);transition:width 0.4s ease;border-radius:2px;}
+.product-card:hover::after{width:80%;}
+
+/* ── Diagonal Band ── */
+.diagonal-band{position:relative;overflow:hidden;}
+.diagonal-band::before{content:'';position:absolute;top:-50%;right:-10%;width:400px;height:200%;background:var(--gold-gradient);opacity:0.03;transform:rotate(15deg);pointer-events:none;}
+
+/* ── Blog Card ── */
+.blog-card{transition:all 0.4s;}
+.blog-card:hover{transform:translateY(-6px);border-color:var(--gold-primary);}
+.blog-card:hover .blog-card-image img{transform:scale(1.08);}
+
+/* ── Social Proof ── */
+.social-proof-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:24px;margin-top:50px;}
+.proof-card{background:rgba(255,255,255,0.02);border:1px solid rgba(212,175,55,0.08);border-radius:18px;padding:28px 24px;transition:all 0.4s;position:relative;overflow:hidden;}
+.proof-card:hover{border-color:var(--gold-primary);transform:translateY(-4px);box-shadow:0 12px 30px rgba(8,12,16,0.3);}
+.proof-card::after{content:'';position:absolute;inset:0;background:linear-gradient(135deg,rgba(212,175,55,0.04) 0%,transparent 60%);opacity:0;transition:opacity 0.3s;}
+.proof-card:hover::after{opacity:1;}
+.proof-stars{color:var(--gold-light);font-size:0.85rem;margin-bottom:10px;}
+.proof-text{font-size:0.92rem;color:rgba(255,255,255,0.7);line-height:1.6;font-style:italic;margin-bottom:16px;position:relative;z-index:1;}
+.proof-author{display:flex;align-items:center;gap:10px;position:relative;z-index:1;}
+.proof-avatar{width:36px;height:36px;border-radius:50%;background:var(--gold-gradient);display:flex;align-items:center;justify-content:center;font-size:0.7rem;font-weight:800;color:#080C10;}
+.proof-name{font-size:0.82rem;color:#fff;font-weight:700;}
+.proof-tag{font-size:0.68rem;color:var(--gold-primary);font-weight:600;}
+
+/* ── Divider ── */
+.divider-wave{position:relative;width:100%;overflow:hidden;line-height:0;margin-top:-1px;}
+.divider-wave svg{display:block;width:100%;height:50px;}
+
+/* ── Tilt & Spotlight ── */
+.tilt-card{transform-style:preserve-3d;perspective:1000px;}
+.tilt-card .tilt-shine{position:absolute;inset:0;border-radius:inherit;background:linear-gradient(135deg,rgba(255,255,255,0.06) 0%,transparent 60%);pointer-events:none;opacity:0;transition:opacity 0.3s;}
+.tilt-card:hover .tilt-shine{opacity:1;}
+.spotlight-card{position:relative;overflow:hidden;}
+.spotlight-card::before{content:'';position:absolute;top:var(--mouse-y,50%);left:var(--mouse-x,50%);width:280px;height:280px;background:radial-gradient(circle,rgba(212,175,55,0.08) 0%,transparent 70%);transform:translate(-50%,-50%);pointer-events:none;opacity:0;transition:opacity 0.4s;z-index:0;}
+.spotlight-card:hover::before{opacity:1;}
+
+/* ── Float Badge ── */
+@keyframes floatBadge{0%,100%{transform:translateY(0)}50%{transform:translateY(-6px)}}
+
+@media(max-width:900px){
+    .counter-row{grid-template-columns:repeat(2,1fr);}
+    .social-proof-grid{grid-template-columns:1fr;}
+    .hero-section{min-height:70vh;}
+}
+@media(max-width:600px){
+    .counter-row{grid-template-columns:1fr 1fr;gap:12px;}
+    .counter-num{font-size:2rem;}
+}
+</style>
+
+<canvas id="goldParticles"></canvas>
+
+<!-- ═══ HERO ═══ -->
+<section class="hero-section" style="min-height:auto; padding:0;">
+    <div class="hero-rings">
+        <div class="hero-ring"></div>
+        <div class="hero-ring"></div>
+        <div class="hero-ring"></div>
+    </div>
+    <!-- Image Slider -->
+    <div class="hero-slider" style="position:relative; width:100%;">
+        <div class="hero-slide active"><a href="product.php?slug=wolftox-liver-support-detox"><img src="assets/images/hero1.png" alt="WolfTox"></a></div>
+        <div class="hero-slide"><a href="product.php?slug=wolfpack-unleash-the-alpha-within"><img src="assets/images/hero2.png" alt="Wolfpack"></a></div>
+        <div class="hero-slide"><a href="product.php?slug=wolfpack-unleash-the-alpha-within"><img src="assets/images/hero3.png" alt="Wolfpack Performance"></a></div>
+        <div class="hero-slide"><a href="product.php?slug=wolftox-liver-support-detox"><img src="assets/images/hero4.png" alt="WolfTox Detox"></a></div>
+    </div>
+</section>
+
+<!-- Gold Marquee -->
+<div style="overflow:hidden; background:var(--gold-gradient); padding:11px 0;">
+    <div style="display:flex; white-space:nowrap; animation:marqueeScroll 25s linear infinite;">
+        <?php $mq=['100% Ayurvedic','FSSAI Certified','Veggie Capsules','Free Dietitian Consult','Zero Fillers','Lab Tested','Free Shipping']; for($m=0;$m<2;$m++): foreach($mq as $item): ?>
+            <span style="font-family:var(--font-heading); font-weight:800; font-size:0.78rem; color:#080C10; text-transform:uppercase; letter-spacing:2px; padding:0 32px;"><?php echo $item; ?></span>
+            <span style="color:#080C10; font-size:0.55rem;">&#9670;</span>
+        <?php endforeach; endfor; ?>
+    </div>
+</div>
+
+<!-- ═══ BOLD STATEMENT ═══ -->
+<section style="padding:80px 0 60px; position:relative; z-index:2; overflow:hidden;">
+    <div style="position:absolute; top:50%; left:50%; transform:translate(-50%,-50%); width:600px; height:600px; background:radial-gradient(circle,rgba(212,175,55,0.06) 0%,transparent 60%); pointer-events:none;"></div>
+    <div class="container">
+        <div style="text-align:center; margin-bottom:50px;">
+            <span style="display:inline-block; font-size:0.68rem; font-weight:800; letter-spacing:2.5px; background:var(--gold-gradient); color:#080C10; padding:6px 18px; border-radius:20px; text-transform:uppercase; margin-bottom:22px;">Our Philosophy</span>
+            <div style="font-size:clamp(2.2rem,5vw,3.8rem); font-family:var(--font-heading); font-weight:800; text-transform:uppercase; line-height:1.08; color:#fff; margin-bottom:18px;">
+                Ancient Wisdom.<br>
+                <span style="background:var(--gold-gradient); -webkit-background-clip:text; -webkit-text-fill-color:transparent;">Modern Results.</span>
+            </div>
+            <p style="font-size:1.05rem; color:rgba(255,255,255,0.6); max-width:620px; margin:0 auto; line-height:1.8;">We engineer complete Ayurvedic performance systems. 90 days of consistent discipline for total cellular rejuvenation.</p>
         </div>
 
-        <!-- Tabs Navigation -->
-        <div class="tabs-container">
-            <?php foreach ($categories as $index => $cat): ?>
-                <button class="tab-btn <?php echo $index === 0 ? 'active' : ''; ?>" data-target="cat-<?php echo $cat['slug']; ?>">
+        <!-- 3 Feature Cards -->
+        <div style="display:grid; grid-template-columns:repeat(3,1fr); gap:24px; margin-bottom:40px;">
+            <div class="tilt-card spotlight-card" style="background:rgba(255,255,255,0.02); border:1px solid rgba(212,175,55,0.08); border-radius:18px; padding:30px 24px; text-align:center; position:relative; overflow:hidden; transition:all 0.4s;">
+                <div class="tilt-shine"></div>
+                <div style="width:56px; height:56px; border-radius:14px; background:rgba(212,175,55,0.08); border:1px solid rgba(212,175,55,0.18); display:flex; align-items:center; justify-content:center; margin:0 auto 16px; color:var(--gold-primary); font-size:1.3rem; position:relative; z-index:1;"><i class="fas fa-leaf"></i></div>
+                <h4 style="font-size:1.05rem; color:#fff; margin-bottom:6px; text-transform:uppercase; font-family:var(--font-heading); font-weight:700; position:relative; z-index:1;">100% Ayurvedic</h4>
+                <p style="font-size:0.85rem; color:rgba(255,255,255,0.55); line-height:1.6; position:relative; z-index:1;">Pure Himalayan botanicals. Zero synthetic compounds. Nature's strongest formulas.</p>
+            </div>
+            <div class="tilt-card spotlight-card" style="background:rgba(255,255,255,0.02); border:1px solid rgba(212,175,55,0.08); border-radius:18px; padding:30px 24px; text-align:center; position:relative; overflow:hidden; transition:all 0.4s;">
+                <div class="tilt-shine"></div>
+                <div style="width:56px; height:56px; border-radius:14px; background:rgba(212,175,55,0.08); border:1px solid rgba(212,175,55,0.18); display:flex; align-items:center; justify-content:center; margin:0 auto 16px; color:var(--gold-primary); font-size:1.3rem; position:relative; z-index:1;"><i class="fas fa-flask"></i></div>
+                <h4 style="font-size:1.05rem; color:#fff; margin-bottom:6px; text-transform:uppercase; font-family:var(--font-heading); font-weight:700; position:relative; z-index:1;">Lab Validated</h4>
+                <p style="font-size:0.85rem; color:rgba(255,255,255,0.55); line-height:1.6; position:relative; z-index:1;">Triple-tested purity. Every batch verified before it reaches your doorstep.</p>
+            </div>
+            <div class="tilt-card spotlight-card" style="background:rgba(255,255,255,0.02); border:1px solid rgba(212,175,55,0.08); border-radius:18px; padding:30px 24px; text-align:center; position:relative; overflow:hidden; transition:all 0.4s;">
+                <div class="tilt-shine"></div>
+                <div style="width:56px; height:56px; border-radius:14px; background:rgba(212,175,55,0.08); border:1px solid rgba(212,175,55,0.18); display:flex; align-items:center; justify-content:center; margin:0 auto 16px; color:var(--gold-primary); font-size:1.3rem; position:relative; z-index:1;"><i class="fas fa-user-doctor"></i></div>
+                <h4 style="font-size:1.05rem; color:#fff; margin-bottom:6px; text-transform:uppercase; font-family:var(--font-heading); font-weight:700; position:relative; z-index:1;">Free Consultation</h4>
+                <p style="font-size:0.85rem; color:rgba(255,255,255,0.55); line-height:1.6; position:relative; z-index:1;">Personalized guidance from certified Ayurvedic nutritionists. Always free.</p>
+            </div>
+        </div>
+
+        <!-- CTA Buttons -->
+        <div style="text-align:center;">
+            <a href="https://wa.me/919876543210?text=Hi%20Wolf%20Nutrition,%20I%20would%20like%20to%20start%20my%2090-day%20personalized%20challenge%20program%20please." target="_blank" class="btn-gold" style="padding:15px 38px; font-weight:700; font-size:0.95rem; border-radius:30px; margin-right:12px;">Start 90-Day Challenge</a>
+            <a href="about.php" class="btn-outline-gold" style="padding:14px 38px; font-weight:700; font-size:0.95rem; border-radius:30px;">Our Story</a>
+        </div>
+    </div>
+</section>
+
+<!-- Divider -->
+<div class="divider-wave" style="position:relative; z-index:2;"><svg viewBox="0 0 1200 50" preserveAspectRatio="none"><path d="M0,0 L1200,0 L1200,25 Q900,50 600,25 Q300,0 0,25 Z" fill="rgba(212,175,55,0.03)"/></svg></div>
+
+<!-- ═══ COUNTERS ═══ -->
+<section style="padding:50px 0; position:relative; z-index:2;">
+    <div class="container">
+        <div style="display:grid; grid-template-columns:repeat(4,1fr); gap:20px;">
+
+            <!-- Counter 1 -->
+            <div class="tilt-card" style="background:linear-gradient(135deg,rgba(212,175,55,0.08) 0%,rgba(8,12,16,0.95) 100%); border:1px solid rgba(212,175,55,0.15); border-radius:20px; padding:35px 20px; text-align:center; position:relative; overflow:hidden; transition:all 0.4s;">
+                <div style="position:absolute; top:-30px; right:-30px; width:100px; height:100px; background:radial-gradient(circle,rgba(212,175,55,0.12) 0%,transparent 70%); pointer-events:none;"></div>
+                <div style="width:50px; height:50px; border-radius:50%; background:var(--gold-gradient); display:flex; align-items:center; justify-content:center; margin:0 auto 16px; color:#080C10; font-size:1.1rem; box-shadow:0 8px 24px rgba(212,175,55,0.25);"><i class="fas fa-users"></i></div>
+                <div style="font-size:2.6rem; font-weight:800; font-family:var(--font-heading); background:var(--gold-gradient); -webkit-background-clip:text; -webkit-text-fill-color:transparent; line-height:1; margin-bottom:8px;" class="counter-num" data-target="25000">0</div>
+                <div style="font-size:0.7rem; color:rgba(255,255,255,0.5); text-transform:uppercase; letter-spacing:1.5px; font-weight:600;">Happy Customers</div>
+            </div>
+
+            <!-- Counter 2 -->
+            <div class="tilt-card" style="background:linear-gradient(135deg,rgba(212,175,55,0.08) 0%,rgba(8,12,16,0.95) 100%); border:1px solid rgba(212,175,55,0.15); border-radius:20px; padding:35px 20px; text-align:center; position:relative; overflow:hidden; transition:all 0.4s;">
+                <div style="position:absolute; top:-30px; right:-30px; width:100px; height:100px; background:radial-gradient(circle,rgba(212,175,55,0.12) 0%,transparent 70%); pointer-events:none;"></div>
+                <div style="width:50px; height:50px; border-radius:50%; background:var(--gold-gradient); display:flex; align-items:center; justify-content:center; margin:0 auto 16px; color:#080C10; font-size:1.1rem; box-shadow:0 8px 24px rgba(212,175,55,0.25);"><i class="fas fa-star"></i></div>
+                <div style="font-size:2.6rem; font-weight:800; font-family:var(--font-heading); background:var(--gold-gradient); -webkit-background-clip:text; -webkit-text-fill-color:transparent; line-height:1; margin-bottom:8px;" class="counter-num" data-target="98">0</div>
+                <div style="font-size:0.7rem; color:rgba(255,255,255,0.5); text-transform:uppercase; letter-spacing:1.5px; font-weight:600;">% Satisfaction</div>
+            </div>
+
+            <!-- Counter 3 -->
+            <div class="tilt-card" style="background:linear-gradient(135deg,rgba(212,175,55,0.08) 0%,rgba(8,12,16,0.95) 100%); border:1px solid rgba(212,175,55,0.15); border-radius:20px; padding:35px 20px; text-align:center; position:relative; overflow:hidden; transition:all 0.4s;">
+                <div style="position:absolute; top:-30px; right:-30px; width:100px; height:100px; background:radial-gradient(circle,rgba(212,175,55,0.12) 0%,transparent 70%); pointer-events:none;"></div>
+                <div style="width:50px; height:50px; border-radius:50%; background:var(--gold-gradient); display:flex; align-items:center; justify-content:center; margin:0 auto 16px; color:#080C10; font-size:1.1rem; box-shadow:0 8px 24px rgba(212,175,55,0.25);"><i class="fas fa-leaf"></i></div>
+                <div style="font-size:2.6rem; font-weight:800; font-family:var(--font-heading); background:var(--gold-gradient); -webkit-background-clip:text; -webkit-text-fill-color:transparent; line-height:1; margin-bottom:8px;" class="counter-num" data-target="100">0</div>
+                <div style="font-size:0.7rem; color:rgba(255,255,255,0.5); text-transform:uppercase; letter-spacing:1.5px; font-weight:600;">% Ayurvedic</div>
+            </div>
+
+            <!-- Counter 4 -->
+            <div class="tilt-card" style="background:linear-gradient(135deg,rgba(212,175,55,0.08) 0%,rgba(8,12,16,0.95) 100%); border:1px solid rgba(212,175,55,0.15); border-radius:20px; padding:35px 20px; text-align:center; position:relative; overflow:hidden; transition:all 0.4s;">
+                <div style="position:absolute; top:-30px; right:-30px; width:100px; height:100px; background:radial-gradient(circle,rgba(212,175,55,0.12) 0%,transparent 70%); pointer-events:none;"></div>
+                <div style="width:50px; height:50px; border-radius:50%; background:var(--gold-gradient); display:flex; align-items:center; justify-content:center; margin:0 auto 16px; color:#080C10; font-size:1.1rem; box-shadow:0 8px 24px rgba(212,175,55,0.25);"><i class="fas fa-truck-fast"></i></div>
+                <div style="font-size:2.6rem; font-weight:800; font-family:var(--font-heading); background:var(--gold-gradient); -webkit-background-clip:text; -webkit-text-fill-color:transparent; line-height:1; margin-bottom:8px;" class="counter-num" data-target="50">0</div>
+                <div style="font-size:0.7rem; color:rgba(255,255,255,0.5); text-transform:uppercase; letter-spacing:1.5px; font-weight:600;">Pincode Delivery</div>
+            </div>
+
+        </div>
+    </div>
+</section>
+
+<!-- Divider -->
+<div class="divider-wave"><svg viewBox="0 0 1200 50" preserveAspectRatio="none"><path d="M0,0 L1200,0 L1200,25 Q900,50 600,25 Q300,0 0,25 Z" fill="rgba(212,175,55,0.03)"/></svg></div>
+
+<!-- ═══ CATEGORIES ═══ -->
+<section style="padding:70px 0; position:relative; z-index:2; background:radial-gradient(ellipse at 50% 50%,rgba(212,175,55,0.03) 0%,transparent 60%);">
+    <div class="container">
+        <!-- Section Header -->
+        <div style="text-align:center; margin-bottom:50px;">
+            <span style="display:inline-block; font-size:0.65rem; font-weight:800; letter-spacing:2.5px; color:var(--gold-primary); text-transform:uppercase; margin-bottom:12px; background:rgba(212,175,55,0.06); border:1px solid rgba(212,175,55,0.12); padding:5px 16px; border-radius:20px;">Our Ranges</span>
+            <div style="font-size:clamp(1.8rem,4vw,2.8rem); font-family:var(--font-heading); font-weight:800; color:#fff; text-transform:uppercase; margin-bottom:10px;">Shop By Health Need</div>
+            <p style="font-size:0.95rem; color:rgba(255,255,255,0.5); max-width:500px; margin:0 auto;">Choose your targeted wellness solution and start your transformation.</p>
+        </div>
+
+        <!-- Category Cards - Horizontal Layout -->
+        <div style="display:flex; flex-direction:column; gap:20px;">
+
+            <!-- Vitality - Image Left -->
+            <a href="category.php?slug=vitality" class="tilt-card" style="display:grid; grid-template-columns:auto 1fr; text-decoration:none; background:rgba(255,255,255,0.02); border:1px solid rgba(212,175,55,0.1); border-radius:24px; overflow:hidden; transition:all 0.4s; position:relative;">
+                <!-- Image Side -->
+                <div style="width:320px; min-height:220px; background:linear-gradient(135deg,rgba(212,175,55,0.1) 0%,rgba(8,12,16,0.95) 100%); display:flex; align-items:center; justify-content:center; position:relative; overflow:hidden;">
+                    <div style="position:absolute; top:0; right:0; width:120px; height:120px; background:radial-gradient(circle,rgba(212,175,55,0.15) 0%,transparent 70%); pointer-events:none;"></div>
+                    <img src="assets/images/products/wolfpack.png" alt="Wolfpack Vitality" style="height:180px; object-fit:contain; filter:drop-shadow(0 20px 40px rgba(8,12,16,0.6)); transition:transform 0.5s ease; position:relative; z-index:2;">
+                </div>
+                <!-- Content Side -->
+                <div style="padding:35px 40px; display:flex; flex-direction:column; justify-content:center; position:relative;">
+                    <div style="position:absolute; top:20px; right:20px; background:var(--gold-gradient); color:#080C10; font-size:0.6rem; font-weight:800; padding:4px 12px; border-radius:20px; text-transform:uppercase; letter-spacing:0.5px;">Best Seller</div>
+                    <div style="width:44px; height:44px; border-radius:12px; background:rgba(212,175,55,0.08); border:1px solid rgba(212,175,55,0.15); display:flex; align-items:center; justify-content:center; color:var(--gold-primary); font-size:1.1rem; margin-bottom:16px;"><i class="fas fa-fire"></i></div>
+                    <h3 style="color:#fff; font-family:var(--font-heading); font-size:1.5rem; font-weight:800; text-transform:uppercase; letter-spacing:0.5px; margin:0 0 8px;">Vitality Stack</h3>
+                    <p style="color:rgba(255,255,255,0.55); font-size:0.9rem; line-height:1.6; margin:0 0 20px; max-width:450px;">Premium Himalayan Shilajit, Ashwagandha, and Gokshura. Formulated for peak testosterone, endurance, and raw physical performance.</p>
+                    <div style="display:flex; align-items:center; gap:20px;">
+                        <span style="display:inline-flex; align-items:center; gap:8px; color:var(--gold-primary); font-size:0.85rem; font-weight:700; text-transform:uppercase; letter-spacing:0.5px;">Explore Stack <i class="fas fa-arrow-right"></i></span>
+                        <span style="font-size:0.78rem; color:rgba(255,255,255,0.35);">From ₹1,194</span>
+                    </div>
+                </div>
+            </a>
+
+            <!-- Liver Detox - Image Right -->
+            <a href="category.php?slug=liver-detox" class="tilt-card" style="display:grid; grid-template-columns:1fr auto; text-decoration:none; background:rgba(255,255,255,0.02); border:1px solid rgba(212,175,55,0.1); border-radius:24px; overflow:hidden; transition:all 0.4s; position:relative;">
+                <!-- Content Side -->
+                <div style="padding:35px 40px; display:flex; flex-direction:column; justify-content:center; position:relative;">
+                    <div style="width:44px; height:44px; border-radius:12px; background:rgba(212,175,55,0.08); border:1px solid rgba(212,175,55,0.15); display:flex; align-items:center; justify-content:center; color:var(--gold-primary); font-size:1.1rem; margin-bottom:16px;"><i class="fas fa-shield-halved"></i></div>
+                    <h3 style="color:#fff; font-family:var(--font-heading); font-size:1.5rem; font-weight:800; text-transform:uppercase; letter-spacing:0.5px; margin:0 0 8px;">Liver & Detox Stack</h3>
+                    <p style="color:rgba(255,255,255,0.55); font-size:0.9rem; line-height:1.6; margin:0 0 20px; max-width:450px;">Kutki, Milk Thistle, and Kalmegh. Complete liver cleanse, toxin removal, and digestive enzyme optimization.</p>
+                    <div style="display:flex; align-items:center; gap:20px;">
+                        <span style="display:inline-flex; align-items:center; gap:8px; color:var(--gold-primary); font-size:0.85rem; font-weight:700; text-transform:uppercase; letter-spacing:0.5px;">Explore Stack <i class="fas fa-arrow-right"></i></span>
+                        <span style="font-size:0.78rem; color:rgba(255,255,255,0.35);">From ₹546</span>
+                    </div>
+                </div>
+                <!-- Image Side -->
+                <div style="width:320px; min-height:220px; background:linear-gradient(135deg,rgba(8,12,16,0.95) 0%,rgba(212,175,55,0.1) 100%); display:flex; align-items:center; justify-content:center; position:relative; overflow:hidden;">
+                    <div style="position:absolute; top:0; left:0; width:120px; height:120px; background:radial-gradient(circle,rgba(212,175,55,0.15) 0%,transparent 70%); pointer-events:none;"></div>
+                    <img src="assets/images/products/wolftox.png" alt="Wolftox Detox" style="height:180px; object-fit:contain; filter:drop-shadow(0 20px 40px rgba(8,12,16,0.6)); transition:transform 0.5s ease; position:relative; z-index:2;">
+                </div>
+            </a>
+
+            <!-- Combo - Image Center -->
+            <a href="category.php?slug=all" class="tilt-card" style="display:block; text-decoration:none; background:linear-gradient(135deg,rgba(212,175,55,0.06) 0%,rgba(8,12,16,0.95) 50%,rgba(212,175,55,0.04) 100%); border:1px solid rgba(212,175,55,0.15); border-radius:24px; overflow:hidden; transition:all 0.4s; position:relative;">
+                <div style="position:absolute; top:0; left:0; right:0; height:3px; background:var(--gold-gradient);"></div>
+                <div style="display:grid; grid-template-columns:1fr auto 1fr; gap:30px; align-items:center; padding:40px;">
+                    <!-- Left Text -->
+                    <div style="text-align:right;">
+                        <h3 style="color:#fff; font-family:var(--font-heading); font-size:1.3rem; font-weight:800; text-transform:uppercase; letter-spacing:0.5px; margin:0 0 6px;">WOLFPACK</h3>
+                        <p style="color:rgba(255,255,255,0.45); font-size:0.82rem; margin:0;">Vitality + Strength</p>
+                    </div>
+                    <!-- Center Image -->
+                    <div style="display:flex; align-items:center; gap:12px;">
+                        <img src="assets/images/products/wolfpack.png" alt="Wolfpack" style="height:120px; object-fit:contain; filter:drop-shadow(0 12px 25px rgba(8,12,16,0.5));">
+                        <div style="width:40px; height:40px; border-radius:50%; background:var(--gold-gradient); display:flex; align-items:center; justify-content:center; color:#080C10; font-size:1.2rem; font-weight:800; flex-shrink:0;">+</div>
+                        <img src="assets/images/products/wolftox.png" alt="Wolftox" style="height:120px; object-fit:contain; filter:drop-shadow(0 12px 25px rgba(8,12,16,0.5));">
+                    </div>
+                    <!-- Right Text -->
+                    <div>
+                        <h3 style="color:#fff; font-family:var(--font-heading); font-size:1.3rem; font-weight:800; text-transform:uppercase; letter-spacing:0.5px; margin:0 0 6px;">WOLFTOX</h3>
+                        <p style="color:rgba(255,255,255,0.45); font-size:0.82rem; margin:0;">Detox + Cleanse</p>
+                    </div>
+                </div>
+                <!-- Bottom CTA -->
+                <div style="padding:0 40px 30px; display:flex; justify-content:space-between; align-items:center;">
+                    <span style="display:inline-flex; align-items:center; gap:8px; color:var(--gold-primary); font-size:0.85rem; font-weight:700; text-transform:uppercase; letter-spacing:0.5px;">View All Combos <i class="fas fa-arrow-right"></i></span>
+                    <div style="text-align:right;">
+                        <span style="font-size:0.75rem; color:rgba(255,255,255,0.35); text-decoration:line-through; margin-right:6px;">₹2,998</span>
+                        <span style="font-size:1.3rem; font-weight:800; color:var(--gold-primary); font-family:var(--font-heading);">₹2,699</span>
+                    </div>
+                </div>
+            </a>
+
+        </div>
+    </div>
+</section>
+
+<!-- Divider -->
+<div class="divider-wave"><svg viewBox="0 0 1200 50" preserveAspectRatio="none"><path d="M0,25 Q300,50 600,25 Q900,0 1200,25 L1200,50 L0,50 Z" fill="rgba(212,175,55,0.03)"/></svg></div>
+
+<!-- ═══ PRODUCTS ═══ -->
+<section style="padding:50px 0 60px; position:relative; z-index:2; background:linear-gradient(180deg,rgba(212,175,55,0.02) 0%,rgba(212,175,55,0.04) 50%,rgba(212,175,55,0.02) 100%);">
+    <div class="container">
+        <!-- Section Header -->
+        <div style="text-align:center; margin-bottom:35px;">
+            <span style="display:inline-block; font-size:0.65rem; font-weight:800; letter-spacing:2.5px; color:var(--gold-primary); text-transform:uppercase; margin-bottom:12px; background:rgba(212,175,55,0.06); border:1px solid rgba(212,175,55,0.12); padding:5px 16px; border-radius:20px;">Our Range</span>
+            <div style="font-size:clamp(1.8rem,4vw,2.8rem); font-family:var(--font-heading); font-weight:800; color:#fff; text-transform:uppercase; margin-bottom:10px;">Our Products</div>
+            <p style="font-size:0.95rem; color:rgba(255,255,255,0.5); max-width:450px; margin:0 auto;">Ayurvedic powerhouses for peak performance</p>
+        </div>
+
+        <!-- Quick Features Strip -->
+        <div style="display:flex; justify-content:center; gap:12px; margin-bottom:40px; flex-wrap:wrap;">
+            <?php foreach([['fa-leaf','100% Ayurvedic'],['fa-truck-fast','Free Shipping'],['fa-shield-halved','FSSAI Certified'],['fa-user-doctor','Free Consult']] as $f): ?>
+            <div style="display:flex; align-items:center; gap:8px; font-size:0.78rem; color:rgba(255,255,255,0.6); background:rgba(255,255,255,0.03); border:1px solid rgba(255,255,255,0.06); padding:8px 16px; border-radius:30px;">
+                <div style="width:26px; height:26px; border-radius:50%; background:rgba(212,175,55,0.1); display:flex; align-items:center; justify-content:center; color:var(--gold-primary); font-size:0.7rem;"><i class="fas <?php echo $f[0]; ?>"></i></div>
+                <span style="font-weight:600;"><?php echo $f[1]; ?></span>
+            </div>
+            <?php endforeach; ?>
+        </div>
+
+        <!-- Tabs -->
+        <div style="display:flex; justify-content:center; gap:8px; margin-bottom:40px;">
+            <?php foreach ($categories as $i => $cat): ?>
+                <button class="tab-btn <?php echo $i===0?'active':''; ?>" data-target="cat-<?php echo $cat['slug']; ?>" style="background:rgba(255,255,255,0.04); border:1px solid rgba(255,255,255,0.08); color:rgba(255,255,255,0.6); padding:10px 24px; font-family:var(--font-heading); font-weight:700; font-size:0.82rem; text-transform:uppercase; letter-spacing:1px; cursor:pointer; border-radius:30px; transition:all 0.3s;">
                     <?php echo htmlspecialchars($cat['name']); ?>
                 </button>
             <?php endforeach; ?>
         </div>
 
-        <!-- Tab Contents -->
-        <?php foreach ($categories as $index => $cat): ?>
-            <div id="cat-<?php echo $cat['slug']; ?>" class="tab-pane <?php echo $index === 0 ? 'active' : ''; ?>">
+        <!-- Product Tabs -->
+        <?php foreach ($categories as $i => $cat): ?>
+            <div id="cat-<?php echo $cat['slug']; ?>" class="tab-pane <?php echo $i===0?'active':''; ?>">
                 <div class="product-grid">
-                    <?php 
-                    $prods = isset($products_by_category[$cat['slug']]) ? $products_by_category[$cat['slug']] : [];
-                    if (!empty($prods)):
-                        foreach ($prods as $prod):
-                            // Calculate discount percent
-                            $discount_pct = 0;
-                            if ($prod['max_mrp'] > 0) {
-                                $discount_pct = round((($prod['max_mrp'] - $prod['min_price']) / $prod['max_mrp']) * 100);
-                            }
-                            
-                            // Check average rating
-                            $stmt_r = $pdo->prepare("SELECT AVG(rating) as avg_rating, COUNT(id) as cnt FROM reviews WHERE product_id = ? AND is_approved = 1");
-                            $stmt_r->execute([$prod['id']]);
-                            $rating_info = $stmt_r->fetch();
-                            $avg_r = $rating_info['avg_rating'] ? round($rating_info['avg_rating'], 1) : 5.0;
-                            $cnt_r = $rating_info['cnt'];
+                    <?php
+                    $prods = $products_by_category[$cat['slug']] ?? [];
+                    if (!empty($prods)): foreach ($prods as $prod):
+                        $dp = $prod['max_mrp']>0 ? round((($prod['max_mrp']-$prod['min_price'])/$prod['max_mrp'])*100) : 0;
+                        $sr = $pdo->prepare("SELECT AVG(rating) as avg_rating, COUNT(id) as cnt FROM reviews WHERE product_id=? AND is_approved=1");
+                        $sr->execute([$prod['id']]); $ri=$sr->fetch(); $ar=$ri['avg_rating']?round($ri['avg_rating'],1):5.0;
                     ?>
-                        <div class="product-card glass-card">
-                            <?php if ($discount_pct > 0): ?>
-                                <span class="badge-discount">-<?php echo $discount_pct; ?>% OFF</span>
-                            <?php endif; ?>
-                            
-                            <div class="product-card-image">
-                                <img src="<?php echo htmlspecialchars($prod['image_url']); ?>" alt="<?php echo htmlspecialchars($prod['name']); ?>">
+                        <div class="product-card glass-card tilt-card spotlight-card" style="background:rgba(255,255,255,0.03); border:1px solid rgba(212,175,55,0.08); border-radius:20px; overflow:hidden;">
+                            <?php if($dp>0): ?><span class="badge-discount">-<?php echo $dp; ?>% OFF</span><?php endif; ?>
+                            <div class="tilt-shine"></div>
+                            <div class="product-card-image" style="height:240px; background:radial-gradient(circle at center,rgba(212,175,55,0.08) 0%,rgba(8,12,16,0.95) 80%); padding:20px; display:flex; align-items:center; justify-content:center;">
+                                <img src="<?php echo htmlspecialchars($prod['image_url']); ?>" alt="<?php echo htmlspecialchars($prod['name']); ?>" style="max-height:100%; max-width:100%; object-fit:contain; filter:drop-shadow(0 12px 25px rgba(8,12,16,0.5)); transition:transform 0.4s ease;">
                             </div>
-                            
-                            <div class="product-card-info">
-                                <a href="product.php?slug=<?php echo $prod['slug']; ?>">
-                                    <h3 class="product-card-title"><?php echo htmlspecialchars($prod['name']); ?></h3>
+                            <div class="product-card-info" style="padding:20px;">
+                                <a href="product.php?slug=<?php echo $prod['slug']; ?>" style="text-decoration:none;">
+                                    <h3 class="product-card-title" style="font-size:1rem; color:#fff; margin-bottom:8px; font-family:var(--font-heading); font-weight:700; line-height:1.3;"><?php echo htmlspecialchars($prod['name']); ?></h3>
                                 </a>
-                                
-                                <div class="product-card-rating">
-                                    <?php for($i=1; $i<=5; $i++): ?>
-                                        <i class="<?php echo $i <= round($avg_r) ? 'fas' : 'far'; ?> fa-star"></i>
-                                    <?php endfor; ?>
-                                    <span>(<?php echo $cnt_r; ?>)</span>
+                                <div style="display:flex; align-items:center; gap:6px; margin-bottom:12px;">
+                                    <?php for($s=1;$s<=5;$s++):?><i class="<?php echo $s<=round($ar)?'fas':'far';?> fa-star" style="color:var(--gold-light); font-size:0.75rem;"></i><?php endfor;?>
+                                    <span style="font-size:0.75rem; color:rgba(255,255,255,0.4);">(<?php echo $ri['cnt']; ?>)</span>
                                 </div>
-                                
-                                <div class="product-card-prices">
-                                    <span class="price-sale">₹<?php echo number_format($prod['min_price'], 2); ?></span>
-                                    <span class="price-regular">MRP ₹<?php echo number_format($prod['max_mrp'], 2); ?></span>
+                                <div style="display:flex; align-items:baseline; gap:10px; margin-bottom:16px;">
+                                    <span style="font-size:1.25rem; font-weight:800; color:var(--gold-primary); font-family:var(--font-heading);">₹<?php echo number_format($prod['min_price'],2); ?></span>
+                                    <span style="font-size:0.82rem; color:rgba(255,255,255,0.35); text-decoration:line-through;">MRP ₹<?php echo number_format($prod['max_mrp'],2); ?></span>
                                 </div>
-                                
-                                <div class="product-card-action">
-                                    <!-- Hover Quick Add / Select Options button -->
-                                    <button class="btn-gold quick-add-btn" style="width: 100%;" 
-                                            data-product-id="<?php echo $prod['id']; ?>" 
-                                            data-variant-id="<?php echo $prod['default_variant_id']; ?>">
-                                        <i class="fas fa-shopping-cart"></i> Quick Add
-                                    </button>
-                                </div>
+                                <button class="btn-gold quick-add-btn" style="width:100%; padding:11px; font-size:0.82rem; border-radius:12px; font-weight:700;" data-product-id="<?php echo $prod['id']; ?>" data-variant-id="<?php echo $prod['default_variant_id']; ?>"><i class="fas fa-shopping-cart"></i> Quick Add</button>
                             </div>
                         </div>
-                    <?php 
-                        endforeach;
-                    else:
-                    ?>
-                        <p style="text-align: center; grid-column: 1/-1;">No products found in this category.</p>
+                    <?php endforeach; else: ?>
+                        <p style="text-align:center; grid-column:1/-1; color:rgba(255,255,255,0.4);">No products found.</p>
                     <?php endif; ?>
                 </div>
             </div>
         <?php endforeach; ?>
-    </section>
+    </div>
+</section>
 
-    <!-- Build Your Wellness Stack Combo Section -->
-    <?php if ($bundle): ?>
-    <section class="bundle-builder-section">
-        <div class="container">
-            <div class="section-header">
-                <h2>Build Your Wellness Stack</h2>
-                <p>Maximize your performance. Combined power for peak testosterone & total liver detox</p>
-            </div>
-            
-            <div class="bundle-builder-grid">
-                <!-- Product A: Wolfpack -->
-                <div class="bundle-card glass-card">
-                    <img src="assets/images/products/wolfpack.png" alt="Wolfpack Supplement">
-                    <h3>WOLFPACK Vitality</h3>
-                    <p style="color:var(--gold-muted); margin-bottom:15px; font-weight:600;">60 capsules supply</p>
-                    <select disabled>
-                        <option>60 Veggie Capsules (₹1,999.00)</option>
-                    </select>
-                </div>
-                
-                <div class="bundle-connector">+</div>
-                
-                <!-- Product B: Wolftox -->
-                <div class="bundle-card glass-card">
-                    <img src="assets/images/products/wolftox.png" alt="Wolftox Supplement">
-                    <h3>WOLFTOX Liver Support</h3>
-                    <p style="color:var(--gold-muted); margin-bottom:15px; font-weight:600;">60 capsules supply</p>
-                    <select disabled>
-                        <option>60 Veggie Capsules (₹999.00)</option>
-                    </select>
-                </div>
-                
-                <div class="bundle-connector">=</div>
-                
-                <!-- Combo Price and Checkout Block -->
-                <div class="bundle-results">
-                    <h3>Wolf Stack Combo</h3>
-                    <span class="bundle-save-badge">🔥 SAVE ₹299 (10% COMBO DISCOUNT)</span>
-                    <div class="bundle-price-box">
-                        <span style="text-decoration:line-through; font-size:1.1rem; color:var(--text-muted);">Regular ₹2,998</span>
-                        <div style="font-size:2rem; font-weight:800; color:var(--gold-primary); margin-top:5px;">
-                            ₹<?php echo number_format($bundle['combo_price'], 2); ?>
-                        </div>
-                    </div>
-                    <p style="font-size:0.85rem; color:var(--text-secondary); margin-bottom:20px;">
-                        Full 30-day program containing both premium formulas. Formulated for synergy.
-                    </p>
-                    <button class="btn-gold" id="add-bundle-btn" data-bundle-id="<?php echo $bundle['id']; ?>" style="width:100%;">
-                        <i class="fas fa-cubes"></i> Add Stack to Cart
-                    </button>
-                </div>
-            </div>
+<!-- ═══ SOCIAL PROOF ═══ -->
+<section style="padding:80px 0; position:relative; z-index:2; background:radial-gradient(ellipse at 50% 50%,rgba(212,175,55,0.03) 0%,transparent 60%);">
+    <div class="container">
+        <!-- Section Header -->
+        <div style="text-align:center; margin-bottom:50px;">
+            <span style="display:inline-block; font-size:0.65rem; font-weight:800; letter-spacing:2.5px; color:var(--gold-primary); text-transform:uppercase; margin-bottom:12px; background:rgba(212,175,55,0.06); border:1px solid rgba(212,175,55,0.12); padding:5px 16px; border-radius:20px;">Testimonials</span>
+            <div style="font-size:clamp(2rem,4.5vw,3rem); font-family:var(--font-heading); font-weight:800; color:#fff; text-transform:uppercase; margin-bottom:10px;">What The Pack Says</div>
+            <p style="font-size:1rem; color:rgba(255,255,255,0.5);">Real reviews from real customers who transformed their lives</p>
         </div>
-    </section>
-    <?php endif; ?>
 
-    <!-- 90-Day Challenge Transformation Section -->
-    <section class="transformation-challenge-section">
-        <style>
-            .transformation-challenge-section {
-                padding: 100px 0;
-                background-color: #080C10;
-                background: radial-gradient(circle at 10% 30%, rgba(212, 175, 55, 0.03) 0%, rgba(8, 12, 16, 0) 60%);
-            }
-            .challenge-grid {
-                display: grid;
-                grid-template-columns: 0.95fr 1.05fr;
-                gap: 70px;
-                align-items: center;
-            }
-            .challenge-image-box {
-                position: relative;
-                border-radius: 28px;
-                overflow: hidden;
-                box-shadow: 0 35px 75px -15px rgba(8,12,16,0.9), 0 0 30px rgba(212,175,55,0.08);
-                border: 1px solid rgba(212, 175, 55, 0.15);
-            }
-            .challenge-image-box img {
-                width: 100%;
-                display: block;
-                object-fit: cover;
-                height: 540px;
-                transition: transform 0.6s cubic-bezier(0.25, 0.8, 0.25, 1);
-            }
-            .challenge-image-box:hover img {
-                transform: scale(1.03);
-            }
-            .challenge-accent-circle {
-                position: absolute;
-                width: 250px;
-                height: 250px;
-                background: radial-gradient(circle, rgba(212, 175, 55, 0.15) 0%, rgba(8,12,16,0) 75%);
-                bottom: -50px;
-                right: -50px;
-                z-index: 1;
-                pointer-events: none;
-            }
-            .challenge-content h2 {
-                font-size: 2.8rem;
-                text-transform: uppercase;
-                margin-bottom: 25px;
-                line-height: 1.15;
-                font-family: var(--font-heading);
-                color: #fff;
-                font-weight: 800;
-            }
-            .challenge-content h2 span {
-                background: var(--gold-gradient);
-                -webkit-background-clip: text;
-                -webkit-text-fill-color: transparent;
-            }
-            .challenge-content p.main-desc {
-                font-size: 1.05rem;
-                color: var(--text-secondary);
-                line-height: 1.6;
-                margin-bottom: 35px;
-            }
-            .challenge-features-row {
-                display: grid;
-                grid-template-columns: 1fr 1fr;
-                gap: 25px;
-                margin-bottom: 40px;
-            }
-            .challenge-feat-card {
-                background: rgba(255,255,255,0.01);
-                border: 1px solid rgba(212,175,55,0.1);
-                border-radius: 18px;
-                padding: 24px;
-                transition: all 0.3s ease;
-            }
-            .challenge-feat-card:hover {
-                border-color: var(--gold-primary);
-                box-shadow: 0 10px 25px rgba(8,12,16,0.4);
-                transform: translateY(-3px);
-            }
-            .challenge-feat-icon {
-                width: 48px;
-                height: 48px;
-                background: rgba(212, 175, 55, 0.08);
-                border: 1px solid rgba(212, 175, 55, 0.2);
-                border-radius: 50%;
-                display: flex;
-                justify-content: center;
-                align-items: center;
-                color: var(--gold-primary);
-                font-size: 1.15rem;
-                margin-bottom: 15px;
-                box-shadow: var(--gold-glow);
-            }
-            .challenge-feat-card h4 {
-                font-size: 1.1rem;
-                color: #fff;
-                margin-bottom: 8px;
-                text-transform: uppercase;
-                letter-spacing: 0.5px;
-                font-family: var(--font-heading);
-            }
-            .challenge-feat-card p {
-                font-size: 0.88rem;
-                color: var(--text-muted);
-                line-height: 1.45;
-            }
-
-            @media (max-width: 1024px) {
-                .challenge-grid {
-                    grid-template-columns: 1fr !important;
-                    gap: 50px;
-                }
-                .challenge-image-box img {
-                    height: 450px;
-                }
-            }
-            @media (max-width: 480px) {
-                .challenge-features-row {
-                    grid-template-columns: 1fr !important;
-                    gap: 15px;
-                }
-                .challenge-content h2 {
-                    font-size: 2.1rem;
-                }
-            }
-        </style>
-        
-        <div class="container">
-            <div class="challenge-grid">
-                
-                <!-- Left Column: Visual campaign image -->
-                <div class="challenge-image-box">
-                    <div class="challenge-accent-circle"></div>
-                    <img src="assets/images/fitness_90days.png" alt="90-Day Challenge athlete holding Wolfpack bottle">
-                </div>
-                
-                <!-- Right Column: Campaign content & features -->
-                <div class="challenge-content">
-                    <h2>Change your life in the next<br><span>90 days of Practice</span></h2>
-                    <p class="main-desc">
-                        Ayurveda is not a temporary shortcut. It is a daily discipline. In 90 days of consistent nutrition stacks and physical activity, your body undergoes complete cellular rejuvenation and peak performance enhancement.
-                    </p>
-                    
-                    <div class="challenge-features-row">
-                        <!-- Feat 1 -->
-                        <div class="challenge-feat-card">
-                            <div class="challenge-feat-icon">
-                                <i class="fas fa-leaf"></i>
-                            </div>
-                            <h4>Personalized Nutrition Stack</h4>
-                            <p>Tailored Shilajit & Ashwagandha dosage guidelines to optimize T-levels and clean liver toxins daily.</p>
-                        </div>
-                        
-                        <!-- Feat 2 -->
-                        <div class="challenge-feat-card">
-                            <div class="challenge-feat-icon">
-                                <i class="fas fa-dumbbell"></i>
-                            </div>
-                            <h4>Personalized Exercise Regimen</h4>
-                            <p>Combine peak vitality with high-intensity strength training guides to build lean, raw muscle.</p>
-                        </div>
-                    </div>
-                    
-                    <div style="display:flex; gap:15px; flex-wrap:wrap; align-items:center;">
-                        <a href="https://wa.me/919876543210?text=Hi%20Wolf%20Nutrition,%20I%20would%20like%20to%20start%20my%2090-day%20personalized%20challenge%20program%20please." target="_blank" class="btn-gold" style="padding:15px 36px; font-weight:700; font-size:0.95rem; border-radius:30px;">Start Your 90-Day Challenge</a>
-                        <a href="about.php" class="btn-outline-gold" style="padding:14px 36px; font-weight:700; font-size:0.95rem; border-radius:30px;">Learn Regimen Story</a>
-                    </div>
-                </div>
-
-            </div>
-        </div>
-    </section>
-
-    <!-- Wolfpack Digital Experience / Why Shop With Us -->
-    <section class="digital-experience-section">
-        <style>
-            .digital-experience-section {
-                padding: 100px 0;
-                background: radial-gradient(circle at 75% 50%, rgba(212, 175, 55, 0.05) 0%, rgba(8,12,16, 0) 70%);
-                overflow: hidden;
-            }
-            .digital-experience-grid {
-                display: grid;
-                grid-template-columns: 1.25fr 1fr;
-                gap: 80px;
-                align-items: center;
-            }
-            /* Photo-Real CSS Phone Mockup Wrapper */
-            .phone-mockup-wrapper {
-                position: relative;
-                width: 440px;
-                margin: 0 auto;
-                display: flex;
-                justify-content: center;
-                align-items: center;
-            }
-            .phone-backdrop-accent {
-                position: absolute;
-                bottom: -20px;
-                left: -10px;
-                width: 280px;
-                height: 280px;
-                background: var(--gold-gradient);
-                opacity: 0.08;
-                border-radius: 30px;
-                z-index: 1;
-            }
-            /* Real physical side buttons */
-            .phone-phys-btn {
-                position: absolute;
-                width: 4px;
-                background: linear-gradient(to bottom, #121212, #121212);
-                box-shadow: -2px 4px 10px rgba(8,12,16,0.6);
-                z-index: 2;
-            }
-            .phone-phys-btn.vol-up {
-                top: 150px;
-                left: 36px;
-                height: 55px;
-                border-radius: 3px 0 0 3px;
-            }
-            .phone-phys-btn.vol-down {
-                top: 220px;
-                left: 36px;
-                height: 55px;
-                border-radius: 3px 0 0 3px;
-            }
-            .phone-phys-btn.power {
-                top: 180px;
-                right: 36px;
-                height: 75px;
-                border-radius: 0 3px 3px 0;
-                box-shadow: 2px 4px 10px rgba(8,12,16,0.6);
-            }
-            /* Titanium Casing */
-            .phone-mockup {
-                width: 360px;
-                height: 700px;
-                background: #080C10;
-                border: 6px solid #121212; /* Titanium Outer shell */
-                padding: 10px; /* Inner bezel spacing */
-                border-radius: 50px;
-                box-shadow: 0 45px 85px -20px rgba(8,12,16,0.95), 0 0 35px rgba(212,175,55,0.08);
-                position: relative;
-                overflow: hidden;
-                display: flex;
-                flex-direction: column;
-                z-index: 5;
-            }
-            /* OLED Inner Screen Bezel */
-            .phone-screen-container {
-                flex: 1;
-                background-color: #080C10;
-                border-radius: 38px;
-                position: relative;
-                overflow: hidden;
-                display: flex;
-                flex-direction: column;
-                border: 1px solid rgba(255,255,255,0.02);
-            }
-            /* High Gloss Glass Reflection Overlay */
-            .phone-glass-reflection {
-                position: absolute;
-                top: 0;
-                left: 0;
-                width: 100%;
-                height: 100%;
-                background: linear-gradient(135deg, rgba(255,255,255,0.08) 0%, rgba(255,255,255,0.03) 45%, rgba(255,255,255,0) 46%);
-                pointer-events: none;
-                z-index: 9;
-            }
-            /* Dynamic Speaker & Camera Notch */
-            .phone-notch {
-                position: absolute;
-                top: 15px;
-                left: 50%;
-                transform: translateX(-50%);
-                width: 115px;
-                height: 26px;
-                background-color: #000;
-                border-radius: 14px;
-                z-index: 10;
-                display: flex;
-                align-items: center;
-                justify-content: center;
-                gap: 8px;
-                box-shadow: inset 0 2px 4px rgba(255,255,255,0.05);
-            }
-            .phone-camera-lens {
-                width: 6px;
-                height: 6px;
-                background: radial-gradient(circle at 35% 35%, rgba(212,175,55,0.5) 0%, #080C10 85%);
-                border-radius: 50%;
-                box-shadow: 0 0 2px rgba(255,255,255,0.4);
-            }
-            .phone-speaker-mesh {
-                width: 32px;
-                height: 3px;
-                background: #121212;
-                border-radius: 2px;
-                box-shadow: inset 0 1px 2px rgba(8,12,16,0.8);
-            }
-            .phone-screen {
-                flex: 1;
-                display: flex;
-                flex-direction: column;
-                padding: 45px 18px 18px 18px;
-            }
-            /* Mock App UI */
-            .mock-header {
-                display: flex;
-                justify-content: space-between;
-                align-items: center;
-                margin-bottom: 15px;
-                border-bottom: 1px solid rgba(255,255,255,0.04);
-                padding-bottom: 8px;
-            }
-            .mock-logo {
-                font-size: 0.9rem;
-                font-weight: 800;
-                color: #fff;
-                font-family: var(--font-heading);
-                letter-spacing: 0.5px;
-            }
-            .mock-logo span {
-                color: var(--gold-primary);
-            }
-            .mock-carousel {
-                background: rgba(255,255,255,0.02);
-                border: 1px solid rgba(255,255,255,0.05);
-                border-radius: 14px;
-                padding: 12px;
-                margin-bottom: 15px;
-                text-align: left;
-            }
-            .mock-carousel h5 {
-                font-size: 0.8rem;
-                color: var(--gold-primary);
-                margin-bottom: 4px;
-            }
-            .mock-carousel p {
-                font-size: 0.65rem;
-                color: var(--text-secondary);
-                line-height: 1.3;
-            }
-            .mock-carousel-dots {
-                display: flex;
-                gap: 4px;
-                margin-top: 8px;
-            }
-            .mock-dot {
-                width: 5px;
-                height: 5px;
-                border-radius: 50%;
-                background: rgba(255,255,255,0.2);
-            }
-            .mock-dot.active {
-                background: var(--gold-primary);
-                width: 12px;
-                border-radius: 3px;
-            }
-            .mock-categories-label {
-                font-size: 0.75rem;
-                font-weight: 700;
-                color: #fff;
-                text-align: left;
-                margin-bottom: 10px;
-                text-transform: uppercase;
-                letter-spacing: 0.5px;
-            }
-            .mock-categories-row {
-                display: grid;
-                grid-template-columns: repeat(3, 1fr);
-                gap: 8px;
-            }
-            .mock-cat-card {
-                background: rgba(255,255,255,0.02);
-                border: 1px solid rgba(212,175,55,0.1);
-                border-radius: 10px;
-                padding: 8px;
-                display: flex;
-                flex-direction: column;
-                align-items: center;
-                justify-content: center;
-            }
-            .mock-cat-card img {
-                height: 40px;
-                object-fit: contain;
-                margin-bottom: 5px;
-            }
-            .mock-cat-card span {
-                font-size: 0.55rem;
-                color: var(--text-secondary);
-                font-weight: 600;
-                text-align: center;
-            }
-
-            /* 3D Overlapping Floating Cards */
-            .floating-card-tr {
-                position: absolute;
-                top: 80px;
-                right: -95px;
-                width: 230px;
-                background: rgba(18,18,18, 0.95);
-                backdrop-filter: blur(20px);
-                border: 1px solid var(--gold-primary);
-                border-radius: 16px;
-                padding: 16px;
-                box-shadow: 0 30px 60px rgba(8,12,16,0.85);
-                z-index: 15;
-                text-align: left;
-                animation: floatCardTR 5s ease-in-out infinite;
-                border-color: #FFD700;
-            }
-            .floating-card-tr .ultimate-badge {
-                display: inline-block;
-                background: rgba(212,175,55,0.15);
-                color: var(--gold-primary);
-                font-size: 0.6rem;
-                font-weight: 800;
-                padding: 2px 8px;
-                border-radius: 20px;
-                text-transform: uppercase;
-                letter-spacing: 0.5px;
-                margin-bottom: 10px;
-                border: 1px solid rgba(212,175,55,0.2);
-            }
-            .floating-card-tr .prod-box {
-                display: flex;
-                gap: 12px;
-                align-items: center;
-                margin-bottom: 12px;
-            }
-            .floating-card-tr .prod-box img {
-                width: 60px;
-                height: 60px;
-                object-fit: contain;
-                filter: drop-shadow(0 8px 12px rgba(8,12,16,0.3));
-            }
-            .floating-card-tr .prod-title {
-                font-size: 0.8rem;
-                font-weight: 700;
-                color: #fff;
-                line-height: 1.3;
-            }
-            .floating-card-tr .rating {
-                color: var(--gold-light);
-                font-size: 0.65rem;
-                margin-top: 3px;
-                display: flex;
-                align-items: center;
-                gap: 2px;
-            }
-            .floating-card-tr .price-box {
-                display: flex;
-                align-items: baseline;
-                gap: 6px;
-                margin-bottom: 10px;
-            }
-            .floating-card-tr .price-sale {
-                font-size: 1.1rem;
-                font-weight: 800;
-                color: var(--gold-primary);
-            }
-            .floating-card-tr .price-mrp {
-                font-size: 0.75rem;
-                text-decoration: line-through;
-                color: var(--text-muted);
-            }
-
-            .floating-card-bl {
-                position: absolute;
-                bottom: 80px;
-                left: -95px;
-                width: 240px;
-                background: rgba(18,18,18, 0.95);
-                backdrop-filter: blur(20px);
-                border: 1px solid rgba(212, 175, 55, 0.3);
-                border-radius: 16px;
-                padding: 16px;
-                box-shadow: 0 30px 60px rgba(8,12,16,0.85);
-                z-index: 15;
-                text-align: left;
-                display: flex;
-                flex-direction: column;
-                gap: 10px;
-                animation: floatCardBL 6s ease-in-out infinite;
-            }
-            .floating-card-bl .header-text {
-                font-size: 0.75rem;
-                font-weight: 700;
-                color: var(--gold-primary);
-                text-transform: uppercase;
-                letter-spacing: 0.5px;
-            }
-            .floating-card-bl .body-text {
-                font-size: 0.8rem;
-                font-weight: 600;
-                color: #fff;
-                line-height: 1.4;
-            }
-            .floating-card-bl .avatar-box {
-                display: flex;
-                align-items: center;
-                gap: 10px;
-                margin-bottom: 5px;
-            }
-            .floating-card-bl .avatar-box img {
-                width: 36px;
-                height: 36px;
-                border-radius: 50%;
-                border: 1.5px solid var(--gold-primary);
-                object-fit: cover;
-            }
-            .floating-card-bl .avatar-box .info h5 {
-                font-size: 0.75rem;
-                color: #fff;
-                font-weight: 700;
-            }
-            .floating-card-bl .avatar-box .info p {
-                font-size: 0.6rem;
-                color: var(--text-muted);
-            }
-
-            @keyframes floatCardTR {
-                0%, 100% { transform: translateY(0) rotate(1deg); }
-                50% { transform: translateY(-8px) rotate(-1deg); }
-            }
-            @keyframes floatCardBL {
-                0%, 100% { transform: translateY(0) rotate(-1deg); }
-                50% { transform: translateY(-10px) rotate(1deg); }
-            }
-
-            /* Benefit Cards in Right Column */
-            .benefit-list {
-                display: flex;
-                flex-direction: column;
-                gap: 35px;
-                margin: 40px 0;
-            }
-            .benefit-item {
-                display: flex;
-                gap: 25px;
-                align-items: flex-start;
-            }
-            .benefit-icon-wrapper {
-                width: 58px;
-                height: 58px;
-                background: rgba(212, 175, 55, 0.06);
-                border: 1px solid rgba(212, 175, 55, 0.2);
-                border-radius: 14px;
-                display: flex;
-                justify-content: center;
-                align-items: center;
-                color: var(--gold-primary);
-                font-size: 1.4rem;
-                flex-shrink: 0;
-                box-shadow: var(--gold-glow);
-                transition: all 0.3s;
-            }
-            .benefit-item:hover .benefit-icon-wrapper {
-                background: rgba(212, 175, 55, 0.12);
-                border-color: var(--gold-primary);
-                transform: scale(1.1);
-                box-shadow: var(--gold-glow-hover);
-            }
-            .benefit-text h4 {
-                font-size: 1.25rem;
-                color: #fff;
-                margin-bottom: 6px;
-                text-transform: uppercase;
-                letter-spacing: 0.5px;
-            }
-            .benefit-text p {
-                font-size: 0.95rem;
-                color: var(--text-secondary);
-                line-height: 1.6;
-            }
-
-            @media (max-width: 1024px) {
-                .digital-experience-grid {
-                    grid-template-columns: 1fr !important;
-                    gap: 80px;
-                }
-                .phone-mockup-wrapper {
-                    margin-bottom: 40px;
-                }
-                .floating-card-tr {
-                    right: -10px;
-                }
-                .floating-card-bl {
-                    left: -10px;
-                }
-            }
-            @media (max-width: 480px) {
-                .phone-mockup-wrapper {
-                    width: 320px;
-                }
-                .phone-mockup {
-                    width: 290px;
-                    height: 550px;
-                    border-width: 8px;
-                }
-                .floating-card-tr {
-                    width: 170px;
-                    right: -5px;
-                    top: 60px;
-                    padding: 10px;
-                }
-                .floating-card-bl {
-                    width: 180px;
-                    left: -5px;
-                    bottom: 40px;
-                    padding: 10px;
-                }
-                .floating-card-tr .prod-box img {
-                    width: 45px;
-                    height: 45px;
-                }
-                .floating-card-tr .price-sale {
-                    font-size: 0.95rem;
-                }
-            }
-        </style>
-
-        <div class="container">
-            <div class="digital-experience-grid">
-                
-                <!-- Left Column: Interactive Phone Mockup with 3D overlapping cards -->
-                <div class="phone-mockup-wrapper">
-                    <!-- Asymmetric gold contrast block -->
-                    <div class="phone-backdrop-accent"></div>
-                    
-                    <!-- Physical side buttons -->
-                    <div class="phone-phys-btn vol-up"></div>
-                    <div class="phone-phys-btn vol-down"></div>
-                    <div class="phone-phys-btn power"></div>
-                    
-                    <!-- Phone body mockup -->
-                    <div class="phone-mockup">
-                        <!-- OLED display container -->
-                        <div class="phone-screen-container">
-                            <!-- Gloss reflection overlay -->
-                            <div class="phone-glass-reflection"></div>
-                            
-                            <!-- Notch speaker/camera -->
-                            <div class="phone-notch">
-                                <div class="phone-speaker-mesh"></div>
-                                <div class="phone-camera-lens"></div>
-                            </div>
-                            
-                            <div class="phone-screen" style="display:flex; flex-direction:column; padding:35px 0 0 0;">
-                                <!-- Mock Top Status Bar -->
-                                <div class="mock-status-bar" style="display:flex; justify-content:space-between; align-items:center; padding: 2px 20px; font-size: 0.62rem; color: rgba(255,255,255,0.3); font-weight:700; font-family:sans-serif;">
-                                    <span>09:41</span>
-                                    <div style="display:flex; gap:6px; align-items:center;">
-                                        <i class="fas fa-signal"></i>
-                                        <i class="fas fa-wifi"></i>
-                                        <i class="fas fa-battery-full" style="font-size:0.75rem;"></i>
-                                    </div>
-                                </div>
-
-                                <!-- Mock App Header -->
-                                <div class="mock-header" style="display:flex; justify-content:space-between; align-items:center; padding: 12px 18px 8px 18px; border-bottom:1px solid rgba(255,255,255,0.03); margin-bottom: 0;">
-                                    <i class="fas fa-bars" style="color:var(--gold-primary); font-size:0.85rem; cursor:pointer;"></i>
-                                    <div class="mock-logo" style="font-size:0.9rem; font-weight:800; color:#fff; font-family:var(--font-heading); letter-spacing:0.5px;">WOLF <span>NUTRITION</span></div>
-                                    <div style="position:relative; cursor:pointer;">
-                                        <i class="fas fa-shopping-bag" style="color:#fff; font-size:0.85rem;"></i>
-                                        <span style="position:absolute; top:-6px; right:-6px; background:var(--gold-primary); color:#080C10; font-size:0.5rem; width:12px; height:12px; border-radius:50%; display:flex; justify-content:center; align-items:center; font-weight:800; font-family:sans-serif;">2</span>
-                                    </div>
-                                </div>
-                                
-                                <!-- Large Product Carousel Banner (Spotlight behind floating bottle) -->
-                                <div class="mock-carousel-banner" style="height:210px; background:radial-gradient(circle at 50% 50%, rgba(212, 175, 55, 0.15) 0%, rgba(8,12,16,0) 80%), rgba(255,255,255,0.01); border:1px solid rgba(255,255,255,0.03); border-radius:18px; margin: 15px 15px 12px 15px; position:relative; overflow:hidden; display:flex; flex-direction:column; justify-content:center; align-items:center; text-align:center;">
-                                    <span style="position:absolute; top:12px; left:12px; background:var(--gold-gradient); color:#000; font-size:0.55rem; font-weight:800; padding:2px 8px; border-radius:10px; text-transform:uppercase; letter-spacing:0.5px; font-family:var(--font-heading);">Best Seller</span>
-                                    <img src="assets/images/products/wolfpack.png" alt="Wolfpack Mock Product" style="height:120px; object-fit:contain; filter:drop-shadow(0 15px 25px rgba(8,12,16,0.6)); animation:phoneProductFloat 4s ease-in-out infinite;">
-                                    <h4 style="font-size:0.85rem; font-weight:700; color:#fff; margin-top:8px; font-family:var(--font-heading);">WOLFPACK Vitality</h4>
-                                    <!-- Dots -->
-                                    <div class="mock-carousel-dots" style="position:absolute; bottom:10px; display:flex; gap:4px;">
-                                        <div class="mock-dot active" style="width:12px; height:4px; border-radius:2px; background:var(--gold-primary);"></div>
-                                        <div class="mock-dot" style="width:4px; height:4px; border-radius:50%; background:rgba(255,255,255,0.2);"></div>
-                                        <div class="mock-dot" style="width:4px; height:4px; border-radius:50%; background:rgba(255,255,255,0.2);"></div>
-                                    </div>
-                                </div>
-                                
-                                <!-- Mock Categories Row (Horizontal scrollable circle items) -->
-                                <div class="mock-categories-label" style="font-size:0.7rem; font-weight:800; color:#fff; text-align:left; margin:5px 18px 10px 18px; text-transform:uppercase; letter-spacing:0.5px;">Shop Range</div>
-                                <div class="mock-categories-row" style="display:flex; justify-content:space-between; padding:0 18px; gap:10px;">
-                                    <!-- Item 1: Vitality -->
-                                    <div class="mock-category-item" style="display:flex; flex-direction:column; align-items:center; gap:6px; cursor:pointer;" onclick="location.href='category.php?slug=vitality'">
-                                        <div class="mock-category-circle" style="width:50px; height:50px; background:rgba(255,255,255,0.02); border:1px solid rgba(212,175,55,0.15); border-radius:50%; display:flex; justify-content:center; align-items:center; padding:6px; transition:border-color 0.2s;">
-                                            <img src="assets/images/products/wolfpack.png" alt="Vitality Icon" style="width:100%; height:100%; object-fit:contain; filter:drop-shadow(0 4px 6px rgba(8,12,16,0.3));">
-                                        </div>
-                                        <span style="font-size:0.55rem; color:var(--text-secondary); font-weight:600;">Vitality</span>
-                                    </div>
-                                    <!-- Item 2: Detox -->
-                                    <div class="mock-category-item" style="display:flex; flex-direction:column; align-items:center; gap:6px; cursor:pointer;" onclick="location.href='category.php?slug=liver-detox'">
-                                        <div class="mock-category-circle" style="width:50px; height:50px; background:rgba(255,255,255,0.02); border:1px solid rgba(212,175,55,0.15); border-radius:50%; display:flex; justify-content:center; align-items:center; padding:6px; transition:border-color 0.2s;">
-                                            <img src="assets/images/products/wolftox.png" alt="Detox Icon" style="width:100%; height:100%; object-fit:contain; filter:drop-shadow(0 4px 6px rgba(8,12,16,0.3));">
-                                        </div>
-                                        <span style="font-size:0.55rem; color:var(--text-secondary); font-weight:600;">Liver Detox</span>
-                                    </div>
-                                    <!-- Item 3: Combos -->
-                                    <div class="mock-category-item" style="display:flex; flex-direction:column; align-items:center; gap:6px; cursor:pointer;" onclick="location.href='category.php?slug=all'">
-                                        <div class="mock-category-circle" style="width:50px; height:50px; background:rgba(255,255,255,0.02); border:1px solid rgba(212,175,55,0.15); border-radius:50%; display:flex; justify-content:center; align-items:center; padding:6px; transition:border-color 0.2s;">
-                                            <img src="assets/images/products/wolfpack_wolftox_combo.png" alt="Combos Icon" style="width:100%; height:100%; object-fit:contain; filter:drop-shadow(0 4px 6px rgba(8,12,16,0.3));">
-                                        </div>
-                                        <span style="font-size:0.55rem; color:var(--text-secondary); font-weight:600;">Combos</span>
-                                    </div>
-                                </div>
-                                
-                                <!-- Mock App Bottom Tab Bar -->
-                                <div class="mock-tab-bar" style="display:grid; grid-template-columns:repeat(4, 1fr); padding: 12px 10px; border-top:1px solid rgba(255,255,255,0.03); background:#080C10; margin-top:auto; text-align:center; z-index:10;">
-                                    <div style="display:flex; flex-direction:column; align-items:center; gap:4px; color:var(--gold-primary); cursor:pointer;" onclick="location.href='index.php'">
-                                        <i class="fas fa-home" style="font-size:0.8rem;"></i>
-                                        <span style="font-size:0.5rem; font-weight:700;">Home</span>
-                                    </div>
-                                    <div style="display:flex; flex-direction:column; align-items:center; gap:4px; color:rgba(255,255,255,0.4); cursor:pointer;" onclick="location.href='category.php?slug=all'">
-                                        <i class="fas fa-capsules" style="font-size:0.8rem;"></i>
-                                        <span style="font-size:0.5rem; font-weight:700;">Shop</span>
-                                    </div>
-                                    <div style="display:flex; flex-direction:column; align-items:center; gap:4px; color:rgba(255,255,255,0.4); cursor:pointer;" onclick="location.href='https://wa.me/919876543210'">
-                                        <i class="fas fa-user-doctor" style="font-size:0.8rem;"></i>
-                                        <span style="font-size:0.5rem; font-weight:700;">Consult</span>
-                                    </div>
-                                    <div style="display:flex; flex-direction:column; align-items:center; gap:4px; color:rgba(255,255,255,0.4); cursor:pointer;" onclick="location.href='my-account.php'">
-                                        <i class="fas fa-user" style="font-size:0.8rem;"></i>
-                                        <span style="font-size:0.5rem; font-weight:700;">Profile</span>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- 3D Overlapping Card 1: Ultimate Offer Card (Top-Right) -->
-                    <div class="floating-card-tr">
-                        <span class="ultimate-badge">Ultimate Offer</span>
-                        <div class="prod-box">
-                            <img src="assets/images/products/wolftox.png" alt="Wolftox">
-                            <div class="info">
-                                <div class="prod-title">WOLFTOX Detox</div>
-                                <div class="rating">
-                                    <i class="fas fa-star"></i> 4.9 <span>(24)</span>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="price-box">
-                            <span class="price-sale">₹899</span>
-                            <span class="price-mrp">₹999</span>
-                        </div>
-                        <button class="btn-gold" style="width:100%; padding:8px; font-size:0.75rem; font-weight:700; border-radius:8px;" onclick="location.href='product.php?slug=wolftox-liver-support-detox'">Add to cart</button>
-                    </div>
-
-                    <!-- 3D Overlapping Card 2: Doctor Consultation Card (Bottom-Left) -->
-                    <div class="floating-card-bl">
-                        <div class="header-text">Goal-focused Plans</div>
-                        <div class="body-text">Get your first wellness call free!</div>
-                        <div class="avatar-box">
-                            <img src="assets/images/dietitian_avatar.png" alt="Dietitian Avatar">
-                            <div class="info">
-                                <h5>Shalini Sen</h5>
-                                <p>Certified Dietitian</p>
-                            </div>
-                        </div>
-                        <a href="https://wa.me/919876543210?text=Hi%20Wolf%20Nutrition,%20I%20would%20like%20to%20book%20a%20free%20dietitian%20consultation%20please." target="_blank" class="btn-outline-gold" style="width:100%; text-align:center; padding:8px; font-size:0.75rem; font-weight:700; border-radius:8px; display:block;">Consult Free</a>
-                    </div>
-                </div>
-
-                <!-- Right Column: Brand Value Coordinates -->
+        <!-- Featured Review (Big Card) -->
+        <div class="tilt-card" style="background:linear-gradient(135deg,rgba(212,175,55,0.06) 0%,rgba(8,12,16,0.95) 40%); border:1px solid rgba(212,175,55,0.15); border-radius:24px; padding:45px 50px; margin-bottom:24px; position:relative; overflow:hidden;">
+            <div style="position:absolute; top:-50px; right:-50px; width:200px; height:200px; background:radial-gradient(circle,rgba(212,175,55,0.1) 0%,transparent 70%); pointer-events:none;"></div>
+            <div style="display:grid; grid-template-columns:1fr auto; gap:40px; align-items:center;">
                 <div>
-                    <h4 style="color:var(--gold-primary); font-size:0.95rem; text-transform:uppercase; letter-spacing:1.5px; margin-bottom:10px; font-weight:700;">Designed for High Performance</h4>
-                    <h2 style="font-size:2.8rem; text-transform:uppercase; margin-bottom:25px; line-height:1.15; font-weight:800; font-family:var(--font-heading);">Unleash the Power of Pure Wellness</h2>
-                    <p style="font-size:1.05rem; color:var(--text-secondary); line-height:1.6;">
-                        Experience the gold standard in wellness. We combine ancient Ayurvedic secrets with modern sports science to deliver active daily stacks that fuel your strength and detox your liver.
-                    </p>
-
-                    <div class="benefit-list">
-                        <!-- Benefit 1 -->
-                        <div class="benefit-item">
-                            <div class="benefit-icon-wrapper">
-                                <i class="fas fa-flask"></i>
-                            </div>
-                            <div class="benefit-text">
-                                <h4>100% Transparent Formulations</h4>
-                                <p>No hidden ingredients, zero fillers, and absolutely no proprietary blends. We publish the full disclosure of every premium extract on our label.</p>
-                            </div>
-                        </div>
-
-                        <!-- Benefit 2 -->
-                        <div class="benefit-item">
-                            <div class="benefit-icon-wrapper">
-                                <i class="fas fa-user-doctor"></i>
-                            </div>
-                            <div class="benefit-text">
-                                <h4>Free Certified Expert Guidance</h4>
-                                <p>Confused about what stack is right for you? Consult 1-on-1 with our certified health coaches and dietitians for a personalized regimen.</p>
-                            </div>
-                        </div>
-
-                        <!-- Benefit 3 -->
-                        <div class="benefit-item">
-                            <div class="benefit-icon-wrapper">
-                                <i class="fas fa-truck-fast"></i>
-                            </div>
-                            <div class="benefit-text">
-                                <h4>Prepaid Rewards & Fast Delivery</h4>
-                                <p>Get free express shipping and additional prepaid cashbacks/discounts on all orders. Packed and shipped securely from our certified warehouse.</p>
-                            </div>
-                        </div>
+                    <div style="font-size:4rem; line-height:1; color:rgba(212,175,55,0.12); font-family:Georgia,serif; margin-bottom:16px;">"</div>
+                    <div style="display:flex; gap:4px; margin-bottom:18px;">
+                        <i class="fas fa-star" style="color:var(--gold-primary); font-size:1rem;"></i>
+                        <i class="fas fa-star" style="color:var(--gold-primary); font-size:1rem;"></i>
+                        <i class="fas fa-star" style="color:var(--gold-primary); font-size:1rem;"></i>
+                        <i class="fas fa-star" style="color:var(--gold-primary); font-size:1rem;"></i>
+                        <i class="fas fa-star" style="color:var(--gold-primary); font-size:1rem;"></i>
                     </div>
-
-                    <!-- Action CTA Buttons -->
-                    <div style="display:flex; gap:20px; align-items:center; flex-wrap:wrap; margin-top:20px;">
-                        <a href="category.php?slug=all" class="btn-gold" style="padding:16px 36px; font-size:0.95rem; font-weight:700;">Explore Products</a>
-                        <a href="https://wa.me/919876543210?text=Hi%20Wolf%20Nutrition,%20I%20would%20like%20to%20book%20a%20free%20dietitian%20consultation%20please." target="_blank" class="btn-outline-gold" style="padding:15px 36px; font-size:0.95rem; font-weight:700; display:inline-flex; align-items:center; gap:8px;">
-                            <i class="fab fa-whatsapp"></i> Chat with Dietitian
-                        </a>
-                    </div>
-                </div>
-
-            </div>
-        </div>
-    </section>
-
-    <!-- Trust Strip Section -->
-    <section class="container">
-        <div class="trust-strip">
-            <div class="trust-item">
-                <svg viewBox="0 0 24 24"><path d="M12 2C6.5 2 2 6.5 2 12s4.5 10 10 10 10-4.5 10-10S17.5 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/></svg>
-                <h4>FSSAI Certified</h4>
-                <p>License No. 22126022000063</p>
-            </div>
-            <div class="trust-item">
-                <svg viewBox="0 0 24 24"><path d="M12 3c-1.2 0-2.4.4-3.4 1.1C6.7 3.5 4.5 3 2 3v13c2.5 0 4.7.5 6.6 1.2 1-.7 2.2-1.2 3.4-1.2s2.4.5 3.4 1.2c1.9-.7 4.1-1.2 6.6-1.2V3c-2.5 0-4.7.5-6.6 1.2C14.4 3.4 13.2 3 12 3zm0 11.5c-1.1 0-2.2.3-3 .9V6.1c.8-.6 1.9-.9 3-.9s2.2.3 3 .9v8.3c-.8-.6-1.9-.9-3-.9z"/></svg>
-                <h4>100% Ayurvedic</h4>
-                <p>Pure Himalayan botanicals & extracts</p>
-            </div>
-            <div class="trust-item">
-                <svg viewBox="0 0 24 24"><path d="M12 2L2 22h20L12 2zm0 3.99L19.53 19H4.47L12 5.99zM13 16h-2v2h2v-2zm0-6h-2v4h2v-4z"/></svg>
-                <h4>Veggie Capsules</h4>
-                <p>100% clean veggie caps, zero fillers</p>
-            </div>
-        </div>
-    </section>
-
-    <!-- Brand Teaser / About Teaser -->
-    <section class="container" style="margin: 60px auto;">
-        <div class="glass-card" style="display:grid; grid-template-columns: 1fr 1fr; align-items:center; border-radius:12px; overflow:hidden;">
-            <div style="padding: 40px;">
-                <h2 style="font-size:2.2rem; text-transform:uppercase; margin-bottom:15px; background:var(--gold-gradient); -webkit-background-clip:text; -webkit-text-fill-color:transparent;">
-                    Our Brand Philosophy
-                </h2>
-                <p style="margin-bottom:20px; font-size:1.05rem;">
-                    At Wolf Nutrition, we bridge the gap between time-tested Ayurvedic wisdom and the rigorous performance demands of modern life. We source the highest grade Shilajit, Ashwagandha, Kutki and Gokshura to formulate active wellness stacks for those who refuse to settle for average.
-                </p>
-                <a href="about.php" class="btn-outline-gold">Know More About Our Story</a>
-            </div>
-            <div style="height:100%; min-height:300px; background-image:url('assets/images/logo.png'); background-size:contain; background-position:center; background-repeat:no-repeat; background-color:#000; padding:20px;"></div>
-        </div>
-    </section>
-
-    <!-- Wolfpack loyalty and expert assistance hub -->
-    <section class="loyalty-assistance-section">
-        <style>
-            .loyalty-assistance-section {
-                padding: 60px 0;
-                background: linear-gradient(180deg, rgba(8,12,16, 0) 0%, rgba(212, 175, 55, 0.02) 50%, rgba(8,12,16, 0) 100%);
-            }
-            .loyalty-grid {
-                display: grid;
-                grid-template-columns: 1fr 1fr;
-                gap: 30px;
-            }
-            .loyalty-left-col {
-                display: flex;
-                flex-direction: column;
-                gap: 30px;
-            }
-            .loyalty-card {
-                background: #121212;
-                border: 1px solid rgba(212, 175, 55, 0.1);
-                border-radius: 24px;
-                overflow: hidden;
-                position: relative;
-                transition: all 0.3s ease;
-            }
-            .loyalty-card:hover {
-                border-color: var(--gold-primary);
-                box-shadow: 0 15px 35px rgba(8,12,16,0.5), 0 0 15px rgba(212,175,55,0.05);
-                transform: translateY(-4px);
-            }
-            .loyalty-elite-card {
-                background: linear-gradient(135deg, #121212 0%, #080C10 100%);
-                padding: 35px;
-                display: flex;
-                flex-direction: column;
-                justify-content: space-between;
-                min-height: 220px;
-            }
-            .loyalty-elite-card .elite-badge {
-                align-self: flex-start;
-                background: var(--gold-gradient);
-                color: #080C10;
-                font-size: 0.75rem;
-                font-weight: 800;
-                padding: 4px 12px;
-                border-radius: 20px;
-                text-transform: uppercase;
-                letter-spacing: 0.5px;
-                margin-bottom: 15px;
-            }
-            .loyalty-elite-card h3 {
-                font-size: 1.8rem;
-                color: #fff;
-                margin-bottom: 10px;
-                text-transform: uppercase;
-                font-family: var(--font-heading);
-            }
-            .loyalty-elite-card p {
-                color: var(--text-secondary);
-                font-size: 0.95rem;
-                line-height: 1.5;
-                margin-bottom: 20px;
-                max-width: 80%;
-            }
-            .elite-bolt-icon {
-                position: absolute;
-                right: 30px;
-                bottom: 20px;
-                font-size: 8rem;
-                color: var(--gold-primary);
-                opacity: 0.05;
-                transform: rotate(15deg);
-                pointer-events: none;
-            }
-
-            /* Refer Card & Assistance Card Grid Split */
-            .loyalty-split-card {
-                padding: 30px;
-                display: grid;
-                grid-template-columns: 1.2fr 1fr;
-                align-items: center;
-                min-height: 220px;
-            }
-            .loyalty-split-card.tall {
-                min-height: 470px;
-                height: 100%;
-            }
-            .loyalty-card-text {
-                z-index: 2;
-            }
-            .loyalty-card-text h3 {
-                font-size: 1.8rem;
-                color: #fff;
-                margin-bottom: 12px;
-                text-transform: uppercase;
-                font-family: var(--font-heading);
-            }
-            .loyalty-card-text p {
-                color: var(--text-secondary);
-                font-size: 0.95rem;
-                line-height: 1.5;
-                margin-bottom: 20px;
-            }
-            .loyalty-card-image-box {
-                position: relative;
-                width: 100%;
-                height: 100%;
-                display: flex;
-                justify-content: center;
-                align-items: flex-end;
-            }
-            .loyalty-card-image-box img {
-                max-height: 220px;
-                object-fit: contain;
-                z-index: 2;
-            }
-            .loyalty-split-card.tall .loyalty-card-image-box img {
-                max-height: 440px;
-                object-fit: contain;
-                width: 110%;
-                transform: translateX(10px);
-            }
-            .loyalty-image-backdrop {
-                position: absolute;
-                width: 160px;
-                height: 160px;
-                background: radial-gradient(circle, rgba(212, 175, 55, 0.2) 0%, rgba(8,12,16,0) 70%);
-                border-radius: 50%;
-                bottom: 20px;
-                z-index: 1;
-            }
-            .loyalty-split-card.tall .loyalty-image-backdrop {
-                width: 250px;
-                height: 250px;
-                bottom: 60px;
-            }
-
-            @media (max-width: 900px) {
-                .loyalty-grid {
-                    grid-template-columns: 1fr !important;
-                }
-                .loyalty-split-card.tall {
-                    min-height: auto;
-                }
-                .loyalty-split-card {
-                    grid-template-columns: 1fr !important;
-                    text-align: center;
-                    padding: 30px 20px;
-                }
-                .loyalty-card-image-box {
-                    margin-top: 20px;
-                }
-                .loyalty-split-card.tall .loyalty-card-image-box img {
-                    width: 100%;
-                    transform: none;
-                }
-            }
-        </style>
-        
-        <div class="container">
-            <div class="loyalty-grid">
-                
-                <!-- Left Column (Elite & Refer banners) -->
-                <div class="loyalty-left-col">
-                    
-                    <!-- Elite Card -->
-                    <div class="loyalty-card loyalty-elite-card">
-                        <i class="fas fa-bolt-lightning elite-bolt-icon"></i>
+                    <p style="font-size:1.1rem; color:rgba(255,255,255,0.8); line-height:1.75; margin-bottom:24px; font-style:italic;">After 60 days of WOLFPACK, my gym performance and energy levels are completely different. The Shilajit quality is unmatched. I went from struggling with 5 reps to hitting personal records every week. This is the real deal.</p>
+                    <div style="display:flex; align-items:center; gap:16px;">
+                        <div style="width:52px; height:52px; border-radius:50%; background:var(--gold-gradient); display:flex; align-items:center; justify-content:center; font-size:0.9rem; font-weight:800; color:#080C10; box-shadow:0 6px 16px rgba(212,175,55,0.2);">RK</div>
                         <div>
-                            <span class="elite-badge"><i class="fas fa-crown"></i> Elite Member</span>
-                            <h3>Wolfpack VIP Club</h3>
-                            <p>Become a VIP member. Earn 2x loyalty points on every stack and access private formulations before general release.</p>
+                            <div style="font-size:1rem; color:#fff; font-weight:700;">Rahul K.</div>
+                            <div style="font-size:0.78rem; color:var(--gold-primary); font-weight:600;">Verified Buyer &bull; WOLFPACK Vitality</div>
                         </div>
-                        <a href="my-account.php" class="btn-gold" style="align-self: flex-start; padding: 12px 28px; font-weight:700;">Join VIP Pack</a>
-                    </div>
-                    
-                    <!-- Refer Card -->
-                    <div class="loyalty-card loyalty-split-card">
-                        <div class="loyalty-card-text">
-                            <h3>Refer & Earn</h3>
-                            <p>Bring a brother to the pack. They get ₹150 off on their first order, and you get ₹150 coupon rewards instantly!</p>
-                            <a href="my-account.php" style="color:var(--gold-primary); font-weight:700; text-decoration:none; display:inline-flex; align-items:center; gap:8px;">
-                                Invite Friends <i class="fas fa-arrow-right-long"></i>
-                            </a>
-                        </div>
-                        <div class="loyalty-card-image-box">
-                            <div class="loyalty-image-backdrop"></div>
-                            <img src="assets/images/athletic_guy.png" alt="Happy pack member">
-                        </div>
-                    </div>
-                    
-                </div>
-                
-                <!-- Right Column (Tall Doctor Banner) -->
-                <div class="loyalty-card loyalty-split-card tall">
-                    <div class="loyalty-card-text" style="display:flex; flex-direction:column; justify-content:center;">
-                        <h4 style="color:var(--gold-primary); font-size:0.9rem; text-transform:uppercase; letter-spacing:1.5px; margin-bottom:10px; font-weight:700;">Expert Guidance</h4>
-                        <h3>Instant Ayurvedic Consultation</h3>
-                        <p style="margin-bottom:25px;">Confused about Shilajit dosage or liver detox timing? Consult 1-on-1 with our certified Ayurvedic nutritionists for a custom regimen.</p>
-                        
-                        <a href="https://wa.me/919876543210?text=Hi%20Wolf%20Nutrition,%20I%20would%20like%20to%20book%20a%20free%20dietitian%20consultation%20please." target="_blank" class="btn-gold" style="align-self: flex-start; padding: 15px 35px; font-weight:700; display:inline-flex; align-items:center; gap:8px;">
-                            <i class="fab fa-whatsapp"></i> Book Appointment
-                        </a>
-                        
-                        <span style="font-size: 0.8rem; color: var(--text-muted); margin-top: 15px; display:block;">*Get your customized nutrition & lifestyle plan</span>
-                    </div>
-                    <div class="loyalty-card-image-box">
-                        <div class="loyalty-image-backdrop"></div>
-                        <img src="assets/images/ayurvedic_doctor.png" alt="Ayurvedic Practitioner">
                     </div>
                 </div>
-                
+                <!-- Product Image -->
+                <div style="width:180px; height:180px; display:flex; align-items:center; justify-content:center; position:relative;">
+                    <div style="position:absolute; width:160px; height:160px; border-radius:50%; background:radial-gradient(circle,rgba(212,175,55,0.12) 0%,transparent 70%);"></div>
+                    <img src="assets/images/products/wolfpack.png" alt="WOLFPACK" style="height:150px; object-fit:contain; filter:drop-shadow(0 15px 30px rgba(8,12,16,0.5)); position:relative; z-index:2;">
+                </div>
             </div>
         </div>
-    </section>
 
-    <!-- Certificates Grid Gallery -->
-    <?php if (!empty($certs)): ?>
-    <section class="container" style="margin-bottom: 60px;">
-        <div class="section-header">
-            <h2>Quality Certificates</h2>
-            <p>Our quality and safety registrations for wholesale distribution</p>
-        </div>
-        <div class="cert-gallery">
-            <?php foreach ($certs as $cert): ?>
-                <div class="cert-item">
-                    <a href="certificates.php">
-                        <img src="<?php echo htmlspecialchars($cert['image_url']); ?>" alt="<?php echo htmlspecialchars($cert['title']); ?>">
-                    </a>
-                    <h4><?php echo htmlspecialchars($cert['title']); ?></h4>
+        <!-- 3 Smaller Review Cards -->
+        <div style="display:grid; grid-template-columns:repeat(3,1fr); gap:20px;">
+
+            <!-- Review 2 -->
+            <div class="tilt-card" style="background:rgba(255,255,255,0.02); border:1px solid rgba(212,175,55,0.08); border-radius:20px; padding:28px 24px; position:relative; overflow:hidden; transition:all 0.4s;">
+                <div style="position:absolute; top:0; left:0; right:0; height:2px; background:var(--gold-gradient); opacity:0; transition:opacity 0.3s;"></div>
+                <div style="display:flex; gap:4px; margin-bottom:14px;">
+                    <i class="fas fa-star" style="color:var(--gold-primary); font-size:0.8rem;"></i>
+                    <i class="fas fa-star" style="color:var(--gold-primary); font-size:0.8rem;"></i>
+                    <i class="fas fa-star" style="color:var(--gold-primary); font-size:0.8rem;"></i>
+                    <i class="fas fa-star" style="color:var(--gold-primary); font-size:0.8rem;"></i>
+                    <i class="fas fa-star" style="color:var(--gold-primary); font-size:0.8rem;"></i>
                 </div>
-            <?php endforeach; ?>
-        </div>
-    </section>
-    <?php endif; ?>
-
-    <!-- Blog Preview Grid -->
-    <?php if (!empty($blogs)): ?>
-    <section class="container" style="margin-bottom: 60px;">
-        <div class="section-header">
-            <h2>The Wellness Pack Blog</h2>
-            <p>Scientific insights, biohacking strategies and Ayurvedic guides</p>
-        </div>
-        <div class="blog-grid">
-            <?php foreach ($blogs as $blog): ?>
-                <div class="blog-card">
-                    <div class="blog-card-image">
-                        <img src="<?php echo htmlspecialchars($blog['cover_image'] ? $blog['cover_image'] : 'assets/images/blog/default.png'); ?>" alt="<?php echo htmlspecialchars($blog['title']); ?>">
-                        <span class="blog-card-badge"><?php echo htmlspecialchars($blog['category_tag']); ?></span>
-                    </div>
-                    <div class="blog-card-content">
-                        <div class="blog-card-date"><?php echo date('M d, Y', strtotime($blog['published_at'])); ?></div>
-                        <a href="blog-post.php?slug=<?php echo $blog['slug']; ?>">
-                            <h3 class="blog-card-title"><?php echo htmlspecialchars($blog['title']); ?></h3>
-                        </a>
-                        <p class="blog-card-excerpt">
-                            <?php 
-                            $text = strip_tags($blog['body']);
-                            echo htmlspecialchars(strlen($text) > 100 ? substr($text, 0, 97) . '...' : $text); 
-                            ?>
-                        </p>
-                        <a href="blog-post.php?slug=<?php echo $blog['slug']; ?>" class="blog-card-link">
-                            Read Article <i class="fas fa-arrow-right"></i>
-                        </a>
+                <p style="font-size:0.88rem; color:rgba(255,255,255,0.65); line-height:1.6; margin-bottom:20px; font-style:italic;">WOLFTOX completely changed my digestion and liver health. My doctor was impressed with the improvement in my enzyme levels.</p>
+                <div style="display:flex; align-items:center; gap:12px; padding-top:14px; border-top:1px solid rgba(255,255,255,0.05);">
+                    <div style="width:38px; height:38px; border-radius:50%; background:var(--gold-gradient); display:flex; align-items:center; justify-content:center; font-size:0.7rem; font-weight:800; color:#080C10;">AS</div>
+                    <div>
+                        <div style="font-size:0.85rem; color:#fff; font-weight:700;">Amit S.</div>
+                        <div style="font-size:0.68rem; color:var(--gold-primary); font-weight:600;">Verified Buyer</div>
                     </div>
                 </div>
-            <?php endforeach; ?>
+            </div>
+
+            <!-- Review 3 -->
+            <div class="tilt-card" style="background:rgba(255,255,255,0.02); border:1px solid rgba(212,175,55,0.08); border-radius:20px; padding:28px 24px; position:relative; overflow:hidden; transition:all 0.4s;">
+                <div style="position:absolute; top:0; left:0; right:0; height:2px; background:var(--gold-gradient); opacity:0; transition:opacity 0.3s;"></div>
+                <div style="display:flex; gap:4px; margin-bottom:14px;">
+                    <i class="fas fa-star" style="color:var(--gold-primary); font-size:0.8rem;"></i>
+                    <i class="fas fa-star" style="color:var(--gold-primary); font-size:0.8rem;"></i>
+                    <i class="fas fa-star" style="color:var(--gold-primary); font-size:0.8rem;"></i>
+                    <i class="fas fa-star" style="color:var(--gold-primary); font-size:0.8rem;"></i>
+                    <i class="fas fa-star" style="color:var(--gold-primary); font-size:0.8rem;"></i>
+                </div>
+                <p style="font-size:0.88rem; color:rgba(255,255,255,0.65); line-height:1.6; margin-bottom:20px; font-style:italic;">The free dietitian consultation was a game-changer. Shalini ma'am designed a perfect regimen for my goals. Premium quality.</p>
+                <div style="display:flex; align-items:center; gap:12px; padding-top:14px; border-top:1px solid rgba(255,255,255,0.05);">
+                    <div style="width:38px; height:38px; border-radius:50%; background:var(--gold-gradient); display:flex; align-items:center; justify-content:center; font-size:0.7rem; font-weight:800; color:#080C10;">VP</div>
+                    <div>
+                        <div style="font-size:0.85rem; color:#fff; font-weight:700;">Vikram P.</div>
+                        <div style="font-size:0.68rem; color:var(--gold-primary); font-weight:600;">VIP Member</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Review 4 -->
+            <div class="tilt-card" style="background:rgba(255,255,255,0.02); border:1px solid rgba(212,175,55,0.08); border-radius:20px; padding:28px 24px; position:relative; overflow:hidden; transition:all 0.4s;">
+                <div style="position:absolute; top:0; left:0; right:0; height:2px; background:var(--gold-gradient); opacity:0; transition:opacity 0.3s;"></div>
+                <div style="display:flex; gap:4px; margin-bottom:14px;">
+                    <i class="fas fa-star" style="color:var(--gold-primary); font-size:0.8rem;"></i>
+                    <i class="fas fa-star" style="color:var(--gold-primary); font-size:0.8rem;"></i>
+                    <i class="fas fa-star" style="color:var(--gold-primary); font-size:0.8rem;"></i>
+                    <i class="fas fa-star" style="color:var(--gold-primary); font-size:0.8rem;"></i>
+                    <i class="fas fa-star" style="color:var(--gold-primary); font-size:0.8rem;"></i>
+                </div>
+                <p style="font-size:0.88rem; color:rgba(255,255,255,0.65); line-height:1.6; margin-bottom:20px; font-style:italic;">I've tried many supplements but Wolf Nutrition is different. Clean ingredients, real results, and the VIP program is incredible. Best investment in my health.</p>
+                <div style="display:flex; align-items:center; gap:12px; padding-top:14px; border-top:1px solid rgba(255,255,255,0.05);">
+                    <div style="width:38px; height:38px; border-radius:50%; background:var(--gold-gradient); display:flex; align-items:center; justify-content:center; font-size:0.7rem; font-weight:800; color:#080C10;">MR</div>
+                    <div>
+                        <div style="font-size:0.85rem; color:#fff; font-weight:700;">Mohit R.</div>
+                        <div style="font-size:0.68rem; color:var(--gold-primary); font-weight:600;">Verified Buyer</div>
+                    </div>
+                </div>
+            </div>
+
         </div>
-    </section>
-    <?php endif; ?>
+
+        <!-- Trust Stats -->
+        <div style="display:flex; justify-content:center; gap:50px; margin-top:45px; padding-top:35px; border-top:1px solid rgba(255,255,255,0.05);">
+            <div style="text-align:center;">
+                <div style="font-size:1.6rem; font-weight:800; color:var(--gold-primary); font-family:var(--font-heading);">4.9/5</div>
+                <div style="font-size:0.7rem; color:rgba(255,255,255,0.4); text-transform:uppercase; letter-spacing:1px; font-weight:600;">Average Rating</div>
+            </div>
+            <div style="width:1px; background:rgba(255,255,255,0.06);"></div>
+            <div style="text-align:center;">
+                <div style="font-size:1.6rem; font-weight:800; color:var(--gold-primary); font-family:var(--font-heading);">500+</div>
+                <div style="font-size:0.7rem; color:rgba(255,255,255,0.4); text-transform:uppercase; letter-spacing:1px; font-weight:600;">5-Star Reviews</div>
+            </div>
+            <div style="width:1px; background:rgba(255,255,255,0.06);"></div>
+            <div style="text-align:center;">
+                <div style="font-size:1.6rem; font-weight:800; color:var(--gold-primary); font-family:var(--font-heading);">25K+</div>
+                <div style="font-size:0.7rem; color:rgba(255,255,255,0.4); text-transform:uppercase; letter-spacing:1px; font-weight:600;">Happy Customers</div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- ═══ COMBO BUNDLE ═══ -->
+<?php if ($bundle): ?>
+<section style="padding:60px 0; position:relative; z-index:2; background:linear-gradient(180deg,rgba(212,175,55,0.04) 0%,rgba(212,175,55,0.02) 100%);">
+    <div class="container">
+        <!-- Section Header -->
+        <div style="text-align:center; margin-bottom:45px;">
+            <span style="display:inline-block; font-size:0.65rem; font-weight:800; letter-spacing:2.5px; color:var(--gold-primary); text-transform:uppercase; margin-bottom:12px; background:rgba(212,175,55,0.06); border:1px solid rgba(212,175,55,0.12); padding:5px 16px; border-radius:20px;">Combo Offer</span>
+            <div style="font-size:clamp(1.8rem,4vw,2.8rem); font-family:var(--font-heading); font-weight:800; color:#fff; text-transform:uppercase; margin-bottom:10px;">Build Your Wellness Stack</div>
+            <p style="font-size:1rem; color:rgba(255,255,255,0.5);">Combined power for peak testosterone & total liver detox</p>
+        </div>
+
+        <!-- Bundle Grid -->
+        <div style="display:grid; grid-template-columns:1fr auto 1fr auto 1.3fr; gap:24px; align-items:stretch;">
+
+            <!-- Product 1 -->
+            <div class="tilt-card" style="background:rgba(255,255,255,0.02); border:1px solid rgba(212,175,55,0.1); border-radius:20px; padding:32px 24px; text-align:center; position:relative; overflow:hidden; transition:all 0.4s;">
+                <div style="display:flex; justify-content:center; margin-bottom:18px;">
+                    <img src="assets/images/products/wolfpack.png" alt="Wolfpack" style="height:170px; object-fit:contain; filter:drop-shadow(0 12px 25px rgba(8,12,16,0.5));">
+                </div>
+                <h3 style="color:#fff; font-size:1.15rem; font-weight:800; text-transform:uppercase; font-family:var(--font-heading); margin-bottom:6px;">WOLFPACK</h3>
+                <p style="color:var(--text-muted); font-size:0.82rem; margin-bottom:4px;">Vitality & Strength</p>
+                <p style="color:var(--gold-primary); font-size:0.8rem; font-weight:600;">60 Veggie Capsules</p>
+            </div>
+
+            <!-- Plus Connector -->
+            <div style="display:flex; align-items:center; justify-content:center;">
+                <div style="width:50px; height:50px; border-radius:50%; background:var(--gold-gradient); display:flex; align-items:center; justify-content:center; color:#080C10; font-size:1.5rem; font-weight:800; box-shadow:0 8px 20px rgba(212,175,55,0.25);">+</div>
+            </div>
+
+            <!-- Product 2 -->
+            <div class="tilt-card" style="background:rgba(255,255,255,0.02); border:1px solid rgba(212,175,55,0.1); border-radius:20px; padding:32px 24px; text-align:center; position:relative; overflow:hidden; transition:all 0.4s;">
+                <div style="display:flex; justify-content:center; margin-bottom:18px;">
+                    <img src="assets/images/products/wolftox.png" alt="Wolftox" style="height:170px; object-fit:contain; filter:drop-shadow(0 12px 25px rgba(8,12,16,0.5));">
+                </div>
+                <h3 style="color:#fff; font-size:1.15rem; font-weight:800; text-transform:uppercase; font-family:var(--font-heading); margin-bottom:6px;">WOLFTOX</h3>
+                <p style="color:var(--text-muted); font-size:0.82rem; margin-bottom:4px;">Liver Support & Detox</p>
+                <p style="color:var(--gold-primary); font-size:0.8rem; font-weight:600;">60 Veggie Capsules</p>
+            </div>
+
+            <!-- Equals Connector -->
+            <div style="display:flex; align-items:center; justify-content:center;">
+                <div style="width:50px; height:50px; border-radius:50%; background:var(--gold-gradient); display:flex; align-items:center; justify-content:center; color:#080C10; font-size:1.5rem; font-weight:800; box-shadow:0 8px 20px rgba(212,175,55,0.25);">=</div>
+            </div>
+
+            <!-- Combo Result -->
+            <div class="tilt-card" style="background:linear-gradient(135deg,rgba(212,175,55,0.08) 0%,rgba(8,12,16,0.95) 100%); border:1px solid rgba(212,175,55,0.2); border-radius:20px; padding:32px 28px; text-align:center; position:relative; overflow:hidden; transition:all 0.4s;">
+                <div style="position:absolute; top:-30px; right:-30px; width:120px; height:120px; background:radial-gradient(circle,rgba(212,175,55,0.12) 0%,transparent 70%); pointer-events:none;"></div>
+                <div style="position:absolute; top:0; left:0; right:0; height:3px; background:var(--gold-gradient);"></div>
+                <span style="display:inline-block; background:var(--gold-gradient); color:#080C10; font-size:0.65rem; font-weight:800; padding:4px 14px; border-radius:16px; text-transform:uppercase; letter-spacing:0.5px; margin-bottom:14px;">Save ₹299 (10% OFF)</span>
+                <h3 style="color:#fff; font-size:1.2rem; font-weight:800; text-transform:uppercase; font-family:var(--font-heading); margin-bottom:12px;">Wolf Stack Combo</h3>
+                <div style="margin-bottom:16px;">
+                    <span style="text-decoration:line-through; font-size:0.95rem; color:rgba(255,255,255,0.35); margin-right:6px;">₹2,998</span>
+                    <span style="font-size:2rem; font-weight:800; color:var(--gold-primary); font-family:var(--font-heading);">₹<?php echo number_format($bundle['combo_price'],2); ?></span>
+                </div>
+                <p style="font-size:0.82rem; color:rgba(255,255,255,0.5); margin-bottom:20px;">Full 30-day program. Both formulas, synergized.</p>
+                <button class="btn-gold" id="add-bundle-btn" data-bundle-id="<?php echo $bundle['id']; ?>" style="width:100%; padding:13px; border-radius:12px; font-size:0.88rem; font-weight:700;"><i class="fas fa-cubes"></i> Add Stack to Cart</button>
+            </div>
+
+        </div>
+    </div>
+</section>
+<?php endif; ?>
+
+<!-- ═══ WHY SHOP WITH US ═══ -->
+<section style="padding:100px 0; background:radial-gradient(circle at 75% 50%,rgba(212,175,55,0.04) 0%,transparent 70%); overflow:hidden; position:relative; z-index:2;">
+    <div class="container">
+        <div style="display:grid; grid-template-columns:1.2fr 1fr; gap:70px; align-items:center;">
+            <!-- Phone Mockup -->
+            <div style="position:relative; width:400px; margin:0 auto; display:flex; justify-content:center;">
+                <div style="position:absolute; bottom:-15px; left:-10px; width:250px; height:250px; background:var(--gold-gradient); opacity:0.06; border-radius:30px;"></div>
+                <div style="width:320px; height:640px; background:#080C10; border:5px solid #121212; padding:8px; border-radius:44px; box-shadow:0 40px 80px -20px rgba(8,12,16,0.9), 0 0 30px rgba(212,175,55,0.06); position:relative; overflow:hidden; display:flex; flex-direction:column; z-index:5;">
+                    <div style="position:absolute; top:12px; left:50%; transform:translateX(-50%); width:100px; height:24px; background:#080C10; border-radius:12px; z-index:10; display:flex; align-items:center; justify-content:center; gap:6px;"><div style="width:30px; height:3px; background:#121212; border-radius:2px;"></div><div style="width:5px; height:5px; background:radial-gradient(circle at 35% 35%,rgba(212,175,55,0.5),#080C10); border-radius:50%;"></div></div>
+                    <div style="position:absolute; inset:0; background:linear-gradient(135deg,rgba(255,255,255,0.06) 0%,rgba(255,255,255,0.02) 45%,transparent 46%); pointer-events:none; z-index:9; border-radius:40px;"></div>
+                    <div style="flex:1; display:flex; flex-direction:column; padding:38px 14px 14px 14px;">
+                        <div style="display:flex; justify-content:space-between; padding:2px 16px; font-size:0.58rem; color:rgba(255,255,255,0.3); font-weight:700; font-family:sans-serif; margin-bottom:10px;"><span>09:41</span><div style="display:flex; gap:5px; align-items:center;"><i class="fas fa-signal"></i><i class="fas fa-wifi"></i><i class="fas fa-battery-full"></i></div></div>
+                        <div style="display:flex; justify-content:space-between; align-items:center; padding:0 14px 8px; border-bottom:1px solid rgba(255,255,255,0.03); margin-bottom:12px;"><i class="fas fa-bars" style="color:var(--gold-primary); font-size:0.8rem;"></i><span style="font-size:0.82rem; font-weight:800; color:#fff; font-family:var(--font-heading);">WOLF <span style="color:var(--gold-primary);">NUTRITION</span></span><div style="position:relative;"><i class="fas fa-shopping-bag" style="color:#fff; font-size:0.8rem;"></i><span style="position:absolute; top:-5px; right:-5px; background:var(--gold-primary); color:#080C10; font-size:0.45rem; width:11px; height:11px; border-radius:50%; display:flex; justify-content:center; align-items:center; font-weight:800;">2</span></div></div>
+                        <div style="height:190px; background:radial-gradient(circle at 50% 50%,rgba(212,175,55,0.12) 0%,transparent 80%); border:1px solid rgba(255,255,255,0.03); border-radius:16px; margin:0 14px 10px; position:relative; display:flex; flex-direction:column; justify-content:center; align-items:center; text-align:center;"><span style="position:absolute; top:10px; left:10px; background:var(--gold-gradient); color:#080C10; font-size:0.5rem; font-weight:800; padding:2px 7px; border-radius:8px; text-transform:uppercase; font-family:var(--font-heading);">Best Seller</span><img src="assets/images/products/wolfpack.png" alt="Wolfpack" style="height:110px; object-fit:contain; filter:drop-shadow(0 12px 20px rgba(8,12,16,0.5)); animation:phoneProductFloat 4s ease-in-out infinite;"><span style="font-size:0.78rem; font-weight:700; color:#fff; margin-top:6px; font-family:var(--font-heading);">WOLFPACK Vitality</span><div style="position:absolute; bottom:8px; display:flex; gap:3px;"><div style="width:10px; height:3px; border-radius:2px; background:var(--gold-primary);"></div><div style="width:4px; height:4px; border-radius:50%; background:rgba(255,255,255,0.2);"></div><div style="width:4px; height:4px; border-radius:50%; background:rgba(255,255,255,0.2);"></div></div></div>
+                        <div style="font-size:0.65rem; font-weight:800; color:#fff; text-align:left; margin:4px 14px 8px; text-transform:uppercase; letter-spacing:0.5px;">Shop Range</div>
+                        <div style="display:flex; justify-content:space-between; padding:0 14px; gap:8px;">
+                            <?php foreach([['wolfpack.png','Vitality'],['wolftox.png','Detox'],['wolfpack_wolftox_combo.png','Combos']] as $mc): ?>
+                            <div style="display:flex; flex-direction:column; align-items:center; gap:4px;"><div style="width:46px; height:46px; background:rgba(255,255,255,0.02); border:1px solid rgba(212,175,55,0.12); border-radius:50%; display:flex; align-items:center; justify-content:center; padding:5px;"><img src="assets/images/products/<?php echo $mc[0]; ?>" alt="<?php echo $mc[1]; ?>" style="width:100%; height:100%; object-fit:contain;"></div><span style="font-size:0.5rem; color:rgba(255,255,255,0.5); font-weight:600;"><?php echo $mc[1]; ?></span></div>
+                            <?php endforeach; ?>
+                        </div>
+                        <div style="display:grid; grid-template-columns:repeat(4,1fr); padding:10px 8px; border-top:1px solid rgba(255,255,255,0.03); background:#080C10; margin-top:auto; text-align:center;">
+                            <div style="color:var(--gold-primary);"><i class="fas fa-home" style="font-size:0.75rem;"></i><br><span style="font-size:0.45rem; font-weight:700;">Home</span></div>
+                            <div style="color:rgba(255,255,255,0.35);"><i class="fas fa-capsules" style="font-size:0.75rem;"></i><br><span style="font-size:0.45rem; font-weight:700;">Shop</span></div>
+                            <div style="color:rgba(255,255,255,0.35);"><i class="fas fa-user-doctor" style="font-size:0.75rem;"></i><br><span style="font-size:0.45rem; font-weight:700;">Consult</span></div>
+                            <div style="color:rgba(255,255,255,0.35);"><i class="fas fa-user" style="font-size:0.75rem;"></i><br><span style="font-size:0.45rem; font-weight:700;">Profile</span></div>
+                        </div>
+                    </div>
+                </div>
+                <!-- Floating Card 1 -->
+                <div style="position:absolute; top:70px; right:-80px; width:210px; background:rgba(18,18,18,0.95); backdrop-filter:blur(16px); border:1px solid var(--gold-primary); border-radius:14px; padding:14px; box-shadow:0 25px 50px rgba(8,12,16,0.8); z-index:15; animation:floatBadge 5s ease-in-out infinite;">
+                    <span style="display:inline-block; background:rgba(212,175,55,0.12); color:var(--gold-primary); font-size:0.55rem; font-weight:800; padding:2px 7px; border-radius:16px; text-transform:uppercase; border:1px solid rgba(212,175,55,0.15); margin-bottom:8px;">Ultimate Offer</span>
+                    <div style="display:flex; gap:10px; align-items:center; margin-bottom:10px;"><img src="assets/images/products/wolftox.png" alt="Wolftox" style="width:50px; height:50px; object-fit:contain; filter:drop-shadow(0 6px 10px rgba(8,12,16,0.3));"><div><div style="font-size:0.75rem; font-weight:700; color:#fff;">WOLFTOX Detox</div><div style="color:var(--gold-light); font-size:0.6rem; margin-top:2px;"><i class="fas fa-star"></i> 4.9 (24)</div></div></div>
+                    <div style="display:flex; align-items:baseline; gap:5px; margin-bottom:8px;"><span style="font-size:1rem; font-weight:800; color:var(--gold-primary);">₹899</span><span style="font-size:0.7rem; text-decoration:line-through; color:var(--text-muted);">₹999</span></div>
+                    <button class="btn-gold" style="width:100%; padding:7px; font-size:0.7rem; font-weight:700; border-radius:8px;" onclick="location.href='product.php?slug=wolftox-liver-support-detox'">Add to Cart</button>
+                </div>
+                <!-- Floating Card 2 -->
+                <div style="position:absolute; bottom:60px; left:-80px; width:220px; background:rgba(18,18,18,0.95); backdrop-filter:blur(16px); border:1px solid rgba(212,175,55,0.25); border-radius:14px; padding:14px; box-shadow:0 25px 50px rgba(8,12,16,0.8); z-index:15; display:flex; flex-direction:column; gap:8px; animation:floatBadge 6s ease-in-out infinite;">
+                    <span style="font-size:0.7rem; font-weight:700; color:var(--gold-primary); text-transform:uppercase; letter-spacing:0.5px;">Goal-focused Plans</span>
+                    <span style="font-size:0.78rem; font-weight:600; color:#fff; line-height:1.3;">Get your first wellness call free!</span>
+                    <div style="display:flex; align-items:center; gap:8px; margin-bottom:3px;"><img src="assets/images/dietitian_avatar.png" alt="Dietitian" style="width:32px; height:32px; border-radius:50%; border:1.5px solid var(--gold-primary); object-fit:cover;"><div><div style="font-size:0.7rem; color:#fff; font-weight:700;">Shalini Sen</div><div style="font-size:0.55rem; color:var(--text-muted);">Certified Dietitian</div></div></div>
+                    <a href="https://wa.me/919876543210?text=Hi%20Wolf%20Nutrition,%20I%20would%20like%20to%20book%20a%20free%20dietitian%20consultation%20please." target="_blank" class="btn-outline-gold" style="width:100%; text-align:center; padding:7px; font-size:0.7rem; font-weight:700; border-radius:8px; display:block;">Consult Free</a>
+                </div>
+            </div>
+            <!-- Right Column -->
+            <div>
+                <span style="display:inline-block; font-size:0.85rem; color:var(--gold-primary); text-transform:uppercase; letter-spacing:2px; margin-bottom:10px; font-weight:700;">Designed for High Performance</span>
+                <h2 style="font-size:2.6rem; text-transform:uppercase; margin-bottom:22px; line-height:1.12; font-weight:800; font-family:var(--font-heading);">Unleash The Power Of Pure Wellness</h2>
+                <p style="font-size:1.02rem; color:rgba(255,255,255,0.65); line-height:1.7; margin-bottom:35px;">We combine ancient Ayurvedic secrets with modern sports science to deliver daily stacks that fuel strength and detox your liver.</p>
+                <div style="display:flex; flex-direction:column; gap:28px; margin-bottom:35px;">
+                    <?php foreach([['fa-flask','100% Transparent Formulations','No hidden ingredients, zero fillers. Full disclosure of every premium extract.'],['fa-user-doctor','Free Certified Expert Guidance','Consult 1-on-1 with our certified health coaches for a personalized regimen.'],['fa-truck-fast','Prepaid Rewards & Fast Delivery','Free express shipping and additional prepaid cashbacks on all orders.']] as $b): ?>
+                    <div style="display:flex; gap:22px; align-items:flex-start;">
+                        <div style="width:52px; height:52px; background:rgba(212,175,55,0.06); border:1px solid rgba(212,175,55,0.18); border-radius:14px; display:flex; align-items:center; justify-content:center; color:var(--gold-primary); font-size:1.3rem; flex-shrink:0; box-shadow:var(--gold-glow); transition:all 0.3s;"><i class="fas <?php echo $b[0]; ?>"></i></div>
+                        <div><h4 style="font-size:1.15rem; color:#fff; margin-bottom:5px; text-transform:uppercase; letter-spacing:0.5px;"><?php echo $b[1]; ?></h4><p style="font-size:0.92rem; color:rgba(255,255,255,0.6); line-height:1.6;"><?php echo $b[2]; ?></p></div>
+                    </div>
+                    <?php endforeach; ?>
+                </div>
+                <div style="display:flex; gap:18px; flex-wrap:wrap;">
+                    <a href="category.php?slug=all" class="btn-gold" style="padding:15px 34px; font-size:0.92rem; font-weight:700;">Explore Products</a>
+                    <a href="https://wa.me/919876543210?text=Hi%20Wolf%20Nutrition,%20I%20would%20like%20to%20book%20a%20free%20dietitian%20consultation%20please." target="_blank" class="btn-outline-gold" style="padding:14px 34px; font-size:0.92rem; font-weight:700; display:inline-flex; align-items:center; gap:8px;"><i class="fab fa-whatsapp"></i> Chat with Dietitian</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- ═══ TRUST ═══ -->
+<section class="container" style="margin-top:80px; position:relative; z-index:2;">
+    <div class="trust-strip" style="border-radius:20px; padding:42px 28px;">
+        <?php foreach([['fa-certificate','FSSAI Certified','License No. 22126022000063'],['fa-leaf','100% Ayurvedic','Pure Himalayan botanicals'],['fa-shield-halved','Veggie Capsules','100% clean, zero fillers']] as $t): ?>
+        <div class="trust-item tilt-card spotlight-card">
+            <div class="tilt-shine"></div>
+            <div style="width:62px; height:62px; border-radius:50%; background:var(--gold-gradient); display:flex; align-items:center; justify-content:center; margin-bottom:16px; box-shadow:0 8px 22px rgba(212,175,55,0.25); position:relative; z-index:1;"><i class="fas <?php echo $t[0]; ?>" style="font-size:1.4rem; color:#080C10;"></i></div>
+            <h4 style="font-size:1.1rem; margin-bottom:5px; position:relative; z-index:1;"><?php echo $t[1]; ?></h4>
+            <p style="font-size:0.82rem; position:relative; z-index:1;"><?php echo $t[2]; ?></p>
+        </div>
+        <?php endforeach; ?>
+    </div>
+</section>
+
+<!-- ═══ BRAND PHILOSOPHY ═══ -->
+<section class="container" style="margin:70px auto; position:relative; z-index:2;">
+    <div style="display:grid; grid-template-columns:1fr 1fr; align-items:center; border-radius:22px; overflow:hidden; border:1px solid rgba(212,175,55,0.1); box-shadow:0 20px 50px rgba(8,12,16,0.5); background:#121212;">
+        <div style="padding:48px 42px;">
+            <span style="display:inline-block; font-size:0.68rem; font-weight:800; color:var(--gold-primary); text-transform:uppercase; letter-spacing:2px; margin-bottom:14px; background:rgba(212,175,55,0.08); border:1px solid rgba(212,175,55,0.12); padding:5px 13px; border-radius:20px;">Our Philosophy</span>
+            <h2 style="font-size:2.1rem; text-transform:uppercase; margin-bottom:16px; background:var(--gold-gradient); -webkit-background-clip:text; -webkit-text-fill-color:transparent; line-height:1.2; font-family:var(--font-heading);">Bridging Ancient Wisdom & Modern Science</h2>
+            <p style="margin-bottom:24px; font-size:1.02rem; color:rgba(255,255,255,0.65); line-height:1.7;">We source the highest grade Shilajit, Ashwagandha, Kutki and Gokshura to formulate active wellness stacks for those who refuse to settle.</p>
+            <a href="about.php" class="btn-gold" style="padding:13px 30px; font-size:0.88rem; border-radius:30px;"><i class="fas fa-arrow-right"></i> Know Our Story</a>
+        </div>
+        <div style="height:100%; min-height:310px; background-image:url('assets/images/logo.png'); background-size:contain; background-position:center; background-repeat:no-repeat; background-color:#080C10; border-left:1px solid rgba(212,175,55,0.06); position:relative;">
+            <div style="position:absolute; inset:0; background:radial-gradient(circle at center,rgba(212,175,55,0.05) 0%,transparent 70%);"></div>
+        </div>
+    </div>
+</section>
+
+<!-- ═══ CERTIFICATES ═══ -->
+<?php if (!empty($certs)): ?>
+<section class="container" style="margin-bottom:60px; position:relative; z-index:2;">
+    <div class="section-header"><h2>Quality Certificates</h2><p>Our quality and safety registrations</p></div>
+    <div class="cert-gallery">
+        <?php foreach ($certs as $cert): ?>
+            <div class="cert-item tilt-card spotlight-card"><div class="tilt-shine"></div><a href="certificates.php"><img src="<?php echo htmlspecialchars($cert['image_url']); ?>" alt="<?php echo htmlspecialchars($cert['title']); ?>"></a><h4><?php echo htmlspecialchars($cert['title']); ?></h4></div>
+        <?php endforeach; ?>
+    </div>
+</section>
+<?php endif; ?>
+
+<!-- ═══ BLOG ═══ -->
+<?php if (!empty($blogs)): ?>
+<section class="container" style="margin-bottom:60px; position:relative; z-index:2;">
+    <div class="section-header"><h2>The Wellness Pack Blog</h2><p>Scientific insights & Ayurvedic guides</p></div>
+    <div class="blog-grid">
+        <?php foreach ($blogs as $blog): ?>
+            <div class="blog-card tilt-card spotlight-card"><div class="tilt-shine"></div>
+                <div class="blog-card-image"><img src="<?php echo htmlspecialchars($blog['cover_image'] ?: 'assets/images/blog/default.png'); ?>" alt="<?php echo htmlspecialchars($blog['title']); ?>"><span class="blog-card-badge"><?php echo htmlspecialchars($blog['category_tag']); ?></span></div>
+                <div class="blog-card-content"><div class="blog-card-date"><?php echo date('M d, Y', strtotime($blog['published_at'])); ?></div><a href="blog-post.php?slug=<?php echo $blog['slug']; ?>"><h3 class="blog-card-title"><?php echo htmlspecialchars($blog['title']); ?></h3></a><p class="blog-card-excerpt"><?php $text=strip_tags($blog['body']); echo htmlspecialchars(strlen($text)>100?substr($text,0,97).'...':$text); ?></p><a href="blog-post.php?slug=<?php echo $blog['slug']; ?>" class="blog-card-link">Read Article <i class="fas fa-arrow-right"></i></a></div>
+            </div>
+        <?php endforeach; ?>
+    </div>
+</section>
+<?php endif; ?>
+
+<!-- ═══ NEWSLETTER ═══ -->
+<section class="container" style="margin-bottom:60px; position:relative; z-index:2;">
+    <div style="background:linear-gradient(135deg,rgba(212,175,55,0.07) 0%,rgba(8,12,16,0.95) 50%,rgba(212,175,55,0.04) 100%); border:1px solid rgba(212,175,55,0.12); border-radius:22px; padding:55px 50px; text-align:center; position:relative; overflow:hidden;">
+        <div style="position:absolute; top:-60px; right:-60px; width:200px; height:200px; background:radial-gradient(circle,rgba(212,175,55,0.08) 0%,transparent 70%); pointer-events:none;"></div>
+        <div style="position:absolute; bottom:-60px; left:-60px; width:200px; height:200px; background:radial-gradient(circle,rgba(212,175,55,0.08) 0%,transparent 70%); pointer-events:none;"></div>
+        <h2 style="font-size:2rem; text-transform:uppercase; margin-bottom:8px; font-family:var(--font-heading); position:relative; z-index:2;">Join the Wolf Pack</h2>
+        <p style="color:rgba(255,255,255,0.65); font-size:0.95rem; margin-bottom:28px; max-width:460px; margin-left:auto; margin-right:auto; position:relative; z-index:2;">Exclusive discounts, stack guides, and early access. No spam, only gains.</p>
+        <form onsubmit="event.preventDefault(); this.querySelector('input').value=''; alert('Welcome to the pack! Check your inbox.');" style="display:flex; gap:10px; max-width:440px; margin:0 auto; position:relative; z-index:2;">
+            <input type="email" placeholder="Your email address" required style="flex:1; background:rgba(255,255,255,0.04); border:1px solid rgba(255,255,255,0.1); border-radius:30px; padding:13px 20px; color:#fff; font-size:0.9rem; outline:none; font-family:var(--font-body);">
+            <button type="submit" class="btn-gold" style="border-radius:30px; padding:13px 26px; white-space:nowrap; font-size:0.88rem;"><i class="fas fa-paper-plane"></i> Subscribe</button>
+        </form>
+    </div>
+</section>
 
 <?php require_once __DIR__ . '/includes/footer.php'; ?>
+
+<script>
+// ── Gold Particles ──
+(function(){var c=document.getElementById('goldParticles');if(!c)return;var ctx=c.getContext('2d'),p=[];function r(){c.width=window.innerWidth;c.height=window.innerHeight;}r();window.addEventListener('resize',r);for(var i=0;i<40;i++)p.push({x:Math.random()*c.width,y:Math.random()*c.height,r:Math.random()*2+0.5,dx:(Math.random()-0.5)*0.3,dy:(Math.random()-0.5)*0.3,o:Math.random()*0.5+0.1});function d(){ctx.clearRect(0,0,c.width,c.height);for(var i=0;i<p.length;i++){var v=p[i];ctx.beginPath();ctx.arc(v.x,v.y,v.r,0,Math.PI*2);ctx.fillStyle='rgba(212,175,55,'+v.o+')';ctx.fill();v.x+=v.dx;v.y+=v.dy;if(v.x<0||v.x>c.width)v.dx*=-1;if(v.y<0||v.y>c.height)v.dy*=-1;}requestAnimationFrame(d);}d();})();
+
+// ── Scroll Reveal ──
+(function(){var els=document.querySelectorAll('.section-header,.category-tile,.product-card,.trust-item,.blog-card,.counter-item,.proof-card');els.forEach(function(el){el.style.opacity='0';el.style.transform='translateY(24px)';el.style.transition='opacity 0.55s ease, transform 0.55s ease';});var obs=new IntersectionObserver(function(entries){entries.forEach(function(e,i){if(e.isIntersecting){setTimeout(function(){e.target.style.opacity='1';e.target.style.transform='translateY(0)';},i*60);obs.unobserve(e.target);}});},{threshold:0.1});els.forEach(function(el){obs.observe(el);});})();
+
+// ── Counter Animation ──
+(function(){var counters=document.querySelectorAll('.counter-num[data-target]');var obs=new IntersectionObserver(function(entries){entries.forEach(function(e){if(e.isIntersecting){var el=e.target,target=parseInt(el.getAttribute('data-target')),current=0,increment=target/50;var timer=setInterval(function(){current+=increment;if(current>=target){current=target;clearInterval(timer);}el.textContent=Math.floor(current).toLocaleString()+(target>=1000?'+':'');},30);obs.unobserve(el);}});},{threshold:0.5});counters.forEach(function(c){obs.observe(c);});})();
+
+// ── 3D Tilt ──
+(function(){document.querySelectorAll('.tilt-card').forEach(function(card){card.addEventListener('mousemove',function(e){var rect=card.getBoundingClientRect();var x=(e.clientX-rect.left)/rect.width-0.5;var y=(e.clientY-rect.top)/rect.height-0.5;card.style.transform='rotateY('+(x*6)+'deg) rotateX('+(-y*6)+'deg) scale(1.015)';card.style.setProperty('--mouse-x',((e.clientX-rect.left)/rect.width*100)+'%');card.style.setProperty('--mouse-y',((e.clientY-rect.top)/rect.height*100)+'%');});card.addEventListener('mouseleave',function(){card.style.transform='';});});})();
+</script>
