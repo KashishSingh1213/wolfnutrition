@@ -92,118 +92,181 @@ $stmt->execute();
 $coupons = $stmt->fetchAll();
 ?>
 
-    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:30px;">
-        <h2 style="font-size:1.8rem; text-transform:uppercase;">Coupons & Promos</h2>
-        <div style="font-size:0.85rem; color:var(--text-muted);">Manage store discount vouchers</div>
+    <!-- Page Header -->
+    <div style="margin-bottom:32px;">
+        <h1 style="font-size:1.75rem; font-weight:800; color:#fff; margin-bottom:6px; text-transform:uppercase; letter-spacing:1px;">Coupons & Promos</h1>
+        <p style="font-size:0.85rem; color:rgba(255,255,255,0.45); font-weight:400;">Manage store discount vouchers and promotional codes</p>
     </div>
 
     <?php if ($action_msg): ?>
-        <div class="quantity-discount-widget" style="background-color:rgba(212,175,55,0.05); border-color:rgba(212,175,55,0.3); color:var(--success-color); margin-bottom:25px;">
-            ✅ <?php echo htmlspecialchars($action_msg); ?>
+        <div style="background:rgba(74,222,128,0.08); border:1px solid rgba(74,222,128,0.2); border-radius:10px; padding:14px 20px; margin-bottom:24px; display:flex; align-items:center; gap:10px;">
+            <i class="fas fa-check-circle" style="color:#4ade80; font-size:1rem;"></i>
+            <span style="color:#4ade80; font-size:0.875rem; font-weight:500;"><?php echo htmlspecialchars($action_msg); ?></span>
+        </div>
+    <?php endif; ?>
+    <?php if (isset($action_error) && $action_error): ?>
+        <div style="background:rgba(239,68,68,0.08); border:1px solid rgba(239,68,68,0.2); border-radius:10px; padding:14px 20px; margin-bottom:24px; display:flex; align-items:center; gap:10px;">
+            <i class="fas fa-exclamation-circle" style="color:#ef4444; font-size:1rem;"></i>
+            <span style="color:#ef4444; font-size:0.875rem; font-weight:500;"><?php echo htmlspecialchars($action_error); ?></span>
         </div>
     <?php endif; ?>
 
-    <div style="display:grid; grid-template-columns: 2fr 1.2fr; gap:30px; align-items:start;">
-        <!-- Coupons list -->
-        <div class="glass-card" style="padding: 25px; border-radius:6px;">
-            <h3 style="font-size:1.15rem; text-transform:uppercase; margin-bottom:15px; color:var(--gold-primary); border-bottom:1px solid var(--border-color); padding-bottom:10px;">
-                Active Coupons
-            </h3>
+    <div style="display:grid; grid-template-columns: 1fr 400px; gap:28px; align-items:start;">
+
+        <!-- Coupons Table -->
+        <div class="glass-card" style="padding:0; overflow:hidden;">
+            <div style="padding:20px 24px; border-bottom:1px solid rgba(255,255,255,0.06); display:flex; align-items:center; justify-content:space-between;">
+                <div>
+                    <h3 style="font-size:1rem; font-weight:700; color:#fff; text-transform:uppercase; letter-spacing:0.5px;">Active Coupons</h3>
+                    <p style="font-size:0.75rem; color:rgba(255,255,255,0.45); margin-top:4px;"><?php echo count($coupons); ?> total codes</p>
+                </div>
+                <div style="width:36px; height:36px; border-radius:8px; background:rgba(212,175,55,0.1); display:flex; align-items:center; justify-content:center;">
+                    <i class="fas fa-percent" style="color:#D4AF37; font-size:0.9rem;"></i>
+                </div>
+            </div>
 
             <?php if (empty($coupons)): ?>
-                <p style="color:var(--text-muted); text-align:center; padding:20px 0;">No coupon codes created yet.</p>
+                <div style="padding:48px 24px; text-align:center;">
+                    <i class="fas fa-ticket" style="font-size:2.5rem; color:rgba(255,255,255,0.1); margin-bottom:16px; display:block;"></i>
+                    <p style="color:rgba(255,255,255,0.45); font-size:0.9rem;">No coupon codes created yet.</p>
+                    <p style="color:rgba(255,255,255,0.3); font-size:0.8rem; margin-top:6px;">Use the form on the right to create your first coupon.</p>
+                </div>
             <?php else: ?>
-                <table class="admin-table" style="font-size:0.85rem;">
-                    <thead>
-                        <tr>
-                            <th>Code</th>
-                            <th>Type</th>
-                            <th>Value</th>
-                            <th>Min. Order</th>
-                            <th>Expiry</th>
-                            <th>Used</th>
-                            <th>Status</th>
-                            <th>Action</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <?php foreach ($coupons as $c): ?>
+                <div style="overflow-x:auto;">
+                    <table class="admin-table" style="margin-top:0; border:none; border-radius:0;">
+                        <thead>
                             <tr>
-                                <td><strong style="color:#fff; font-size:1rem;"><?php echo htmlspecialchars($c['code']); ?></strong></td>
-                                <td style="text-transform:capitalize;"><?php echo htmlspecialchars($c['type']); ?></td>
-                                <td><?php echo $c['type'] === 'percentage' ? htmlspecialchars($c['value']) . '%' : '₹' . number_format($c['value'], 2); ?></td>
-                                <td>₹<?php echo number_format($c['min_order_amount'], 2); ?></td>
-                                <td><?php echo date('d-M-Y', strtotime($c['expiry_date'])); ?></td>
-                                <td><?php echo $c['used_count']; ?> times</td>
-                                <td>
-                                    <span class="admin-badge <?php echo $c['status'] ? 'badge-completed' : 'badge-pending'; ?>">
-                                        <?php echo $c['status'] ? 'Active' : 'Inactive'; ?>
-                                    </span>
-                                </td>
-                                <td>
-                                    <div style="display:flex; gap:10px;">
-                                        <a href="coupons.php?edit_id=<?php echo $c['id']; ?>" style="color:var(--gold-primary); font-weight:700;">Edit</a>
-                                        <a href="coupons.php?toggle_id=<?php echo $c['id']; ?>" style="color:var(--success-color); font-weight:700;"><?php echo $c['status'] ? 'Disable' : 'Enable'; ?></a>
-                                        <a href="coupons.php?delete_id=<?php echo $c['id']; ?>" style="color:var(--danger-color); font-weight:700;" onclick="return confirm('Delete this coupon code?')">Delete</a>
-                                    </div>
-                                </td>
+                                <th>Code</th>
+                                <th>Type</th>
+                                <th>Value</th>
+                                <th>Min. Order</th>
+                                <th>Expiry</th>
+                                <th>Used</th>
+                                <th>Status</th>
+                                <th>Actions</th>
                             </tr>
-                        <?php endforeach; ?>
-                    </tbody>
-                </table>
+                        </thead>
+                        <tbody>
+                            <?php foreach ($coupons as $c): ?>
+                                <tr>
+                                    <td>
+                                        <span style="font-family:'Inter',monospace; font-weight:700; color:#fff; font-size:0.8rem; background:rgba(212,175,55,0.1); padding:3px 8px; border-radius:4px; letter-spacing:0.5px;">
+                                            <?php echo htmlspecialchars($c['code']); ?>
+                                        </span>
+                                    </td>
+                                    <td style="text-transform:capitalize; font-size:0.8rem;">
+                                        <?php echo htmlspecialchars($c['type']); ?>
+                                    </td>
+                                    <td>
+                                        <span style="color:#4ade80; font-weight:700; font-size:0.85rem;">
+                                            <?php echo $c['type'] === 'percentage' ? htmlspecialchars($c['value']) . '%' : '₹' . number_format($c['value'], 2); ?>
+                                        </span>
+                                    </td>
+                                    <td style="font-size:0.8rem;">₹<?php echo number_format($c['min_order_amount'], 2); ?></td>
+                                    <td style="font-size:0.8rem;">
+                                        <?php
+                                        $exp = date('Y-m-d', strtotime($c['expiry_date']));
+                                        $now = date('Y-m-d');
+                                        $isExpired = $exp < $now;
+                                        ?>
+                                        <span style="color:<?php echo $isExpired ? '#ef4444' : 'rgba(255,255,255,0.7)'; ?>;">
+                                            <?php echo date('d M Y', strtotime($c['expiry_date'])); ?>
+                                        </span>
+                                    </td>
+                                    <td style="font-size:0.8rem; color:rgba(255,255,255,0.6);"><?php echo $c['used_count']; ?>x</td>
+                                    <td>
+                                        <span class="admin-badge <?php echo $c['status'] ? 'badge-completed' : 'badge-pending'; ?>">
+                                            <?php echo $c['status'] ? 'Active' : 'Inactive'; ?>
+                                        </span>
+                                    </td>
+                                    <td>
+                                        <div style="display:flex; gap:6px; align-items:center;">
+                                            <a href="coupons.php?edit_id=<?php echo $c['id']; ?>" title="Edit" style="width:30px; height:30px; border-radius:6px; background:rgba(212,175,55,0.1); display:flex; align-items:center; justify-content:center; color:#D4AF37; font-size:0.75rem; transition:all 0.2s;">
+                                                <i class="fas fa-pen"></i>
+                                            </a>
+                                            <a href="coupons.php?toggle_id=<?php echo $c['id']; ?>" title="<?php echo $c['status'] ? 'Disable' : 'Enable'; ?>" style="width:30px; height:30px; border-radius:6px; background:rgba(74,222,128,0.1); display:flex; align-items:center; justify-content:center; color:#4ade80; font-size:0.75rem; transition:all 0.2s;">
+                                                <i class="fas fa-<?php echo $c['status'] ? 'toggle-on' : 'toggle-off'; ?>"></i>
+                                            </a>
+                                            <a href="coupons.php?delete_id=<?php echo $c['id']; ?>" title="Delete" onclick="return confirm('Delete this coupon code?')" style="width:30px; height:30px; border-radius:6px; background:rgba(239,68,68,0.1); display:flex; align-items:center; justify-content:center; color:#ef4444; font-size:0.75rem; transition:all 0.2s;">
+                                                <i class="fas fa-trash"></i>
+                                            </a>
+                                        </div>
+                                    </td>
+                                </tr>
+                            <?php endforeach; ?>
+                        </tbody>
+                    </table>
+                </div>
             <?php endif; ?>
         </div>
 
-        <!-- Add/Edit Coupon Form -->
-        <div class="glass-card" style="padding: 25px; border-radius:6px;">
-            <h3 style="font-size:1.15rem; text-transform:uppercase; margin-bottom:15px; color:var(--gold-primary); border-bottom:1px solid var(--border-color); padding-bottom:10px;">
-                <?php echo $edit_coupon ? 'Edit Coupon' : 'Add New Coupon'; ?>
-            </h3>
+        <!-- Add/Edit Form -->
+        <div class="glass-card" style="padding:0; overflow:hidden; position:sticky; top:96px;">
+            <div style="padding:20px 24px; border-bottom:1px solid rgba(255,255,255,0.06); display:flex; align-items:center; gap:12px;">
+                <div style="width:36px; height:36px; border-radius:8px; background:rgba(212,175,55,0.1); display:flex; align-items:center; justify-content:center;">
+                    <i class="fas fa-<?php echo $edit_coupon ? 'edit' : 'plus'; ?>" style="color:#D4AF37; font-size:0.9rem;"></i>
+                </div>
+                <h3 style="font-size:1rem; font-weight:700; color:#fff; text-transform:uppercase; letter-spacing:0.5px;">
+                    <?php echo $edit_coupon ? 'Edit Coupon' : 'Add New Coupon'; ?>
+                </h3>
+            </div>
 
-            <form action="coupons.php" method="POST">
+            <form action="coupons.php" method="POST" style="padding:24px;">
                 <?php if ($edit_coupon): ?>
                     <input type="hidden" name="edit_id" value="<?php echo $edit_coupon['id']; ?>">
                 <?php endif; ?>
 
                 <div class="form-group">
-                    <label for="c-code">Coupon Code *</label>
-                    <input type="text" name="code" id="c-code" class="form-control" style="font-size:0.85rem; padding:8px;" placeholder="e.g. PACK20"
+                    <label for="c-code" style="font-size:0.75rem; text-transform:uppercase; letter-spacing:0.8px; color:rgba(255,255,255,0.5); margin-bottom:8px;">Coupon Code *</label>
+                    <input type="text" name="code" id="c-code" class="form-control" placeholder="e.g. PACK20" style="font-family:'Inter',monospace; letter-spacing:1px; font-weight:600;"
                         value="<?php echo htmlspecialchars($edit_coupon ? $edit_coupon['code'] : ''); ?>" required>
                 </div>
-                <div class="form-group">
-                    <label for="c-type">Discount Type</label>
-                    <select name="type" id="c-type" class="form-control" style="font-size:0.85rem; padding:8px;">
-                        <option value="percentage" <?php echo ($edit_coupon && $edit_coupon['type'] === 'percentage') ? 'selected' : ''; ?>>Percentage (%)</option>
-                        <option value="flat" <?php echo ($edit_coupon && $edit_coupon['type'] === 'flat') ? 'selected' : ''; ?>>Flat Amount (₹)</option>
-                    </select>
+
+                <div style="display:grid; grid-template-columns:1fr 1fr; gap:16px;">
+                    <div class="form-group">
+                        <label for="c-type" style="font-size:0.75rem; text-transform:uppercase; letter-spacing:0.8px; color:rgba(255,255,255,0.5); margin-bottom:8px;">Discount Type</label>
+                        <select name="type" id="c-type" class="form-control">
+                            <option value="percentage" <?php echo ($edit_coupon && $edit_coupon['type'] === 'percentage') ? 'selected' : ''; ?>>Percentage (%)</option>
+                            <option value="flat" <?php echo ($edit_coupon && $edit_coupon['type'] === 'flat') ? 'selected' : ''; ?>>Flat Amount (₹)</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="c-val" style="font-size:0.75rem; text-transform:uppercase; letter-spacing:0.8px; color:rgba(255,255,255,0.5); margin-bottom:8px;">Value *</label>
+                        <input type="number" step="0.01" name="value" id="c-val" class="form-control" required placeholder="e.g. 10 or 150"
+                            value="<?php echo $edit_coupon ? htmlspecialchars($edit_coupon['value']) : ''; ?>">
+                    </div>
                 </div>
-                <div class="form-group">
-                    <label for="c-val">Value *</label>
-                    <input type="number" step="0.01" name="value" id="c-val" class="form-control" style="font-size:0.85rem; padding:8px;" required placeholder="e.g. 10 or 150"
-                        value="<?php echo $edit_coupon ? htmlspecialchars($edit_coupon['value']) : ''; ?>">
+
+                <div style="display:grid; grid-template-columns:1fr 1fr; gap:16px;">
+                    <div class="form-group">
+                        <label for="c-min" style="font-size:0.75rem; text-transform:uppercase; letter-spacing:0.8px; color:rgba(255,255,255,0.5); margin-bottom:8px;">Min. Order (₹)</label>
+                        <input type="number" step="0.01" name="min_order_amount" id="c-min" class="form-control" placeholder="0.00"
+                            value="<?php echo $edit_coupon ? htmlspecialchars($edit_coupon['min_order_amount']) : '0.00'; ?>">
+                    </div>
+                    <div class="form-group">
+                        <label for="c-max" style="font-size:0.75rem; text-transform:uppercase; letter-spacing:0.8px; color:rgba(255,255,255,0.5); margin-bottom:8px;">Max. Discount (₹)</label>
+                        <input type="number" step="0.01" name="max_discount" id="c-max" class="form-control" placeholder="0 = unlimited"
+                            value="<?php echo $edit_coupon ? htmlspecialchars($edit_coupon['max_discount']) : '0.00'; ?>">
+                    </div>
                 </div>
+
                 <div class="form-group">
-                    <label for="c-min">Min. Order Value (₹)</label>
-                    <input type="number" step="0.01" name="min_order_amount" id="c-min" class="form-control" style="font-size:0.85rem; padding:8px;"
-                        value="<?php echo $edit_coupon ? htmlspecialchars($edit_coupon['min_order_amount']) : '0.00'; ?>">
-                </div>
-                <div class="form-group">
-                    <label for="c-max">Max. Discount Limit (₹)</label>
-                    <input type="number" step="0.01" name="max_discount" id="c-max" class="form-control" style="font-size:0.85rem; padding:8px;" placeholder="0 for unlimited"
-                        value="<?php echo $edit_coupon ? htmlspecialchars($edit_coupon['max_discount']) : '0.00'; ?>">
-                </div>
-                <div class="form-group">
-                    <label for="c-expiry">Expiry Date *</label>
-                    <input type="date" name="expiry_date" id="c-expiry" class="form-control" style="font-size:0.85rem; padding:8px;" required
+                    <label for="c-expiry" style="font-size:0.75rem; text-transform:uppercase; letter-spacing:0.8px; color:rgba(255,255,255,0.5); margin-bottom:8px;">Expiry Date *</label>
+                    <input type="date" name="expiry_date" id="c-expiry" class="form-control" required
                         value="<?php echo $edit_coupon ? htmlspecialchars($edit_coupon['expiry_date']) : ''; ?>">
                 </div>
 
-                <button type="submit" name="<?php echo $edit_coupon ? 'edit_coupon' : 'add_coupon'; ?>" class="btn-gold" style="width:100%; margin-top:10px; padding:10px; font-size:0.85rem;">
-                    <?php echo $edit_coupon ? 'Update Coupon' : 'Save Coupon'; ?>
-                </button>
+                <div style="display:flex; gap:10px; margin-top:8px;">
+                    <button type="submit" name="<?php echo $edit_coupon ? 'edit_coupon' : 'add_coupon'; ?>" class="btn-gold" style="flex:1; padding:12px 20px;">
+                        <i class="fas fa-<?php echo $edit_coupon ? 'save' : 'plus'; ?>"></i>
+                        <?php echo $edit_coupon ? 'Update Coupon' : 'Save Coupon'; ?>
+                    </button>
+                </div>
 
                 <?php if ($edit_coupon): ?>
-                    <a href="coupons.php" style="display:block; text-align:center; margin-top:10px; color:var(--text-muted); font-size:0.85rem;">Cancel Edit</a>
+                    <a href="coupons.php" style="display:flex; align-items:center; justify-content:center; gap:6px; margin-top:12px; padding:10px; border-radius:8px; border:1px solid rgba(255,255,255,0.08); color:rgba(255,255,255,0.5); font-size:0.8rem; font-weight:500; transition:all 0.2s; text-decoration:none;">
+                        <i class="fas fa-times"></i> Cancel Edit
+                    </a>
                 <?php endif; ?>
             </form>
         </div>

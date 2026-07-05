@@ -1,5 +1,5 @@
 <?php
-// admin/bundle_edit.php — Dedicated Edit Bundle + Manage Items
+// admin/bundle_edit.php — Dedicated Edit Combo + Manage Items
 require_once __DIR__ . '/includes/header.php';
 require_once __DIR__ . '/includes/sidebar.php';
 
@@ -49,13 +49,15 @@ $items = $stmt_items->fetchAll();
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['update_bundle'])) {
     $title = trim($_POST['title']);
     $description = trim($_POST['description']);
-    $banner_image = trim($_POST['banner_image']);
     $combo_price = (float)$_POST['combo_price'];
     $discount_percent = (float)$_POST['discount_percent'];
     $display_order = (int)$_POST['display_order'];
     $status = isset($_POST['status']) ? 1 : 0;
 
-    // Handle banner image upload
+    // Keep existing banner by default
+    $banner_image = $bundle['banner_image'];
+
+    // Handle banner image upload (only if new file provided)
     if (isset($_FILES['banner_image_file']) && $_FILES['banner_image_file']['error'] === UPLOAD_ERR_OK) {
         $file = $_FILES['banner_image_file'];
         $allowed = ['image/jpeg', 'image/png', 'image/gif', 'image/webp'];
@@ -63,7 +65,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['update_bundle'])) {
             $upload_dir = __DIR__ . '/../uploads/products/';
             if (!is_dir($upload_dir)) mkdir($upload_dir, 0755, true);
             $ext = pathinfo($file['name'], PATHINFO_EXTENSION);
-            $filename = 'bundle_' . time() . '_' . bin2hex(random_bytes(8)) . '.' . $ext;
+            $filename = 'combo_' . time() . '_' . bin2hex(random_bytes(8)) . '.' . $ext;
             if (move_uploaded_file($file['tmp_name'], $upload_dir . $filename)) {
                 $banner_image = 'uploads/products/' . $filename;
             }
@@ -80,7 +82,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['update_bundle'])) {
     $stmt_b2->execute([$edit_id]);
     $bundle = $stmt_b2->fetch();
     
-    $action_msg = "Bundle updated successfully.";
+    $action_msg = "Combo updated successfully.";
 }
 
 // Handle ADD bundle item
@@ -91,7 +93,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['add_bundle_item'])) {
     $stmt_check = $pdo->prepare("SELECT id FROM bundle_items WHERE bundle_id = ? AND product_id = ? AND variant_id = ?");
     $stmt_check->execute([$edit_id, $product_id, $variant_id]);
     if ($stmt_check->fetch()) {
-        $action_error = "This product variant is already in the bundle.";
+        $action_error = "This product variant is already in the combo.";
     } else {
         $stmt_ai = $pdo->prepare("INSERT INTO bundle_items (bundle_id, product_id, variant_id) VALUES (?, ?, ?)");
         $stmt_ai->execute([$edit_id, $product_id, $variant_id]);
@@ -111,7 +113,7 @@ if (isset($_GET['remove_item_id'])) {
 
 // Success messages
 if (isset($_GET['msg'])) {
-    $msgs = ['item_added' => 'Item added to bundle.', 'item_removed' => 'Item removed from bundle.'];
+    $msgs = ['item_added' => 'Item added to combo.', 'item_removed' => 'Item removed from combo.'];
     $action_msg = $msgs[$_GET['msg']] ?? $action_msg;
 }
 
@@ -129,12 +131,12 @@ $items = $stmt_items2->fetchAll();
 
     <div style="margin-bottom:20px;">
         <a href="bundles.php" style="color:var(--gold-muted); font-size:0.9rem; text-decoration:none;">
-            <i class="fas fa-arrow-left"></i> Back to Bundles
+            <i class="fas fa-arrow-left"></i> Back to Combos
         </a>
     </div>
 
     <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:30px;">
-        <h2 style="font-size:1.8rem; text-transform:uppercase;">Edit Bundle</h2>
+        <h2 style="font-size:1.8rem; text-transform:uppercase;">Edit Combo</h2>
         <div style="font-size:0.85rem; color:var(--text-muted);">Editing: <strong style="color:var(--gold-primary);"><?php echo htmlspecialchars($bundle['title']); ?></strong></div>
     </div>
 
@@ -154,10 +156,10 @@ $items = $stmt_items2->fetchAll();
         <!-- Left: Edit Details + Items -->
         <div style="display:flex; flex-direction:column; gap:25px;">
             
-            <!-- Edit Bundle Details -->
+            <!-- Edit Combo Details -->
             <div class="glass-card" style="padding:25px; border-radius:8px;">
                 <h3 style="font-size:1.1rem; text-transform:uppercase; color:var(--gold-primary); margin-bottom:15px; border-bottom:1px solid var(--border-color); padding-bottom:8px;">
-                    <i class="fas fa-edit"></i> Bundle Details
+                    <i class="fas fa-edit"></i> Combo Details
                 </h3>
                 <form action="bundle_edit.php?id=<?php echo $edit_id; ?>" method="POST" enctype="multipart/form-data">
                     <input type="hidden" name="bundle_id" value="<?php echo $edit_id; ?>">
@@ -208,32 +210,26 @@ $items = $stmt_items2->fetchAll();
                         </div>
                     <?php endif; ?>
 
-                    <div style="display:grid; grid-template-columns:1fr 1fr; gap:20px; margin-bottom:20px;">
-                        <div class="form-group">
-                            <label>Replace Banner Image</label>
-                            <input type="file" name="banner_image_file" accept="image/*" class="form-control" style="padding:8px;">
-                        </div>
-                        <div class="form-group">
-                            <label for="b-banner">Or Enter Path</label>
-                            <input type="text" name="banner_image" id="b-banner" class="form-control" 
-                                value="<?php echo htmlspecialchars($bundle['banner_image']); ?>">
-                        </div>
+                    <div class="form-group" style="margin-bottom:20px; max-width:400px;">
+                        <label><?php echo $bundle['banner_image'] ? 'Replace Banner Image' : 'Upload Banner Image'; ?></label>
+                        <input type="file" name="banner_image_file" accept="image/*" class="form-control" style="padding:8px;">
+                        <small style="color:var(--text-muted); font-size:0.75rem; margin-top:4px; display:block;">JPG, PNG, WEBP — Max 5MB. Stored in uploads/products/</small>
                     </div>
 
                     <button type="submit" name="update_bundle" class="btn-gold" style="padding:10px 30px; font-size:0.9rem;">
-                        <i class="fas fa-save"></i> Update Bundle
+                        <i class="fas fa-save"></i> Update Combo
                     </button>
                 </form>
             </div>
 
-            <!-- Bundle Items -->
+            <!-- Combo Items -->
             <div class="glass-card" style="padding:25px; border-radius:8px;">
                 <h3 style="font-size:1.1rem; text-transform:uppercase; color:var(--gold-primary); margin-bottom:15px; border-bottom:1px solid var(--border-color); padding-bottom:8px;">
-                    <i class="fas fa-boxes"></i> Bundle Items (<?php echo count($items); ?>)
+                    <i class="fas fa-boxes"></i> Combo Items (<?php echo count($items); ?>)
                 </h3>
 
                 <?php if (empty($items)): ?>
-                    <p style="color:var(--text-muted); font-size:0.9rem; margin-bottom:20px;">No items in this bundle yet. Add products below.</p>
+                    <p style="color:var(--text-muted); font-size:0.9rem; margin-bottom:20px;">No items in this combo yet. Add products below.</p>
                 <?php else: ?>
                     <div style="margin-bottom:25px;">
                         <?php foreach ($items as $item): ?>
@@ -245,7 +241,7 @@ $items = $stmt_items2->fetchAll();
                                     <span style="color:var(--text-muted); font-size:0.8rem; margin-left:8px;">— ₹<?php echo number_format($item['sale_price'], 2); ?></span>
                                 </span>
                                 <a href="bundle_edit.php?id=<?php echo $edit_id; ?>&remove_item_id=<?php echo $item['id']; ?>" 
-                                   onclick="return confirm('Remove this item from the bundle?');"
+                                   onclick="return confirm('Remove this item from the combo?');"
                                    style="color:#dc3545; font-size:0.8rem; text-decoration:none;">
                                     <i class="fas fa-times-circle"></i> Remove
                                 </a>
@@ -256,7 +252,7 @@ $items = $stmt_items2->fetchAll();
 
                 <!-- Add Item Form -->
                 <div style="background:var(--bg-primary); border:1px solid var(--border-color); padding:20px; border-radius:6px;">
-                    <h4 style="font-size:0.9rem; color:var(--text-muted); margin-bottom:15px; text-transform:uppercase;">Add Item to Bundle</h4>
+                    <h4 style="font-size:0.9rem; color:var(--text-muted); margin-bottom:15px; text-transform:uppercase;">Add Item to Combo</h4>
                     <form action="bundle_edit.php?id=<?php echo $edit_id; ?>" method="POST" style="display:grid; grid-template-columns: 2fr 2fr auto; gap:15px; align-items:end;">
                         <div class="form-group" style="margin:0;">
                             <label style="font-size:0.75rem; color:var(--text-muted); display:block; margin-bottom:4px;">Select Product</label>
@@ -283,15 +279,15 @@ $items = $stmt_items2->fetchAll();
             </div>
         </div>
 
-        <!-- Right: Bundle Stats -->
+        <!-- Right: Combo Stats -->
         <div class="glass-card" style="padding:25px; border-radius:6px; border-left:4px solid var(--gold-primary);">
             <h3 style="font-size:1.15rem; text-transform:uppercase; margin-bottom:15px; color:var(--gold-primary); border-bottom:1px solid var(--border-color); padding-bottom:10px;">
-                Bundle Summary
+                Combo Summary
             </h3>
             
             <div style="display:flex; flex-direction:column; gap:15px;">
                 <div style="display:flex; justify-content:space-between; font-size:0.9rem;">
-                    <span style="color:var(--text-muted);">Items in bundle</span>
+                    <span style="color:var(--text-muted);">Items in combo</span>
                     <strong style="color:#fff; font-size:1.1rem;"><?php echo count($items); ?></strong>
                 </div>
                 <div style="display:flex; justify-content:space-between; font-size:0.9rem;">
@@ -348,6 +344,36 @@ $items = $stmt_items2->fetchAll();
             });
         }
     }
+    </script>
+
+    <!-- Trumbowyg JS -->
+    <script src="https://cdn.jsdelivr.net/npm/jquery@3.6.0/dist/jquery.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/trumbowyg@2.27.3/dist/trumbowyg.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/trumbowyg@2.27.3/dist/plugins/upload/trumbowyg.upload.min.js"></script>
+    <script>
+    $(document).ready(function() {
+        $('#b-desc').trumbowyg({
+            btns: [
+                ['viewHTML'],
+                ['formatting'],
+                ['strong', 'em', 'del'],
+                ['link'],
+                ['insertImage'],
+                ['unorderedList', 'orderedList'],
+                ['horizontalRule'],
+                ['removeformat'],
+                ['fullscreen']
+            ],
+            plugins: {
+                upload: {
+                    serverPath: 'upload_handler.php',
+                    fileFieldName: 'file',
+                    urlPropertyName: 'url'
+                }
+            },
+            autogrow: true
+        });
+    });
     </script>
 
 <?php 

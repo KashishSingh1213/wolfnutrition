@@ -89,44 +89,80 @@ if (isset($_GET['edit_id'])) {
 }
 ?>
 
-    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:30px;">
-        <h2 style="font-size:1.8rem; text-transform:uppercase;">Blog Manager</h2>
-        <div style="font-size:0.85rem; color:var(--text-muted);">Author and publish wellness articles</div>
+    <!-- Page Header -->
+    <div style="margin-bottom:32px;">
+        <h1 style="font-size:1.75rem; font-weight:800; color:#fff; margin-bottom:6px; text-transform:uppercase; letter-spacing:1px;">Blog Manager</h1>
+        <p style="font-size:0.85rem; color:rgba(255,255,255,0.45); font-weight:400;">Author and publish wellness articles</p>
     </div>
 
     <?php if ($action_msg): ?>
-        <div class="quantity-discount-widget" style="background-color:rgba(212,175,55,0.05); border-color:rgba(212,175,55,0.3); color:var(--success-color); margin-bottom:25px;">
-            ✅ <?php echo htmlspecialchars($action_msg); ?>
+        <div style="background:rgba(74,222,128,0.08); border:1px solid rgba(74,222,128,0.2); border-radius:10px; padding:14px 20px; margin-bottom:24px; display:flex; align-items:center; gap:10px;">
+            <i class="fas fa-check-circle" style="color:#4ade80; font-size:1rem;"></i>
+            <span style="color:#4ade80; font-size:0.875rem; font-weight:500;"><?php echo htmlspecialchars($action_msg); ?></span>
+        </div>
+    <?php endif; ?>
+    <?php if (isset($action_error) && $action_error): ?>
+        <div style="background:rgba(239,68,68,0.08); border:1px solid rgba(239,68,68,0.2); border-radius:10px; padding:14px 20px; margin-bottom:24px; display:flex; align-items:center; gap:10px;">
+            <i class="fas fa-exclamation-circle" style="color:#ef4444; font-size:1rem;"></i>
+            <span style="color:#ef4444; font-size:0.875rem; font-weight:500;"><?php echo htmlspecialchars($action_error); ?></span>
         </div>
     <?php endif; ?>
 
-    <div style="display:grid; grid-template-columns: 1.5fr 1fr; gap:30px; align-items:start;">
-        <!-- Articles list -->
-        <div class="glass-card" style="padding: 25px; border-radius:6px;">
-            <h3 style="font-size:1.15rem; text-transform:uppercase; margin-bottom:15px; color:var(--gold-primary); border-bottom:1px solid var(--border-color); padding-bottom:10px;">
-                Published Articles
-            </h3>
-            
+    <div style="display:grid; grid-template-columns: 1fr 480px; gap:28px; align-items:start;">
+
+        <!-- Articles List -->
+        <div class="glass-card" style="padding:0; overflow:hidden;">
+            <div style="padding:20px 24px; border-bottom:1px solid rgba(255,255,255,0.06); display:flex; align-items:center; justify-content:space-between;">
+                <div>
+                    <h3 style="font-size:1rem; font-weight:700; color:#fff; text-transform:uppercase; letter-spacing:0.5px;">Published Articles</h3>
+                    <p style="font-size:0.75rem; color:rgba(255,255,255,0.45); margin-top:4px;"><?php echo count($posts); ?> articles</p>
+                </div>
+                <div style="width:36px; height:36px; border-radius:8px; background:rgba(212,175,55,0.1); display:flex; align-items:center; justify-content:center;">
+                    <i class="fas fa-blog" style="color:#D4AF37; font-size:0.9rem;"></i>
+                </div>
+            </div>
+
             <?php if (empty($posts)): ?>
-                <p style="color:var(--text-muted); text-align:center; padding:20px 0;">No articles written yet.</p>
+                <div style="padding:48px 24px; text-align:center;">
+                    <i class="fas fa-pen-fancy" style="font-size:2.5rem; color:rgba(255,255,255,0.1); margin-bottom:16px; display:block;"></i>
+                    <p style="color:rgba(255,255,255,0.45); font-size:0.9rem;">No articles written yet.</p>
+                    <p style="color:rgba(255,255,255,0.3); font-size:0.8rem; margin-top:6px;">Start writing your first wellness article.</p>
+                </div>
             <?php else: ?>
-                <div style="display:flex; flex-direction:column; gap:15px;">
-                    <?php foreach ($posts as $post): ?>
-                        <div style="border-bottom:1px solid rgba(255,255,255,0.05); padding-bottom:12px;">
-                            <div style="display:flex; justify-content:space-between; align-items:center;">
-                                <div>
-                                    <strong style="color:#fff; font-size:1rem; display:block;"><?php echo htmlspecialchars($post['title']); ?></strong>
-                                    <span style="font-size:0.75rem; color:var(--gold-muted); font-weight:600; text-transform:uppercase;"><?php echo htmlspecialchars($post['category_tag']); ?></span>
-                                    <span style="font-size:0.75rem; color:var(--text-muted); margin-left:15px;"><?php echo date('M d, Y', strtotime($post['published_at'])); ?></span>
+                <div style="display:flex; flex-direction:column;">
+                    <?php foreach ($posts as $index => $post): ?>
+                        <div style="padding:18px 24px; border-bottom:1px solid rgba(255,255,255,0.04); <?php echo $index === 0 ? '' : ''; ?> transition:background 0.15s;">
+                            <div style="display:flex; justify-content:space-between; align-items:flex-start; gap:16px;">
+                                <div style="flex:1; min-width:0;">
+                                    <div style="display:flex; align-items:center; gap:8px; margin-bottom:4px;">
+                                        <span class="admin-badge <?php echo $post['status'] ? 'badge-completed' : 'badge-pending'; ?>" style="flex-shrink:0;">
+                                            <?php echo $post['status'] ? 'Published' : 'Draft'; ?>
+                                        </span>
+                                        <?php if ($post['category_tag']): ?>
+                                            <span style="font-size:0.65rem; font-weight:600; color:#D4AF37; text-transform:uppercase; letter-spacing:0.5px; background:rgba(212,175,55,0.08); padding:2px 8px; border-radius:4px;">
+                                                <?php echo htmlspecialchars($post['category_tag']); ?>
+                                            </span>
+                                        <?php endif; ?>
+                                    </div>
+                                    <h4 style="font-size:0.95rem; font-weight:700; color:#fff; margin-bottom:4px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">
+                                        <?php echo htmlspecialchars($post['title']); ?>
+                                    </h4>
+                                    <div style="font-size:0.72rem; color:rgba(255,255,255,0.35);">
+                                        <i class="far fa-calendar" style="margin-right:4px;"></i>
+                                        <?php echo date('M d, Y', strtotime($post['published_at'])); ?>
+                                    </div>
                                 </div>
-                                <span class="admin-badge <?php echo $post['status'] ? 'badge-completed' : 'badge-pending'; ?>">
-                                    <?php echo $post['status'] ? 'Published' : 'Draft'; ?>
-                                </span>
-                            </div>
-                            <div style="display:flex; gap:12px; margin-top:8px;">
-                                <a href="blog.php?edit_id=<?php echo $post['id']; ?>" style="color:var(--gold-primary); font-weight:700; font-size:0.85rem;">Edit</a>
-                                <a href="blog.php?toggle_id=<?php echo $post['id']; ?>" style="color:var(--text-secondary); font-weight:700; font-size:0.85rem;"><?php echo $post['status'] ? 'Unpublish' : 'Publish'; ?></a>
-                                <a href="blog.php?delete_id=<?php echo $post['id']; ?>" style="color:var(--danger-color); font-weight:700; font-size:0.85rem;" onclick="return confirm('Delete this blog post?')">Delete</a>
+                                <div style="display:flex; gap:6px; align-items:center; flex-shrink:0;">
+                                    <a href="blog.php?edit_id=<?php echo $post['id']; ?>" title="Edit" style="width:30px; height:30px; border-radius:6px; background:rgba(212,175,55,0.1); display:flex; align-items:center; justify-content:center; color:#D4AF37; font-size:0.75rem;">
+                                        <i class="fas fa-pen"></i>
+                                    </a>
+                                    <a href="blog.php?toggle_id=<?php echo $post['id']; ?>" title="<?php echo $post['status'] ? 'Unpublish' : 'Publish'; ?>" style="width:30px; height:30px; border-radius:6px; background:rgba(74,222,128,0.1); display:flex; align-items:center; justify-content:center; color:#4ade80; font-size:0.75rem;">
+                                        <i class="fas fa-<?php echo $post['status'] ? 'eye-slash' : 'eye'; ?>"></i>
+                                    </a>
+                                    <a href="blog.php?delete_id=<?php echo $post['id']; ?>" title="Delete" onclick="return confirm('Delete this blog post?')" style="width:30px; height:30px; border-radius:6px; background:rgba(239,68,68,0.1); display:flex; align-items:center; justify-content:center; color:#ef4444; font-size:0.75rem;">
+                                        <i class="fas fa-trash"></i>
+                                    </a>
+                                </div>
                             </div>
                         </div>
                     <?php endforeach; ?>
@@ -134,65 +170,91 @@ if (isset($_GET['edit_id'])) {
             <?php endif; ?>
         </div>
 
-        <!-- Add/Edit Article Form -->
-        <div class="glass-card" style="padding: 25px; border-radius:6px;">
-            <h3 style="font-size:1.15rem; text-transform:uppercase; margin-bottom:15px; color:var(--gold-primary); border-bottom:1px solid var(--border-color); padding-bottom:10px;">
-                <?php echo $edit_post ? 'Edit Article' : 'Write Article'; ?>
-            </h3>
-            
+        <!-- Add/Edit Form -->
+        <div class="glass-card" style="padding:0; overflow:hidden; position:sticky; top:96px;">
+            <div style="padding:20px 24px; border-bottom:1px solid rgba(255,255,255,0.06); display:flex; align-items:center; gap:12px;">
+                <div style="width:36px; height:36px; border-radius:8px; background:rgba(212,175,55,0.1); display:flex; align-items:center; justify-content:center;">
+                    <i class="fas fa-<?php echo $edit_post ? 'edit' : 'pen-fancy'; ?>" style="color:#D4AF37; font-size:0.9rem;"></i>
+                </div>
+                <h3 style="font-size:1rem; font-weight:700; color:#fff; text-transform:uppercase; letter-spacing:0.5px;">
+                    <?php echo $edit_post ? 'Edit Article' : 'Write Article'; ?>
+                </h3>
+            </div>
+
             <?php if ($edit_post): ?>
-                <form action="blog.php" method="POST">
+                <form action="blog.php" method="POST" style="padding:24px;">
                     <input type="hidden" name="post_id" value="<?php echo $edit_post['id']; ?>">
-                    <div class="form-group">
-                        <label for="title">Article Title *</label>
-                        <input type="text" name="title" id="title" class="form-control" style="font-size:0.85rem; padding:8px;" value="<?php echo htmlspecialchars($edit_post['title']); ?>" required>
-                    </div>
-                    <div class="form-group">
-                        <label for="tag">Category Tag</label>
-                        <input type="text" name="category_tag" id="tag" class="form-control" style="font-size:0.85rem; padding:8px;" value="<?php echo htmlspecialchars($edit_post['category_tag']); ?>">
-                    </div>
-                    <div class="form-group">
-                        <label for="img">Cover Image Path</label>
-                        <input type="text" name="cover_image" id="img" class="form-control" style="font-size:0.85rem; padding:8px;" value="<?php echo htmlspecialchars($edit_post['cover_image']); ?>">
-                    </div>
-                    <div class="form-group">
-                        <label for="body">Article Content (HTML Allowed) *</label>
-                        <textarea name="body" id="body" rows="8" class="form-control" style="font-size:0.85rem; padding:8px;" required><?php echo htmlspecialchars($edit_post['body']); ?></textarea>
-                    </div>
-                    
-                    <div style="display:flex; gap:10px; margin-top:10px;">
-                        <button type="submit" name="edit_post" class="btn-gold" style="flex:1; padding:10px; font-size:0.85rem;">
-                            Update Article
-                        </button>
-                        <a href="blog.php" class="btn-outline-gold" style="padding:10px 20px; font-size:0.85rem; text-align:center;">Cancel</a>
-                    </div>
-                </form>
             <?php else: ?>
-                <form action="blog.php" method="POST">
-                    <div class="form-group">
-                        <label for="title">Article Title *</label>
-                        <input type="text" name="title" id="title" class="form-control" style="font-size:0.85rem; padding:8px;" placeholder="e.g. Shilajit Health Benefits" required>
-                    </div>
-                    <div class="form-group">
-                        <label for="tag">Category Tag</label>
-                        <input type="text" name="category_tag" id="tag" class="form-control" style="font-size:0.85rem; padding:8px;" placeholder="e.g. Vitality or Detox" value="Wellness">
-                    </div>
-                    <div class="form-group">
-                        <label for="img">Cover Image Path</label>
-                        <input type="text" name="cover_image" id="img" class="form-control" style="font-size:0.85rem; padding:8px;" placeholder="e.g. assets/images/blog/shilajit_blog.png">
-                    </div>
-                    <div class="form-group">
-                        <label for="body">Article Content (HTML Allowed) *</label>
-                        <textarea name="body" id="body" rows="8" class="form-control" style="font-size:0.85rem; padding:8px;" required placeholder="<p>Article body content goes here...</p>"></textarea>
-                    </div>
-                    
-                    <button type="submit" name="add_post" class="btn-gold" style="width:100%; margin-top:10px; padding:10px; font-size:0.85rem;">
-                        Publish Article
-                    </button>
-                </form>
+                <form action="blog.php" method="POST" style="padding:24px;">
             <?php endif; ?>
+
+                <div class="form-group">
+                    <label for="title" style="font-size:0.75rem; text-transform:uppercase; letter-spacing:0.8px; color:rgba(255,255,255,0.5); margin-bottom:8px;">Article Title *</label>
+                    <input type="text" name="title" id="title" class="form-control" required placeholder="e.g. Shilajit Health Benefits"
+                        value="<?php echo htmlspecialchars($edit_post ? $edit_post['title'] : ''); ?>">
+                </div>
+
+                <div style="display:grid; grid-template-columns:1fr 1fr; gap:16px;">
+                    <div class="form-group">
+                        <label for="tag" style="font-size:0.75rem; text-transform:uppercase; letter-spacing:0.8px; color:rgba(255,255,255,0.5); margin-bottom:8px;">Category Tag</label>
+                        <input type="text" name="category_tag" id="tag" class="form-control" placeholder="e.g. Vitality"
+                            value="<?php echo htmlspecialchars($edit_post ? $edit_post['category_tag'] : 'Wellness'); ?>">
+                    </div>
+                    <div class="form-group">
+                        <label for="img" style="font-size:0.75rem; text-transform:uppercase; letter-spacing:0.8px; color:rgba(255,255,255,0.5); margin-bottom:8px;">Cover Image Path</label>
+                        <input type="text" name="cover_image" id="img" class="form-control" placeholder="e.g. assets/images/blog/..."
+                            value="<?php echo htmlspecialchars($edit_post ? $edit_post['cover_image'] : ''); ?>">
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="body" style="font-size:0.75rem; text-transform:uppercase; letter-spacing:0.8px; color:rgba(255,255,255,0.5); margin-bottom:8px;">Article Content *</label>
+                    <textarea name="body" id="body" rows="12" class="form-control" required><?php echo htmlspecialchars($edit_post ? $edit_post['body'] : ''); ?></textarea>
+                </div>
+
+                <div style="display:flex; gap:10px; margin-top:8px;">
+                    <button type="submit" name="<?php echo $edit_post ? 'edit_post' : 'add_post'; ?>" class="btn-gold" style="flex:1; padding:12px 20px;">
+                        <i class="fas fa-<?php echo $edit_post ? 'save' : 'paper-plane'; ?>"></i>
+                        <?php echo $edit_post ? 'Update Article' : 'Publish Article'; ?>
+                    </button>
+                    <?php if ($edit_post): ?>
+                        <a href="blog.php" class="btn-outline-gold" style="padding:12px 20px; text-align:center;">
+                            <i class="fas fa-times"></i> Cancel
+                        </a>
+                    <?php endif; ?>
+                </div>
+            </form>
         </div>
     </div>
+
+<!-- Trumbowyg Editor -->
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/trumbowyg@2.27.3/dist/ui/trumbowyg.min.css">
+<script src="https://cdn.jsdelivr.net/npm/trumbowyg@2.27.3/dist/trumbowyg.min.js"></script>
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    $('#body').trumbowyg({
+        btns: [
+            ['viewHTML'],
+            ['formatting'],
+            ['strong', 'em', 'del'],
+            ['foreColor', 'backColor'],
+            ['superscript', 'subscript'],
+            ['link'],
+            ['insertImage'],
+            ['justifyLeft', 'justifyCenter', 'justifyRight', 'justifyFull'],
+            ['unorderedList', 'orderedList'],
+            ['horizontalRule'],
+            ['removeformat'],
+            ['fullscreen']
+        ],
+        autogrow: true,
+        urlPrefix: '../',
+        file: {
+            serverPath: 'upload_handler.php'
+        }
+    });
+});
+</script>
 
 <?php 
 require_once __DIR__ . '/includes/footer.php'; 

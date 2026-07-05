@@ -40,69 +40,148 @@ $stmt->execute();
 $categories = $stmt->fetchAll();
 ?>
 
-    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:30px;">
-        <h2 style="font-size:1.8rem; text-transform:uppercase;">Category Management</h2>
-        <div style="display:flex; gap:10px; align-items:center;">
-            <a href="category_add.php" class="btn-gold" style="padding:8px 16px; font-size:0.8rem; text-decoration:none;">
-                <i class="fas fa-plus"></i> Add Category
-            </a>
-            <div style="font-size:0.85rem; color:var(--text-muted);"><?php echo count($categories); ?> categories</div>
+    <style>
+        .cat-table-wrapper {
+            background: rgba(18,18,18,0.6);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border: 1px solid rgba(255,255,255,0.06);
+            border-radius: 12px;
+            overflow: hidden;
+        }
+        .cat-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        .cat-table thead th {
+            text-align: left;
+            font-size: 0.7rem;
+            text-transform: uppercase;
+            letter-spacing: 0.8px;
+            font-weight: 700;
+            color: rgba(255,255,255,0.4);
+            padding: 14px 20px;
+            background: rgba(0,0,0,0.2);
+            border-bottom: 1px solid rgba(255,255,255,0.05);
+        }
+        .cat-table tbody td {
+            padding: 16px 20px;
+            font-size: 0.88rem;
+            color: rgba(255,255,255,0.7);
+            border-bottom: 1px solid rgba(255,255,255,0.04);
+            vertical-align: middle;
+        }
+        .cat-table tbody tr:last-child td {
+            border-bottom: none;
+        }
+        .cat-table tbody tr:hover {
+            background: rgba(255,255,255,0.02);
+        }
+        .badge-active {
+            background: rgba(74,222,128,0.1);
+            color: #4ade80;
+            font-size: 0.68rem;
+            font-weight: 700;
+            padding: 3px 10px;
+            border-radius: 20px;
+            text-transform: uppercase;
+            letter-spacing: 0.3px;
+        }
+        .badge-inactive {
+            background: rgba(255,255,255,0.05);
+            color: rgba(255,255,255,0.4);
+            font-size: 0.68rem;
+            font-weight: 700;
+            padding: 3px 10px;
+            border-radius: 20px;
+            text-transform: uppercase;
+            letter-spacing: 0.3px;
+        }
+        .action-btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 32px;
+            height: 32px;
+            border-radius: 8px;
+            transition: all 0.2s;
+        }
+        .action-btn:hover { transform: scale(1.1); }
+    </style>
+
+    <!-- Page Header -->
+    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:32px;">
+        <div>
+            <h2 style="font-size:1.6rem; font-weight:800; color:#fff; margin:0 0 4px 0; letter-spacing:-0.3px;">Category Management</h2>
+            <p style="font-size:0.85rem; color:rgba(255,255,255,0.45); margin:0;"><?php echo count($categories); ?> categor<?php echo count($categories) !== 1 ? 'ies' : 'y'; ?> total</p>
         </div>
+        <a href="category_add.php" class="btn-gold" style="padding:10px 20px; font-size:0.82rem; text-decoration:none; display:inline-flex; align-items:center; gap:8px; font-weight:600;">
+            <i class="fas fa-plus"></i> Add Category
+        </a>
     </div>
 
+    <!-- Flash Message -->
     <?php if ($action_msg): ?>
-        <div class="quantity-discount-widget" style="background-color:rgba(212,175,55,0.05); border-color:rgba(212,175,55,0.3); color:<?php echo strpos($action_msg, 'Cannot') !== false ? '#ff6b6b' : 'var(--success-color)'; ?>; margin-bottom:25px;">
-            <?php echo strpos($action_msg, 'Cannot') !== false ? '❌' : '✅'; ?> <?php echo htmlspecialchars($action_msg); ?>
+        <?php $is_error = strpos($action_msg, 'Cannot') !== false; ?>
+        <div style="background:<?php echo $is_error ? 'rgba(239,68,68,0.08)' : 'rgba(74,222,128,0.08)'; ?>; border:1px solid <?php echo $is_error ? 'rgba(239,68,68,0.25)' : 'rgba(74,222,128,0.25)'; ?>; border-radius:10px; padding:14px 18px; margin-bottom:24px; display:flex; align-items:center; gap:10px;">
+            <i class="fas <?php echo $is_error ? 'fa-exclamation-circle' : 'fa-check-circle'; ?>" style="color:<?php echo $is_error ? '#ef4444' : '#4ade80'; ?>; font-size:0.95rem;"></i>
+            <span style="color:<?php echo $is_error ? '#ef4444' : '#4ade80'; ?>; font-size:0.88rem; font-weight:500;"><?php echo htmlspecialchars($action_msg); ?></span>
         </div>
     <?php endif; ?>
 
-    <div class="glass-card" style="padding:25px; border-radius:6px;">
+    <!-- Table -->
+    <div class="cat-table-wrapper">
         <?php if (empty($categories)): ?>
-            <p style="color:var(--text-muted); text-align:center; padding:30px 0;">No categories created yet. Click "Add Category" to create one.</p>
+            <div style="text-align:center; padding:48px 20px;">
+                <i class="fas fa-folder-open" style="font-size:2rem; color:rgba(255,255,255,0.15); margin-bottom:12px; display:block;"></i>
+                <p style="color:rgba(255,255,255,0.4); font-size:0.9rem; margin:0 0 16px 0;">No categories created yet.</p>
+                <a href="category_add.php" class="btn-gold" style="padding:10px 24px; font-size:0.82rem; text-decoration:none; display:inline-flex; align-items:center; gap:8px;">
+                    <i class="fas fa-plus"></i> Create First Category
+                </a>
+            </div>
         <?php else: ?>
-            <table class="admin-table">
+            <table class="cat-table">
                 <thead>
                     <tr>
-                        <th>Order</th>
+                        <th style="width:70px;">Order</th>
                         <th>Name</th>
-                        <th>Slug</th>
+                        <th style="width:140px;">Slug</th>
                         <th>Description</th>
-                        <th>Products</th>
-                        <th>Status</th>
-                        <th>Actions</th>
+                        <th style="width:90px; text-align:center;">Products</th>
+                        <th style="width:90px;">Status</th>
+                        <th style="width:100px; text-align:center;">Actions</th>
                     </tr>
                 </thead>
                 <tbody>
                     <?php foreach ($categories as $cat): ?>
                         <tr>
-                            <td><strong style="color:#fff;"><?php echo $cat['display_order']; ?></strong></td>
                             <td>
-                                <a href="category_edit.php?id=<?php echo $cat['id']; ?>" style="color:#fff; text-decoration:none; font-weight:700; font-size:1rem;">
+                                <span style="background:rgba(212,175,55,0.1); color:#D4AF37; font-size:0.78rem; font-weight:700; padding:3px 8px; border-radius:4px; min-width:24px; display:inline-block; text-align:center;"><?php echo $cat['display_order']; ?></span>
+                            </td>
+                            <td>
+                                <a href="category_edit.php?id=<?php echo $cat['id']; ?>" style="color:#fff; text-decoration:none; font-weight:700; font-size:0.92rem; transition:color 0.2s;" onmouseover="this.style.color='#D4AF37'" onmouseout="this.style.color='#fff'">
                                     <?php echo htmlspecialchars($cat['name']); ?>
                                 </a>
                             </td>
-                            <td style="font-size:0.85rem; color:var(--gold-muted);"><?php echo htmlspecialchars($cat['slug']); ?></td>
-                            <td style="font-size:0.85rem; color:var(--text-secondary); max-width:200px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;">
+                            <td style="font-size:0.8rem; color:rgba(255,255,255,0.35); font-family:monospace;"><?php echo htmlspecialchars($cat['slug']); ?></td>
+                            <td style="font-size:0.82rem; color:rgba(255,255,255,0.5); max-width:220px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;">
                                 <?php echo htmlspecialchars($cat['description'] ?: '—'); ?>
                             </td>
-                            <td>
-                                <strong style="color:#fff; font-size:1rem;"><?php echo $cat['product_count']; ?></strong>
+                            <td style="text-align:center;">
+                                <span style="font-weight:700; font-size:1rem; color:#fff;"><?php echo $cat['product_count']; ?></span>
                             </td>
                             <td>
-                                <span class="admin-badge <?php echo $cat['is_active'] ? 'badge-completed' : 'badge-failed'; ?>">
+                                <span class="<?php echo $cat['is_active'] ? 'badge-active' : 'badge-inactive'; ?>">
                                     <?php echo $cat['is_active'] ? 'Active' : 'Inactive'; ?>
                                 </span>
                             </td>
                             <td>
-                                <div style="display:flex; gap:12px;">
-                                    <a href="category_edit.php?id=<?php echo $cat['id']; ?>" style="color:var(--gold-primary); font-weight:700;" title="Edit">
-                                        <i class="fas fa-edit"></i>
+                                <div style="display:flex; gap:6px; justify-content:center;">
+                                    <a href="category_edit.php?id=<?php echo $cat['id']; ?>" class="action-btn" style="color:#D4AF37; text-decoration:none;" title="Edit">
+                                        <i class="fas fa-pen" style="font-size:0.78rem;"></i>
                                     </a>
-                                    <a href="categories.php?delete_id=<?php echo $cat['id']; ?>" 
-                                       style="color:var(--danger-color); font-weight:700;" 
-                                       onclick="return confirm('Delete this category?')"
-                                       title="Delete">
-                                        <i class="fas fa-trash"></i>
+                                    <a href="categories.php?delete_id=<?php echo $cat['id']; ?>" class="action-btn" style="color:#ef4444; text-decoration:none;" onclick="return confirm('Delete this category?')" title="Delete">
+                                        <i class="fas fa-trash" style="font-size:0.78rem;"></i>
                                     </a>
                                 </div>
                             </td>

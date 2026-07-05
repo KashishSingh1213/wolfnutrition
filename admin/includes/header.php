@@ -15,373 +15,420 @@ $admin_name = $_SESSION['admin_name'];
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Wolf Nutrition | Admin Control Center</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link rel="stylesheet" href="../assets/css/style.css">
     <style>
-        /* Admin dashboard adjustments */
+        *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
         body {
             display: flex;
-            min-height: 100vh;
             flex-direction: column;
-            background-color: var(--bg-primary);
-            font-family: var(--font-body);
+            min-height: 100vh;
+            background: #080C10;
+            font-family: 'Inter', system-ui, -apple-system, sans-serif;
+            color: #ffffff;
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
         }
+
+        /* ── Top Header Bar ── */
+        .admin-topbar {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 32px;
+            height: 64px;
+            min-height: 64px;
+            background: rgba(18, 18, 18, 0.6);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+            z-index: 200;
+            position: sticky;
+            top: 0;
+        }
+        .admin-topbar-logo {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            text-decoration: none;
+        }
+        .admin-topbar-logo img {
+            height: 40px;
+            width: auto;
+            filter: drop-shadow(0 2px 8px rgba(0, 0, 0, 0.3));
+        }
+        .admin-topbar-logo .admin-badge {
+            padding: 3px 10px;
+            font-size: 0.6rem;
+            font-weight: 800;
+            letter-spacing: 1.2px;
+            text-transform: uppercase;
+            background: linear-gradient(135deg, #D4AF37 0%, #F2D06B 100%);
+            color: #080C10;
+            border-radius: 4px;
+            line-height: 1.4;
+        }
+        .admin-topbar-user {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 7px 18px;
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid rgba(255, 255, 255, 0.06);
+            border-radius: 40px;
+            font-size: 0.85rem;
+            font-weight: 500;
+            color: rgba(255, 255, 255, 0.7);
+            transition: all 0.2s ease;
+        }
+        .admin-topbar-user i {
+            color: #D4AF37;
+            font-size: 0.9rem;
+        }
+        .admin-topbar-user strong {
+            color: #D4AF37;
+            font-weight: 700;
+        }
+        .admin-topbar-user:hover {
+            background: rgba(255, 255, 255, 0.05);
+            border-color: rgba(212, 175, 55, 0.2);
+        }
+
+        /* ── Layout Grid ── */
         .admin-layout {
             display: grid;
             grid-template-columns: 260px 1fr;
             flex: 1;
-            min-height: calc(100vh - 75px);
+            min-height: calc(100vh - 64px);
         }
-        .admin-sidebar {
-            background-color: #080C10;
-            border-right: 1px solid rgba(212, 175, 55, 0.1);
-            padding: 30px 18px;
-            display: flex;
-            flex-direction: column;
-            gap: 12px;
-            box-shadow: 5px 0 25px rgba(8,12,16,0.3);
-        }
-        .admin-sidebar-link {
-            display: flex;
-            align-items: center;
-            gap: 14px;
-            padding: 13px 18px;
-            border-radius: 8px;
-            color: var(--text-secondary);
-            font-weight: 600;
-            font-size: 0.9rem;
-            letter-spacing: 0.3px;
-            transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
-            border-left: 3px solid transparent;
-        }
-        .admin-sidebar-link i {
-            font-size: 1rem;
-            width: 18px;
-            text-align: center;
-            opacity: 0.75;
-            transition: transform 0.3s;
-        }
-        .admin-sidebar-link:hover {
-            color: var(--gold-light);
-            background: rgba(212, 175, 55, 0.05);
-            border-left: 3px solid rgba(212, 175, 55, 0.4);
-            padding-left: 22px;
-        }
-        .admin-sidebar-link:hover i {
-            transform: scale(1.1);
-            opacity: 1;
-        }
-        .admin-sidebar-link.active {
-            background: linear-gradient(135deg, rgba(212, 175, 55, 0.15) 0%, rgba(212, 175, 55, 0.03) 100%);
-            color: var(--gold-primary);
-            border-left: 3px solid var(--gold-primary);
-            padding-left: 22px;
-            box-shadow: 0 4px 15px rgba(8,12,16, 0.2);
-        }
-        .admin-sidebar-link.active i {
-            opacity: 1;
-            color: var(--gold-primary);
-        }
+
+        /* ── Sidebar styles moved to sidebar.php ── */
+
+        /* ── Main Content ── */
         .admin-content {
-            padding: 45px 50px;
-            background-color: #080C10;
+            padding: 36px 40px;
             overflow-y: auto;
+            min-height: calc(100vh - 64px);
         }
+
+        /* ── Card Grid ── */
         .admin-card-grid {
             display: grid;
             grid-template-columns: repeat(4, 1fr);
-            gap: 25px;
-            margin-bottom: 40px;
+            gap: 20px;
+            margin-bottom: 36px;
         }
+
+        /* ── Glass Card ── */
+        .glass-card,
         .admin-card {
-            background: rgba(18, 18, 18, 0.45);
-            backdrop-filter: blur(12px);
-            border: 1px solid rgba(212, 175, 55, 0.1);
-            padding: 25px;
-            border-radius: 10px;
-            text-align: left;
+            background: rgba(18, 18, 18, 0.6);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border: 1px solid rgba(255, 255, 255, 0.06);
+            border-radius: 12px;
+            padding: 24px;
             position: relative;
             overflow: hidden;
-            transition: all 0.4s cubic-bezier(0.165, 0.84, 0.44, 1);
-            box-shadow: 0 10px 30px rgba(8,12,16, 0.3);
+            transition: all 0.2s ease;
+            box-shadow: 0 4px 24px rgba(0, 0, 0, 0.3);
         }
+        .glass-card:hover,
         .admin-card:hover {
-            transform: translateY(-5px);
-            border-color: var(--gold-primary);
-            box-shadow: 0 15px 35px rgba(212, 175, 55, 0.15), 0 0 20px rgba(212, 175, 55, 0.05);
+            transform: translateY(-2px);
+            border-color: rgba(212, 175, 55, 0.2);
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4), 0 0 20px rgba(212, 175, 55, 0.05);
         }
         .admin-card h4 {
-            color: var(--text-muted);
-            font-size: 0.8rem;
-            text-transform: uppercase;
-            letter-spacing: 1px;
-            margin-bottom: 10px;
+            color: rgba(255, 255, 255, 0.45);
+            font-size: 0.7rem;
             font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 1.2px;
+            margin-bottom: 10px;
         }
-        .admin-card div.val {
-            font-size: 2.1rem;
+        .admin-card div.val,
+        .admin-card .val {
+            font-size: 2rem;
             font-weight: 800;
-            color: #ffffff;
-            background: var(--gold-gradient);
+            background: linear-gradient(135deg, #D4AF37 0%, #F2D06B 100%);
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
+            background-clip: text;
+            line-height: 1.2;
         }
+
+        /* ── Table ── */
         .admin-table {
             width: 100%;
             border-collapse: separate;
             border-spacing: 0;
-            margin-top: 20px;
-            border-radius: 8px;
+            border-radius: 12px;
             overflow: hidden;
-            border: 1px solid rgba(255, 255, 255, 0.05);
-        }
-        .admin-table th, .admin-table td {
-            padding: 16px 20px;
-            text-align: left;
+            border: 1px solid rgba(255, 255, 255, 0.06);
+            margin-top: 20px;
         }
         .admin-table th {
-            background-color: rgba(18,18,18, 0.8);
-            color: var(--gold-primary);
+            background: rgba(18, 18, 18, 0.8);
+            padding: 14px 20px;
+            text-align: left;
+            color: #D4AF37;
+            font-size: 0.7rem;
             font-weight: 700;
             text-transform: uppercase;
-            font-size: 0.75rem;
             letter-spacing: 1px;
-            border-bottom: 1px solid rgba(212, 175, 55, 0.15);
+            border-bottom: 1px solid rgba(212, 175, 55, 0.12);
         }
         .admin-table td {
-            border-bottom: 1px solid rgba(255,255,255,0.03);
-            color: var(--text-secondary);
-            font-size: 0.9rem;
-            background-color: rgba(18, 18, 18, 0.2);
+            padding: 14px 20px;
+            text-align: left;
+            color: rgba(255, 255, 255, 0.7);
+            font-size: 0.875rem;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.04);
+            background: rgba(18, 18, 18, 0.2);
+            transition: all 0.15s ease;
         }
-        .admin-table tr:last-child td {
-            border-bottom: none;
-        }
+        .admin-table tr:last-child td { border-bottom: none; }
         .admin-table tr:hover td {
-            background-color: rgba(255, 255, 255, 0.02);
+            background: rgba(255, 255, 255, 0.025);
             color: #ffffff;
         }
+
+        /* ── Badges ── */
         .admin-badge {
+            display: inline-block;
             padding: 4px 12px;
-            border-radius: 6px;
-            font-size: 0.7rem;
-            font-weight: 800;
+            border-radius: 20px;
+            font-size: 0.65rem;
+            font-weight: 700;
             letter-spacing: 0.5px;
             text-transform: uppercase;
-            display: inline-block;
         }
-        .badge-pending { 
-            background-color: rgba(212, 175, 55, 0.1); 
-            color: var(--gold-primary); 
+        .badge-pending {
+            background: rgba(212, 175, 55, 0.1);
+            color: #D4AF37;
             border: 1px solid rgba(212, 175, 55, 0.15);
         }
-        .badge-completed { 
-            background-color: rgba(212, 175, 55, 0.1); 
-            color: var(--gold-primary); 
-            border: 1px solid rgba(212, 175, 55, 0.15);
+        .badge-completed {
+            background: rgba(74, 222, 128, 0.1);
+            color: #4ade80;
+            border: 1px solid rgba(74, 222, 128, 0.15);
         }
-        .badge-failed { 
-            background-color: rgba(255, 255, 255, 0.06); 
-            color: rgba(255, 255, 255, 0.7); 
-            border: 1px solid rgba(255, 255, 255, 0.1);
-        }
-        
-        /* Admin Global Form overrides for modern clean feel */
-        .admin-content .form-control {
-            background-color: rgba(255, 255, 255, 0.03) !important;
-            border: 1px solid rgba(255, 255, 255, 0.08) !important;
-            color: #ffffff !important;
-            border-radius: 6px;
-            padding: 10px 14px;
-            font-size: 0.9rem;
-        }
-        .admin-content .form-control:focus {
-            border-color: var(--gold-primary) !important;
-            box-shadow: 0 0 10px rgba(212, 175, 55, 0.2) !important;
-        }
-        /* Fix select dropdown option visibility */
-        .admin-content select.form-control {
-            color: #ffffff !important;
-            background-color: rgba(30, 30, 30, 0.95) !important;
-        }
-        .admin-content select.form-control option {
-            background-color: #1a1a2e !important;
-            color: #ffffff !important;
-            padding: 8px !important;
-        }
-        .admin-content select.form-control option:hover {
-            background-color: rgba(212, 175, 55, 0.2) !important;
-        }
-        .admin-content select.form-control option[value=""] {
-            color: #999 !important;
+        .badge-failed {
+            background: rgba(239, 68, 68, 0.1);
+            color: #ef4444;
+            border: 1px solid rgba(239, 68, 68, 0.15);
         }
 
-        /* Responsive Media Queries for Admin Panel Control Center */
+        /* ── Form Controls ── */
+        .form-control {
+            background: rgba(255, 255, 255, 0.03) !important;
+            border: 1px solid rgba(255, 255, 255, 0.08) !important;
+            border-radius: 8px;
+            padding: 10px 14px;
+            font-size: 0.875rem;
+            color: #ffffff !important;
+            font-family: 'Inter', system-ui, sans-serif;
+            transition: all 0.2s ease;
+            outline: none;
+            width: 100%;
+        }
+        .form-control:focus {
+            border-color: #D4AF37 !important;
+            box-shadow: 0 0 0 3px rgba(212, 175, 55, 0.12);
+        }
+        .form-control::placeholder { color: rgba(255, 255, 255, 0.3); }
+        select.form-control {
+            color: #ffffff !important;
+            background-color: rgba(30, 30, 30, 0.95) !important;
+            appearance: none;
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' fill='rgba(255,255,255,0.4)' viewBox='0 0 16 16'%3E%3Cpath d='M8 11L3 6h10z'/%3E%3C/svg%3E");
+            background-repeat: no-repeat;
+            background-position: right 12px center;
+            padding-right: 36px;
+        }
+        select.form-control option {
+            background: #1a1a2e;
+            color: #ffffff;
+            padding: 8px;
+        }
+        select.form-control option:hover { background: rgba(212, 175, 55, 0.2); }
+        textarea.form-control { resize: vertical; min-height: 100px; }
+
+        /* ── Buttons ── */
+        .btn-gold {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 10px 24px;
+            background: linear-gradient(135deg, #D4AF37 0%, #F2D06B 100%);
+            color: #080C10;
+            font-size: 0.85rem;
+            font-weight: 700;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            text-decoration: none;
+            font-family: 'Inter', system-ui, sans-serif;
+            box-shadow: 0 4px 16px rgba(212, 175, 55, 0.2);
+        }
+        .btn-gold:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 6px 24px rgba(212, 175, 55, 0.35);
+        }
+
+        .btn-outline-gold {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 10px 24px;
+            background: transparent;
+            color: #D4AF37;
+            font-size: 0.85rem;
+            font-weight: 600;
+            border: 1px solid rgba(212, 175, 55, 0.3);
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            text-decoration: none;
+            font-family: 'Inter', system-ui, sans-serif;
+        }
+        .btn-outline-gold:hover {
+            background: rgba(212, 175, 55, 0.08);
+            border-color: #D4AF37;
+        }
+
+        /* ── Mobile Sidebar Toggle ── */
+        .admin-mobile-toggle {
+            display: none;
+            position: fixed;
+            bottom: 24px;
+            right: 24px;
+            z-index: 300;
+            width: 52px;
+            height: 52px;
+            border-radius: 14px;
+            background: linear-gradient(135deg, #D4AF37 0%, #F2D06B 100%);
+            color: #080C10;
+            border: none;
+            font-size: 1.2rem;
+            cursor: pointer;
+            box-shadow: 0 4px 24px rgba(212, 175, 55, 0.3);
+            transition: all 0.2s ease;
+            align-items: center;
+            justify-content: center;
+        }
+        .admin-mobile-toggle:hover {
+            transform: scale(1.05);
+            box-shadow: 0 6px 32px rgba(212, 175, 55, 0.4);
+        }
+        .admin-mobile-overlay {
+            display: none;
+            position: fixed;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.6);
+            z-index: 150;
+            opacity: 0;
+            transition: opacity 0.25s ease;
+        }
+        .admin-mobile-overlay.visible {
+            opacity: 1;
+        }
+
+        /* ── Section Headings ── */
+        .section-heading {
+            font-size: 1.3rem;
+            font-weight: 700;
+            color: #ffffff;
+            margin-bottom: 24px;
+        }
+        .section-subheading {
+            font-size: 0.8rem;
+            color: rgba(255, 255, 255, 0.45);
+            font-weight: 500;
+            margin-top: -16px;
+            margin-bottom: 24px;
+        }
+
+        /* ── Utility ── */
+        .text-gold { color: #D4AF37; }
+        .text-muted { color: rgba(255, 255, 255, 0.45); }
+        .text-success { color: #4ade80; }
+        .text-danger { color: #ef4444; }
+        .mt-1 { margin-top: 8px; }
+        .mt-2 { margin-top: 16px; }
+        .mb-1 { margin-bottom: 8px; }
+        .mb-2 { margin-bottom: 16px; }
+
+        /* ── Responsive: Tablet ── */
         @media (max-width: 1024px) {
             .admin-layout {
                 grid-template-columns: 1fr;
-                min-height: auto;
             }
-            .admin-sidebar {
-                border-right: none;
-                border-bottom: 1px solid rgba(212, 175, 55, 0.15);
-                padding: 20px 15px;
-                flex-direction: row;
-                flex-wrap: wrap;
-                justify-content: center;
-                gap: 10px;
-            }
-            .admin-sidebar-link {
-                padding: 10px 15px;
-                font-size: 0.85rem;
-                border-left: none;
-                border-bottom: 2px solid transparent;
-            }
-            .admin-sidebar-link:hover {
-                border-left: none;
-                border-bottom: 2px solid rgba(212, 175, 55, 0.4);
-                padding-left: 15px;
-            }
-            .admin-sidebar-link.active {
-                border-left: none;
-                border-bottom: 2px solid var(--gold-primary);
-                padding-left: 15px;
-            }
+            /* Sidebar responsive handled in sidebar.php */
             .admin-content {
-                padding: 30px 20px;
-                max-width: 100% !important;
-                overflow-x: hidden;
+                padding: 28px 24px;
             }
             .admin-card-grid {
                 grid-template-columns: repeat(2, 1fr);
-                gap: 20px;
-            }
-
-            /* FORCE ALL INLINE GRIDS TO STACK 1-COLUMN ON TABLETS AND MOBILE */
-            .admin-content div[style*="display:grid"],
-            .admin-content div[style*="display: grid"] {
-                grid-template-columns: 1fr !important;
-                gap: 20px !important;
-                width: 100% !important;
-            }
-            
-            /* Prevent grid tracks/glass cards from expanding past parent boundaries */
-            .admin-layout, .admin-content, .admin-card-grid, .admin-content div {
-                min-width: 0 !important;
-            }
-            .glass-card {
-                max-width: 100% !important;
-                overflow-x: auto !important;
-            }
-            
-            /* Globally make all admin tables scrollable and responsive on tablet/mobile viewports */
-            .admin-table, .admin-content table {
-                display: block;
-                width: 100%;
-                overflow-x: auto;
-                -webkit-overflow-scrolling: touch;
-                white-space: nowrap;
+                gap: 16px;
             }
         }
 
+        /* ── Responsive: Mobile ── */
         @media (max-width: 768px) {
-            header {
-                display: block !important;
-                height: auto !important;
-                padding: 10px 0 !important;
+            .admin-topbar {
+                padding: 0 16px;
+                height: 56px;
+                min-height: 56px;
             }
-            .header-container {
-                flex-direction: column !important;
-                align-items: center !important;
-                gap: 12px !important;
-                text-align: center !important;
-                padding: 0 15px !important;
-                height: auto !important;
+            .admin-topbar-logo img { height: 32px; }
+            .admin-topbar-logo .admin-badge {
+                font-size: 0.55rem;
+                padding: 2px 8px;
             }
-            .header-container .logo {
-                flex-direction: column !important;
-                align-items: center !important;
-                gap: 6px !important;
+            .admin-topbar-user {
+                padding: 6px 12px;
+                font-size: 0.78rem;
             }
-            
-            /* Collapsible Mobile Sidebar styling */
-            .admin-sidebar {
-                flex-direction: column;
-                align-items: stretch;
-                padding: 12px 15px;
-                gap: 8px;
+            .admin-topbar-user span.full-name { display: none; }
+            .admin-layout {
+                min-height: calc(100vh - 56px);
             }
-            
-            /* Hide links by default when menu collapsed on mobile */
-            .admin-sidebar-link {
-                display: none !important;
-                border-bottom: none;
-                border-left: 3px solid transparent;
+            /* Sidebar responsive handled in sidebar.php */
+            .admin-content {
+                padding: 20px 16px;
             }
-            .admin-sidebar-link:hover {
-                border-left: 3px solid rgba(212, 175, 55, 0.4);
-                padding-left: 20px;
-            }
-            .admin-sidebar-link.active {
-                border-left: 3px solid var(--gold-primary);
-                padding-left: 20px;
-            }
-            
-            /* Show all links when expanded */
-            .admin-sidebar.expanded .admin-sidebar-link {
-                display: flex !important;
-            }
-            
             .admin-card-grid {
                 grid-template-columns: 1fr;
-                gap: 15px;
+                gap: 12px;
             }
-            
-            /* Make admin content responsive and reduce spacing */
-            .admin-content {
-                padding: 25px 15px;
-            }
-
-            /* FORCE ALL INLINE FLEX HEADERS TO STACK VERTICALLY ON MOBILE */
-            .admin-content > div[style*="display:flex"],
-            .admin-content > div[style*="display: flex"] {
-                flex-direction: column !important;
-                align-items: flex-start !important;
-                gap: 12px !important;
-                margin-bottom: 25px !important;
-                width: 100% !important;
-            }
-            .admin-content > div[style*="display:flex"] p,
-            .admin-content > div[style*="display: flex"] p,
-            .admin-content > div[style*="display:flex"] div,
-            .admin-content > div[style*="display: flex"] div {
-                text-align: left !important;
-                width: 100% !important;
-            }
-            
-            /* Restrict input form widths */
-            .admin-content input, 
-            .admin-content select, 
-            .admin-content textarea {
-                max-width: 100% !important;
-            }
+            .admin-card { padding: 18px; }
+            .admin-card div.val,
+            .admin-card .val { font-size: 1.5rem; }
+            .admin-table { font-size: 0.8rem; }
+            .admin-table th,
+            .admin-table td { padding: 10px 12px; }
+            .section-heading { font-size: 1.1rem; }
         }
     </style>
 </head>
 <body>
 
-    <!-- Header bar -->
-    <header style="position:static; border-bottom:1px solid rgba(212, 175, 55, 0.1); background:#080C10; min-height:75px; height:auto; padding:10px 0; display:flex; align-items:center; box-shadow: 0 4px 20px rgba(8,12,16,0.25); z-index:100; position:relative;">
-        <div class="container header-container" style="max-width:100%; padding:0 30px; display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:15px; width:100%;">
-            <div class="logo" style="margin:0; display:flex; align-items:center; gap:12px;">
-                <img src="../assets/images/logo.png" alt="Wolf Logo" style="height:55px;">
-                <span style="font-size:0.65rem; font-weight:800; letter-spacing:1px; background:var(--gold-gradient); color:#080C10; padding:4px 10px; border-radius:4px; text-transform:uppercase;">ADMIN</span>
-            </div>
-            
-            <div style="font-weight:600; font-size:0.9rem; color:#fff; display:flex; align-items:center; gap:10px; background:rgba(255,255,255,0.03); padding:8px 16px; border-radius:30px; border:1px solid rgba(255,255,255,0.05);">
-                <i class="fas fa-user-shield" style="color:var(--gold-primary); font-size:0.95rem;"></i>
-                <span>Active Shield: <strong style="color:var(--gold-primary);"><?php echo htmlspecialchars($admin_name); ?></strong></span>
-            </div>
+    <!-- Top Header Bar -->
+    <header class="admin-topbar">
+        <a href="dashboard.php" class="admin-topbar-logo">
+            <img src="../assets/images/logo.png" alt="Wolf Nutrition">
+            <span class="admin-badge">Admin</span>
+        </a>
+        <div class="admin-topbar-user">
+            <i class="fas fa-shield-halved"></i>
+            <span class="full-name">Active Shield: <strong><?php echo htmlspecialchars($admin_name); ?></strong></span>
         </div>
     </header>
 

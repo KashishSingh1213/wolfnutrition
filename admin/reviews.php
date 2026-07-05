@@ -40,72 +40,142 @@ $stmt->execute();
 $reviews = $stmt->fetchAll();
 ?>
 
-    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:30px;">
-        <h2 style="font-size:1.8rem; text-transform:uppercase;">Reviews Moderation</h2>
-        <div style="font-size:0.85rem; color:var(--text-muted);">Manage storefront customer feedback</div>
+    <!-- Page Header -->
+    <div style="margin-bottom:32px;">
+        <h1 style="font-size:1.75rem; font-weight:800; color:#fff; margin-bottom:6px; text-transform:uppercase; letter-spacing:1px;">Reviews Moderation</h1>
+        <p style="font-size:0.85rem; color:rgba(255,255,255,0.45); font-weight:400;">Manage customer feedback and ratings</p>
     </div>
 
     <?php if ($action_msg): ?>
-        <div class="quantity-discount-widget" style="background-color:rgba(212,175,55,0.05); border-color:rgba(212,175,55,0.3); color:var(--success-color); margin-bottom:25px;">
-            ✅ <?php echo htmlspecialchars($action_msg); ?>
+        <div style="background:rgba(74,222,128,0.08); border:1px solid rgba(74,222,128,0.2); border-radius:10px; padding:14px 20px; margin-bottom:24px; display:flex; align-items:center; gap:10px;">
+            <i class="fas fa-check-circle" style="color:#4ade80; font-size:1rem;"></i>
+            <span style="color:#4ade80; font-size:0.875rem; font-weight:500;"><?php echo htmlspecialchars($action_msg); ?></span>
         </div>
     <?php endif; ?>
 
-    <div class="glass-card" style="padding: 25px; border-radius:6px;">
+    <!-- Stats Bar -->
+    <div style="display:grid; grid-template-columns:repeat(3, 1fr); gap:16px; margin-bottom:28px;">
+        <?php
+        $total = count($reviews);
+        $approved = 0;
+        $pending = 0;
+        foreach ($reviews as $r) {
+            if ($r['is_approved']) $approved++;
+            else $pending++;
+        }
+        ?>
+        <div class="glass-card" style="padding:16px 20px; display:flex; align-items:center; gap:14px;">
+            <div style="width:40px; height:40px; border-radius:10px; background:rgba(212,175,55,0.1); display:flex; align-items:center; justify-content:center;">
+                <i class="fas fa-star" style="color:#D4AF37; font-size:0.9rem;"></i>
+            </div>
+            <div>
+                <div style="font-size:1.5rem; font-weight:800; color:#fff; line-height:1;"> <?php echo $total; ?></div>
+                <div style="font-size:0.7rem; color:rgba(255,255,255,0.45); text-transform:uppercase; letter-spacing:0.5px; margin-top:2px;">Total Reviews</div>
+            </div>
+        </div>
+        <div class="glass-card" style="padding:16px 20px; display:flex; align-items:center; gap:14px;">
+            <div style="width:40px; height:40px; border-radius:10px; background:rgba(74,222,128,0.1); display:flex; align-items:center; justify-content:center;">
+                <i class="fas fa-check-circle" style="color:#4ade80; font-size:0.9rem;"></i>
+            </div>
+            <div>
+                <div style="font-size:1.5rem; font-weight:800; color:#fff; line-height:1;"> <?php echo $approved; ?></div>
+                <div style="font-size:0.7rem; color:rgba(255,255,255,0.45); text-transform:uppercase; letter-spacing:0.5px; margin-top:2px;">Approved</div>
+            </div>
+        </div>
+        <div class="glass-card" style="padding:16px 20px; display:flex; align-items:center; gap:14px;">
+            <div style="width:40px; height:40px; border-radius:10px; background:rgba(239,68,68,0.1); display:flex; align-items:center; justify-content:center;">
+                <i class="fas fa-clock" style="color:#ef4444; font-size:0.9rem;"></i>
+            </div>
+            <div>
+                <div style="font-size:1.5rem; font-weight:800; color:#fff; line-height:1;"> <?php echo $pending; ?></div>
+                <div style="font-size:0.7rem; color:rgba(255,255,255,0.45); text-transform:uppercase; letter-spacing:0.5px; margin-top:2px;">Pending</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Reviews Table -->
+    <div class="glass-card" style="padding:0; overflow:hidden;">
+        <div style="padding:20px 24px; border-bottom:1px solid rgba(255,255,255,0.06); display:flex; align-items:center; justify-content:space-between;">
+            <div>
+                <h3 style="font-size:1rem; font-weight:700; color:#fff; text-transform:uppercase; letter-spacing:0.5px;">Customer Reviews</h3>
+            </div>
+        </div>
+
         <?php if (empty($reviews)): ?>
-            <p style="color:var(--text-muted); text-align:center; padding:30px 0;">No product reviews submitted yet.</p>
+            <div style="padding:48px 24px; text-align:center;">
+                <i class="fas fa-star" style="font-size:2.5rem; color:rgba(255,255,255,0.1); margin-bottom:16px; display:block;"></i>
+                <p style="color:rgba(255,255,255,0.45); font-size:0.9rem;">No product reviews submitted yet.</p>
+            </div>
         <?php else: ?>
-            <table class="admin-table">
-                <thead>
-                    <tr>
-                        <th>Product</th>
-                        <th>Reviewer Details</th>
-                        <th>Rating</th>
-                        <th>Review content</th>
-                        <th>Status</th>
-                        <th>Actions</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <?php foreach ($reviews as $rev): ?>
+            <div style="overflow-x:auto;">
+                <table class="admin-table" style="margin-top:0; border:none; border-radius:0;">
+                    <thead>
                         <tr>
-                            <td><strong style="color:#fff;"><?php echo htmlspecialchars($rev['p_name']); ?></strong></td>
-                            <td>
-                                <div style="font-weight:600; color:rgba(255,255,255,0.6);"><?php echo htmlspecialchars($rev['user_name']); ?></div>
-                                <div style="font-size:0.75rem; color:var(--text-muted);"><?php echo date('M d, Y', strtotime($rev['created_at'])); ?></div>
-                            </td>
-                            <td style="color:var(--gold-light);">
-                                <?php for($i=1; $i<=5; $i++): ?>
-                                    <i class="<?php echo $i <= $rev['rating'] ? 'fas' : 'far'; ?> fa-star" style="font-size:0.8rem;"></i>
-                                <?php endfor; ?>
-                            </td>
-                            <td style="max-width:300px;">
-                                <div style="font-weight:700; color:rgba(255,255,255,0.7);"><?php echo htmlspecialchars($rev['title']); ?></div>
-                                <div style="font-size:0.85rem; color:var(--text-secondary); margin-top:4px;"><?php echo htmlspecialchars($rev['review_text']); ?></div>
-                            </td>
-                            <td>
-                                <span class="admin-badge <?php echo $rev['is_approved'] ? 'badge-completed' : 'badge-pending'; ?>">
-                                    <?php echo $rev['is_approved'] ? 'Approved' : 'Pending'; ?>
-                                </span>
-                                <?php if ($rev['is_featured']): ?>
-                                    <div style="font-size:0.65rem; background:rgba(212,175,55,0.2); color:var(--gold-primary); font-weight:800; display:inline-block; padding:2px 6px; border-radius:3px; margin-top:5px; text-transform:uppercase;">Featured</div>
-                                <?php endif; ?>
-                            </td>
-                            <td>
-                                <div style="display:flex; flex-direction:column; gap:6px;">
-                                    <?php if (!$rev['is_approved']): ?>
-                                        <a href="reviews.php?approve_id=<?php echo $rev['id']; ?>" class="btn-gold" style="padding:4px 8px; font-size:0.7rem; text-align:center;">Approve</a>
-                                    <?php endif; ?>
-                                    <a href="reviews.php?feature_id=<?php echo $rev['id']; ?>" class="btn-outline-gold" style="padding:4px 8px; font-size:0.7rem; text-align:center;">
-                                        <?php echo $rev['is_featured'] ? 'Unfeature' : 'Feature'; ?>
-                                    </a>
-                                    <a href="reviews.php?delete_id=<?php echo $rev['id']; ?>" class="btn-outline-gold" style="padding:4px 8px; font-size:0.7rem; text-align:center; color:var(--danger-color); border-color:var(--danger-color);" onclick="return confirm('Are you sure you want to delete this review?')">Delete</a>
-                                </div>
-                            </td>
+                            <th>Product</th>
+                            <th>Reviewer</th>
+                            <th>Rating</th>
+                            <th>Review</th>
+                            <th>Status</th>
+                            <th>Actions</th>
                         </tr>
-                    <?php endforeach; ?>
-                </tbody>
-            </table>
+                    </thead>
+                    <tbody>
+                        <?php foreach ($reviews as $rev): ?>
+                            <tr>
+                                <td>
+                                    <span style="font-weight:600; color:#fff; font-size:0.85rem;">
+                                        <?php echo htmlspecialchars($rev['p_name']); ?>
+                                    </span>
+                                </td>
+                                <td>
+                                    <div style="font-weight:600; color:rgba(255,255,255,0.8); font-size:0.85rem;"><?php echo htmlspecialchars($rev['user_name']); ?></div>
+                                    <div style="font-size:0.72rem; color:rgba(255,255,255,0.35); margin-top:2px;"><?php echo date('M d, Y', strtotime($rev['created_at'])); ?></div>
+                                </td>
+                                <td>
+                                    <div style="display:flex; gap:2px;">
+                                        <?php for($i=1; $i<=5; $i++): ?>
+                                            <i class="<?php echo $i <= $rev['rating'] ? 'fas' : 'far'; ?> fa-star" style="font-size:0.75rem; color:<?php echo $i <= $rev['rating'] ? '#D4AF37' : 'rgba(255,255,255,0.15)'; ?>;"></i>
+                                        <?php endfor; ?>
+                                    </div>
+                                </td>
+                                <td style="max-width:280px;">
+                                    <div style="font-weight:600; color:rgba(255,255,255,0.8); font-size:0.82rem; margin-bottom:3px;"><?php echo htmlspecialchars($rev['title']); ?></div>
+                                    <div style="font-size:0.78rem; color:rgba(255,255,255,0.4); line-height:1.4; display:-webkit-box; -webkit-line-clamp:2; -webkit-box-orient:vertical; overflow:hidden;">
+                                        <?php echo htmlspecialchars($rev['review_text']); ?>
+                                    </div>
+                                </td>
+                                <td>
+                                    <div style="display:flex; flex-direction:column; gap:4px;">
+                                        <span class="admin-badge <?php echo $rev['is_approved'] ? 'badge-completed' : 'badge-pending'; ?>">
+                                            <?php echo $rev['is_approved'] ? 'Approved' : 'Pending'; ?>
+                                        </span>
+                                        <?php if ($rev['is_featured']): ?>
+                                            <span style="font-size:0.6rem; font-weight:700; color:#D4AF37; text-transform:uppercase; letter-spacing:0.5px;">
+                                                <i class="fas fa-crown" style="margin-right:3px;"></i> Featured
+                                            </span>
+                                        <?php endif; ?>
+                                    </div>
+                                </td>
+                                <td>
+                                    <div style="display:flex; gap:6px; align-items:center;">
+                                        <?php if (!$rev['is_approved']): ?>
+                                            <a href="reviews.php?approve_id=<?php echo $rev['id']; ?>" title="Approve" style="width:30px; height:30px; border-radius:6px; background:rgba(74,222,128,0.1); display:flex; align-items:center; justify-content:center; color:#4ade80; font-size:0.75rem;">
+                                                <i class="fas fa-check"></i>
+                                            </a>
+                                        <?php endif; ?>
+                                        <a href="reviews.php?feature_id=<?php echo $rev['id']; ?>" title="<?php echo $rev['is_featured'] ? 'Unfeature' : 'Feature'; ?>" style="width:30px; height:30px; border-radius:6px; background:rgba(212,175,55,0.1); display:flex; align-items:center; justify-content:center; color:#D4AF37; font-size:0.75rem;">
+                                            <i class="fas fa-crown"></i>
+                                        </a>
+                                        <a href="reviews.php?delete_id=<?php echo $rev['id']; ?>" title="Delete" onclick="return confirm('Are you sure you want to delete this review?')" style="width:30px; height:30px; border-radius:6px; background:rgba(239,68,68,0.1); display:flex; align-items:center; justify-content:center; color:#ef4444; font-size:0.75rem;">
+                                            <i class="fas fa-trash"></i>
+                                        </a>
+                                    </div>
+                                </td>
+                            </tr>
+                        <?php endforeach; ?>
+                    </tbody>
+                </table>
+            </div>
         <?php endif; ?>
     </div>
 

@@ -1,5 +1,5 @@
 <?php
-// admin/bundles.php — Bundle List (Enhanced UI)
+// admin/bundles.php — Combo List (Enhanced UI)
 require_once __DIR__ . '/includes/header.php';
 require_once __DIR__ . '/includes/sidebar.php';
 
@@ -15,7 +15,7 @@ if (isset($_GET['delete_id'])) {
 }
 
 if (isset($_GET['msg'])) {
-    $msgs = ['deleted' => 'Bundle deleted successfully.'];
+    $msgs = ['deleted' => 'Combo deleted successfully.'];
     $action_msg = $msgs[$_GET['msg']] ?? '';
 }
 
@@ -63,11 +63,11 @@ foreach ($bundles as $b) {
     <!-- Page Header -->
     <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:30px;">
         <div>
-            <h2 style="font-size:1.8rem; text-transform:uppercase; margin-bottom:5px;">Bundle Stacks</h2>
+            <h2 style="font-size:1.8rem; text-transform:uppercase; margin-bottom:5px;">Combos</h2>
             <p style="font-size:0.85rem; color:var(--text-muted);">Manage combo packs & boost average order value</p>
         </div>
         <a href="bundle_add.php" class="btn-gold" style="padding:10px 20px; font-size:0.85rem; text-decoration:none; display:inline-flex; align-items:center; gap:8px;">
-            <i class="fas fa-plus"></i> Create Bundle
+            <i class="fas fa-plus"></i> Create Combo
         </a>
     </div>
 
@@ -80,15 +80,15 @@ foreach ($bundles as $b) {
     <!-- Stats Cards -->
     <div class="admin-card-grid" style="grid-template-columns: repeat(4, 1fr); margin-bottom:35px;">
         <div class="admin-card glass-card">
-            <h4>Total Bundles</h4>
+            <h4>Total Combos</h4>
             <div class="val"><?php echo $stats['total'] ?? 0; ?></div>
         </div>
         <div class="admin-card glass-card">
-            <h4>Active Bundles</h4>
+            <h4>Active Combos</h4>
             <div class="val" style="color:var(--success-color);"><?php echo $stats['active'] ?? 0; ?></div>
         </div>
         <div class="admin-card glass-card">
-            <h4>Total Bundle Items</h4>
+            <h4>Total Combo Items</h4>
             <div class="val"><?php echo $total_items_all; ?></div>
         </div>
         <div class="admin-card glass-card">
@@ -103,18 +103,18 @@ foreach ($bundles as $b) {
             <div style="width:80px; height:80px; background:rgba(212,175,55,0.08); border-radius:50%; display:flex; align-items:center; justify-content:center; margin:0 auto 20px;">
                 <i class="fas fa-cubes" style="font-size:2rem; color:var(--gold-primary);"></i>
             </div>
-            <h3 style="font-size:1.3rem; color:#fff; margin-bottom:10px;">No Bundles Yet</h3>
+            <h3 style="font-size:1.3rem; color:#fff; margin-bottom:10px;">No Combos Yet</h3>
             <p style="color:var(--text-muted); font-size:0.9rem; margin-bottom:25px; max-width:400px; margin-left:auto; margin-right:auto;">
-                Create your first bundle to combine products at a special combo price and increase your average order value.
+                Create your first combo to combine products at a special price and increase your average order value.
             </p>
             <a href="bundle_add.php" class="btn-gold" style="padding:12px 30px; text-decoration:none; display:inline-flex; align-items:center; gap:8px; font-size:0.9rem;">
-                <i class="fas fa-plus"></i> Create Your First Bundle
+                <i class="fas fa-plus"></i> Create Your First Combo
             </a>
         </div>
 
     <?php else: ?>
         
-        <!-- Bundles Grid -->
+        <!-- Combos Grid -->
         <div style="display:grid; grid-template-columns:repeat(auto-fill, minmax(480px, 1fr)); gap:25px;">
             <?php foreach ($bundles as $b): 
                 $d = $bundle_details[$b['id']];
@@ -125,10 +125,10 @@ foreach ($bundles as $b) {
                 <div class="glass-card" style="padding:0; border-radius:12px; overflow:hidden; transition:all 0.3s; position:relative;">
                     
                     <!-- Banner / Header -->
-                    <div style="position:relative; height:140px; overflow:hidden;">
+                    <div style="position:relative; height:180px; overflow:hidden; background:#0a0e13;">
                         <?php if ($b['banner_image']): ?>
                             <img src="../<?php echo htmlspecialchars($b['banner_image']); ?>" alt="" 
-                                 style="width:100%; height:100%; object-fit:cover;">
+                                 style="width:100%; height:100%; object-fit:contain; padding:10px;">
                         <?php else: ?>
                             <div style="width:100%; height:100%; background:linear-gradient(135deg, rgba(212,175,55,0.15) 0%, rgba(212,175,55,0.03) 100%); display:flex; align-items:center; justify-content:center;">
                                 <i class="fas fa-cubes" style="font-size:3rem; color:rgba(212,175,55,0.3);"></i>
@@ -192,7 +192,7 @@ foreach ($bundles as $b) {
                         <?php if (!empty($items)): ?>
                             <div style="margin-bottom:15px;">
                                 <div style="font-size:0.7rem; color:var(--text-muted); text-transform:uppercase; margin-bottom:8px; letter-spacing:0.5px;">
-                                    <?php echo count($items); ?> Product<?php echo count($items) > 1 ? 's' : '' ?> in Bundle
+                                    <?php echo count($items); ?> Product<?php echo count($items) > 1 ? 's' : '' ?> in Combo
                                 </div>
                                 <?php foreach ($items as $item): ?>
                                     <div style="display:flex; align-items:center; gap:10px; padding:8px 0; border-bottom:1px dashed rgba(255,255,255,0.05);">
@@ -223,7 +223,7 @@ foreach ($bundles as $b) {
                                 <i class="fas fa-edit"></i> Edit & Manage Items
                             </a>
                             <a href="bundles.php?delete_id=<?php echo $b['id']; ?>" 
-                               onclick="return confirm('Delete this bundle? All items will be removed.');"
+                               onclick="return confirm('Delete this combo? All items will be removed.');"
                                style="padding:10px 15px; background:rgba(220,53,69,0.08); color:#dc3545; border:1px solid rgba(220,53,69,0.2); border-radius:6px; text-decoration:none; font-size:0.85rem; transition:all 0.2s; display:flex; align-items:center; justify-content:center;">
                                 <i class="fas fa-trash"></i>
                             </a>

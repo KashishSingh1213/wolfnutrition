@@ -1,137 +1,373 @@
 <?php
-// admin/includes/sidebar.php
+// admin/includes/sidebar.php — Redesigned Sidebar
 $active_subpage = basename($_SERVER['PHP_SELF']);
 
-// Set dynamic page title for mobile menu panel indicator
-$active_title = 'Menu Panel';
-if ($active_subpage === 'dashboard.php') $active_title = 'Dashboard';
-elseif ($active_subpage === 'products.php' || $active_subpage === 'product_add.php' || $active_subpage === 'product_edit.php') $active_title = 'Products';
-elseif ($active_subpage === 'categories.php') $active_title = 'Categories';
-elseif ($active_subpage === 'orders.php') $active_title = 'Order Management';
-elseif ($active_subpage === 'bundles.php') $active_title = 'Bundle Stacks';
-elseif ($active_subpage === 'coupons.php') $active_title = 'Coupons & Promos';
-elseif ($active_subpage === 'quantity_discounts.php') $active_title = 'Quantity Discounts';
-elseif ($active_subpage === 'announcements.php') $active_title = 'Announcements';
-elseif ($active_subpage === 'reviews.php') $active_title = 'Reviews Moderation';
-elseif ($active_subpage === 'blog.php') $active_title = 'Blog / Articles';
-elseif ($active_subpage === 'cms.php') $active_title = 'Policy Pages';
-elseif ($active_subpage === 'certificates.php') $active_title = 'Certificates Gallery';
-elseif ($active_subpage === 'whatsapp.php') $active_title = 'WhatsApp settings';
-elseif ($active_subpage === 'reports.php') $active_title = 'Financial Reports';
+// Navigation grouped by function
+$nav_groups = [
+    [
+        'label' => 'Overview',
+        'items' => [
+            ['page' => 'dashboard.php', 'label' => 'Dashboard', 'icon' => 'fas fa-th-large', 'match' => ['dashboard.php']],
+        ]
+    ],
+    [
+        'label' => 'Catalog',
+        'items' => [
+            ['page' => 'products.php',    'label' => 'Products',   'icon' => 'fas fa-box',      'match' => ['products.php', 'product_add.php', 'product_edit.php']],
+            ['page' => 'categories.php',  'label' => 'Categories', 'icon' => 'fas fa-layer-group', 'match' => ['categories.php', 'category_add.php', 'category_edit.php']],
+            ['page' => 'bundles.php',     'label' => 'Combos',       'icon' => 'fas fa-cubes',    'match' => ['bundles.php', 'bundle_add.php', 'bundle_edit.php']],
+        ]
+    ],
+    [
+        'label' => 'Sales',
+        'items' => [
+            ['page' => 'orders.php',              'label' => 'Orders',            'icon' => 'fas fa-shopping-bag', 'match' => ['orders.php']],
+            ['page' => 'coupons.php',             'label' => 'Coupons',           'icon' => 'fas fa-ticket-alt',   'match' => ['coupons.php']],
+            ['page' => 'quantity_discounts.php',  'label' => 'Discounts',         'icon' => 'fas fa-percentage',   'match' => ['quantity_discounts.php']],
+        ]
+    ],
+    [
+        'label' => 'Marketing',
+        'items' => [
+            ['page' => 'announcements.php',  'label' => 'Announcements', 'icon' => 'fas fa-bullhorn',  'match' => ['announcements.php']],
+            ['page' => 'reviews.php',        'label' => 'Reviews',       'icon' => 'fas fa-star-half-alt', 'match' => ['reviews.php']],
+        ]
+    ],
+    [
+        'label' => 'Content',
+        'items' => [
+            ['page' => 'blog.php',         'label' => 'Blog',          'icon' => 'fas fa-pen-nib',     'match' => ['blog.php']],
+            ['page' => 'cms.php',          'label' => 'Pages',         'icon' => 'fas fa-file-alt',    'match' => ['cms.php']],
+            ['page' => 'certificates.php', 'label' => 'Certificates',  'icon' => 'fas fa-award',       'match' => ['certificates.php']],
+        ]
+    ],
+    [
+        'label' => 'System',
+        'items' => [
+            ['page' => 'whatsapp.php',  'label' => 'WhatsApp', 'icon' => 'fab fa-whatsapp', 'match' => ['whatsapp.php']],
+            ['page' => 'reports.php',   'label' => 'Reports',  'icon' => 'fas fa-chart-bar', 'match' => ['reports.php']],
+        ]
+    ],
+];
 ?>
 
-<!-- Inline CSS for Collapsible Menu Toggle -->
-<style>
-    .admin-mobile-menu-header {
-        display: none;
-    }
-    @media (max-width: 768px) {
-        .admin-mobile-menu-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 12px 18px;
-            background-color: rgba(255, 255, 255, 0.02);
-            border: 1px solid rgba(212, 175, 55, 0.2);
-            border-radius: 6px;
-            cursor: pointer;
-            width: 100%;
-            user-select: none;
-            transition: background-color 0.2s;
-            margin-bottom: 5px;
-        }
-        .admin-mobile-menu-header:hover {
-            background-color: rgba(255, 255, 255, 0.05);
-        }
-        .admin-mobile-menu-header span {
-            font-weight: 700;
-            color: var(--gold-primary);
-            text-transform: uppercase;
-            font-size: 0.8rem;
-            letter-spacing: 0.5px;
-            display: flex;
-            align-items: center;
-            gap: 10px;
-        }
-        .admin-mobile-menu-header .toggle-icon {
-            color: var(--gold-primary);
-            font-size: 0.85rem;
-            transition: transform 0.3s ease;
-        }
-        .admin-sidebar.expanded .admin-mobile-menu-header .toggle-icon {
-            transform: rotate(180deg);
-        }
-    }
-</style>
+<!-- Mobile Overlay -->
+<div class="admin-mobile-overlay" id="admin-mobile-overlay"></div>
 
-<aside class="admin-sidebar" id="admin-sidebar-menu">
-    <!-- Mobile Menu Accordion Header -->
-    <div class="admin-mobile-menu-header" id="mobile-menu-toggle">
-        <span>
-            <i class="fas fa-bars"></i> Nav Menu: <strong style="color:#fff;"><?php echo $active_title; ?></strong>
-        </span>
-        <i class="fas fa-chevron-down toggle-icon"></i>
+<!-- Sidebar -->
+<aside class="admin-sidebar" id="admin-sidebar">
+    
+    <!-- Logo Section -->
+    <div class="sidebar-logo">
+        <img src="../assets/images/logo.png" alt="Wolf" class="sidebar-logo-img">
+        <div class="sidebar-logo-text">
+            <span class="sidebar-brand">Wolf Nutrition</span>
+            <span class="sidebar-badge">ADMIN</span>
+        </div>
     </div>
 
-    <!-- Sidebar Navigation Links -->
-    <a href="dashboard.php" class="admin-sidebar-link <?php echo $active_subpage === 'dashboard.php' ? 'active' : ''; ?>">
-        <i class="fas fa-chart-line"></i> Dashboard
-    </a>
-    <a href="products.php" class="admin-sidebar-link <?php echo ($active_subpage === 'products.php' || $active_subpage === 'product_add.php' || $active_subpage === 'product_edit.php') ? 'active' : ''; ?>">
-        <i class="fas fa-capsules"></i> Products
-    </a>
-    <a href="categories.php" class="admin-sidebar-link <?php echo ($active_subpage === 'categories.php' || $active_subpage === 'category_add.php' || $active_subpage === 'category_edit.php') ? 'active' : ''; ?>">
-        <i class="fas fa-tags"></i> Categories
-    </a>
-    <a href="orders.php" class="admin-sidebar-link <?php echo $active_subpage === 'orders.php' ? 'active' : ''; ?>">
-        <i class="fas fa-receipt"></i> Order Management
-    </a>
-    <a href="bundles.php" class="admin-sidebar-link <?php echo ($active_subpage === 'bundles.php' || $active_subpage === 'bundle_add.php' || $active_subpage === 'bundle_edit.php') ? 'active' : ''; ?>">
-        <i class="fas fa-cubes"></i> Bundle Stacks
-    </a>
-    <a href="coupons.php" class="admin-sidebar-link <?php echo $active_subpage === 'coupons.php' ? 'active' : ''; ?>">
-        <i class="fas fa-percent"></i> Coupons & Promos
-    </a>
-    <a href="quantity_discounts.php" class="admin-sidebar-link <?php echo $active_subpage === 'quantity_discounts.php' ? 'active' : ''; ?>">
-        <i class="fas fa-layer-group"></i> Quantity Discounts
-    </a>
-    <a href="announcements.php" class="admin-sidebar-link <?php echo $active_subpage === 'announcements.php' ? 'active' : ''; ?>">
-        <i class="fas fa-bullhorn"></i> Announcements
-    </a>
-    <a href="reviews.php" class="admin-sidebar-link <?php echo $active_subpage === 'reviews.php' ? 'active' : ''; ?>">
-        <i class="fas fa-star"></i> Reviews Moderation
-    </a>
-    <a href="blog.php" class="admin-sidebar-link <?php echo $active_subpage === 'blog.php' ? 'active' : ''; ?>">
-        <i class="fas fa-blog"></i> Blog / Articles
-    </a>
-    <a href="cms.php" class="admin-sidebar-link <?php echo $active_subpage === 'cms.php' ? 'active' : ''; ?>">
-        <i class="fas fa-file-alt"></i> Policy Pages
-    </a>
-    <a href="certificates.php" class="admin-sidebar-link <?php echo $active_subpage === 'certificates.php' ? 'active' : ''; ?>">
-        <i class="fas fa-certificate"></i> Certificates Gallery
-    </a>
-    <a href="whatsapp.php" class="admin-sidebar-link <?php echo $active_subpage === 'whatsapp.php' ? 'active' : ''; ?>">
-        <i class="fab fa-whatsapp"></i> WhatsApp settings
-    </a>
-    <a href="reports.php" class="admin-sidebar-link <?php echo $active_subpage === 'reports.php' ? 'active' : ''; ?>">
-        <i class="fas fa-file-csv"></i> Financial Reports
-    </a>
-    <a href="logout.php" class="admin-sidebar-link" style="margin-top:auto; color:var(--danger-color);">
-        <i class="fas fa-sign-out-alt"></i> Exit Admin
-    </a>
+    <!-- Navigation Groups -->
+    <nav class="sidebar-nav">
+        <?php foreach ($nav_groups as $group): ?>
+            <div class="sidebar-group">
+                <div class="sidebar-group-label"><?php echo $group['label']; ?></div>
+                <?php foreach ($group['items'] as $item): ?>
+                    <a href="<?php echo $item['page']; ?>"
+                       class="sidebar-link <?php echo in_array($active_subpage, $item['match']) ? 'active' : ''; ?>">
+                        <span class="sidebar-link-icon"><i class="<?php echo $item['icon']; ?>"></i></span>
+                        <span class="sidebar-link-text"><?php echo $item['label']; ?></span>
+                        <?php if (in_array($active_subpage, $item['match'])): ?>
+                            <span class="sidebar-link-indicator"></span>
+                        <?php endif; ?>
+                    </a>
+                <?php endforeach; ?>
+            </div>
+        <?php endforeach; ?>
+    </nav>
+
+    <!-- Logout -->
+    <div class="sidebar-footer">
+        <a href="logout.php" class="sidebar-link sidebar-logout">
+            <span class="sidebar-link-icon"><i class="fas fa-sign-out-alt"></i></span>
+            <span class="sidebar-link-text">Logout</span>
+        </a>
+    </div>
 </aside>
+
+<!-- Mobile Toggle Button -->
+<button class="admin-mobile-toggle" id="admin-mobile-toggle" aria-label="Toggle navigation">
+    <span class="toggle-bar"></span>
+    <span class="toggle-bar"></span>
+    <span class="toggle-bar"></span>
+</button>
+
+<style>
+/* ═══════════════════════════════════════════════
+   SIDEBAR STYLES — Premium Dark Glass Theme
+   ═══════════════════════════════════════════════ */
+
+/* Logo Section */
+.sidebar-logo {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 20px 16px;
+    margin-bottom: 8px;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+}
+.sidebar-logo-img {
+    width: 38px;
+    height: 38px;
+    object-fit: contain;
+    border-radius: 8px;
+    background: rgba(212, 175, 55, 0.1);
+    padding: 4px;
+    border: 1px solid rgba(212, 175, 55, 0.15);
+}
+.sidebar-logo-text {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+}
+.sidebar-brand {
+    font-size: 0.95rem;
+    font-weight: 700;
+    color: #fff;
+    letter-spacing: -0.3px;
+}
+.sidebar-badge {
+    font-size: 0.55rem;
+    font-weight: 800;
+    letter-spacing: 1.5px;
+    color: #080C10;
+    background: linear-gradient(135deg, #D4AF37, #F2D06B);
+    padding: 2px 8px;
+    border-radius: 3px;
+    width: fit-content;
+    text-transform: uppercase;
+}
+
+/* Navigation */
+.sidebar-nav {
+    flex: 1;
+    overflow-y: auto;
+    overflow-x: hidden;
+    padding: 12px 0;
+    scrollbar-width: thin;
+    scrollbar-color: rgba(212, 175, 55, 0.15) transparent;
+}
+.sidebar-nav::-webkit-scrollbar { width: 3px; }
+.sidebar-nav::-webkit-scrollbar-track { background: transparent; }
+.sidebar-nav::-webkit-scrollbar-thumb { background: rgba(212, 175, 55, 0.15); border-radius: 3px; }
+
+/* Groups */
+.sidebar-group {
+    margin-bottom: 4px;
+}
+.sidebar-group-label {
+    font-size: 0.65rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 1.2px;
+    color: rgba(255, 255, 255, 0.25);
+    padding: 12px 20px 6px;
+    user-select: none;
+}
+
+/* Links */
+.sidebar-link {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 10px 16px;
+    margin: 1px 10px;
+    border-radius: 8px;
+    color: rgba(255, 255, 255, 0.5);
+    font-size: 0.85rem;
+    font-weight: 500;
+    text-decoration: none;
+    transition: all 0.15s ease;
+    position: relative;
+    white-space: nowrap;
+}
+.sidebar-link-icon {
+    width: 32px;
+    height: 32px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 8px;
+    background: rgba(255, 255, 255, 0.04);
+    font-size: 0.85rem;
+    transition: all 0.15s ease;
+    flex-shrink: 0;
+}
+.sidebar-link-text {
+    flex: 1;
+}
+.sidebar-link-indicator {
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: #D4AF37;
+    box-shadow: 0 0 8px rgba(212, 175, 55, 0.5);
+    flex-shrink: 0;
+}
+
+/* Hover */
+.sidebar-link:hover {
+    color: rgba(255, 255, 255, 0.9);
+    background: rgba(255, 255, 255, 0.05);
+}
+.sidebar-link:hover .sidebar-link-icon {
+    background: rgba(212, 175, 55, 0.1);
+    color: rgba(212, 175, 55, 0.8);
+}
+
+/* Active */
+.sidebar-link.active {
+    color: #D4AF37;
+    background: rgba(212, 175, 55, 0.08);
+    font-weight: 600;
+}
+.sidebar-link.active .sidebar-link-icon {
+    background: rgba(212, 175, 55, 0.15);
+    color: #D4AF37;
+}
+
+/* Logout */
+.sidebar-footer {
+    padding: 10px 0;
+    border-top: 1px solid rgba(255, 255, 255, 0.06);
+}
+.sidebar-logout {
+    color: rgba(239, 68, 68, 0.7) !important;
+}
+.sidebar-logout .sidebar-link-icon {
+    background: rgba(239, 68, 68, 0.08);
+    color: rgba(239, 68, 68, 0.7);
+}
+.sidebar-logout:hover {
+    background: rgba(239, 68, 68, 0.08) !important;
+    color: #ef4444 !important;
+}
+.sidebar-logout:hover .sidebar-link-icon {
+    background: rgba(239, 68, 68, 0.15);
+    color: #ef4444;
+}
+
+/* Mobile Toggle */
+.admin-mobile-toggle {
+    display: none;
+    position: fixed;
+    bottom: 24px;
+    right: 24px;
+    z-index: 200;
+    width: 52px;
+    height: 52px;
+    border-radius: 14px;
+    background: linear-gradient(135deg, #D4AF37, #F2D06B);
+    border: none;
+    cursor: pointer;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 5px;
+    box-shadow: 0 4px 20px rgba(212, 175, 55, 0.4);
+    transition: all 0.2s ease;
+}
+.admin-mobile-toggle:hover {
+    transform: scale(1.05);
+    box-shadow: 0 6px 25px rgba(212, 175, 55, 0.5);
+}
+.admin-mobile-toggle .toggle-bar {
+    width: 20px;
+    height: 2px;
+    background: #080C10;
+    border-radius: 2px;
+    transition: all 0.2s ease;
+}
+
+/* Mobile Overlay */
+.admin-mobile-overlay {
+    display: none;
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.6);
+    backdrop-filter: blur(4px);
+    z-index: 150;
+}
+.admin-mobile-overlay.visible {
+    display: block;
+}
+
+/* ═══════════════════════════════════════════════
+   RESPONSIVE
+   ═══════════════════════════════════════════════ */
+@media (max-width: 1024px) {
+    .admin-sidebar {
+        position: fixed !important;
+        top: 0 !important;
+        left: 0;
+        width: 260px;
+        height: 100vh;
+        z-index: 160;
+        transform: translateX(-100%);
+        transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+    .admin-sidebar.mobile-open {
+        transform: translateX(0);
+    }
+    .admin-mobile-toggle {
+        display: flex;
+    }
+    .admin-mobile-overlay {
+        display: block;
+        pointer-events: none;
+    }
+    .admin-mobile-overlay.visible {
+        pointer-events: auto;
+    }
+}
+
+@media (max-width: 768px) {
+    .admin-sidebar {
+        width: 280px;
+    }
+    .sidebar-logo {
+        padding: 16px 14px;
+    }
+    .sidebar-link {
+        padding: 10px 14px;
+        margin: 1px 8px;
+    }
+}
+</style>
 
 <script>
 document.addEventListener('DOMContentLoaded', function() {
-    const toggleBtn = document.getElementById('mobile-menu-toggle');
-    const sidebar = document.getElementById('admin-sidebar-menu');
-    
-    if (toggleBtn && sidebar) {
-        toggleBtn.addEventListener('click', function(e) {
-            e.stopPropagation();
-            sidebar.classList.toggle('expanded');
-        });
+    const sidebar = document.getElementById('admin-sidebar');
+    const toggle = document.getElementById('admin-mobile-toggle');
+    const overlay = document.getElementById('admin-mobile-overlay');
+
+    function openSidebar() {
+        sidebar.classList.add('mobile-open');
+        overlay.classList.add('visible');
     }
+    function closeSidebar() {
+        sidebar.classList.remove('mobile-open');
+        overlay.classList.remove('visible');
+    }
+
+    if (toggle && sidebar && overlay) {
+        toggle.addEventListener('click', function() {
+            sidebar.classList.contains('mobile-open') ? closeSidebar() : openSidebar();
+        });
+        overlay.addEventListener('click', closeSidebar);
+    }
+    document.addEventListener('keydown', function(e) {
+        if (e.key === 'Escape') closeSidebar();
+    });
 });
 </script>
 

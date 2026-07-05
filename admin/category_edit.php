@@ -61,125 +61,231 @@ $stmt_products->execute([$edit_id]);
 $cat_products = $stmt_products->fetchAll();
 ?>
 
-    <div style="margin-bottom:20px;">
-        <a href="categories.php" style="color:var(--gold-muted); font-size:0.9rem; text-decoration:none;">
+    <style>
+        .form-section-card {
+            background: rgba(18,18,18,0.6);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border: 1px solid rgba(255,255,255,0.06);
+            border-radius: 12px;
+            padding: 28px;
+        }
+        .form-section-title {
+            font-size: 0.8rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            font-weight: 700;
+            color: #D4AF37;
+            margin-bottom: 20px;
+            padding-bottom: 10px;
+            border-bottom: 1px solid rgba(255,255,255,0.06);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .form-label {
+            font-size: 0.78rem;
+            font-weight: 600;
+            color: rgba(255,255,255,0.7);
+            display: block;
+            margin-bottom: 6px;
+        }
+        .form-input {
+            width: 100%;
+            padding: 10px 14px;
+            background: rgba(0,0,0,0.3);
+            border: 1px solid rgba(255,255,255,0.08);
+            border-radius: 8px;
+            color: #fff;
+            font-size: 0.88rem;
+            transition: border-color 0.3s ease;
+            box-sizing: border-box;
+        }
+        .form-input:focus {
+            outline: none;
+            border-color: rgba(212,175,55,0.5);
+            box-shadow: 0 0 0 3px rgba(212,175,55,0.08);
+        }
+        .form-input::placeholder { color: rgba(255,255,255,0.25); }
+        .form-hint {
+            font-size: 0.72rem;
+            color: rgba(255,255,255,0.35);
+            margin-top: 5px;
+            display: block;
+        }
+        .stat-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 10px 0;
+            border-bottom: 1px solid rgba(255,255,255,0.04);
+        }
+        .stat-row:last-child { border-bottom: none; }
+        .stat-label {
+            font-size: 0.82rem;
+            color: rgba(255,255,255,0.45);
+        }
+        .stat-value {
+            font-weight: 700;
+            color: #fff;
+            font-size: 0.92rem;
+        }
+        .badge-active {
+            background: rgba(74,222,128,0.1);
+            color: #4ade80;
+            font-size: 0.62rem;
+            font-weight: 700;
+            padding: 2px 8px;
+            border-radius: 20px;
+            text-transform: uppercase;
+        }
+        .badge-inactive {
+            background: rgba(255,255,255,0.05);
+            color: rgba(255,255,255,0.4);
+            font-size: 0.62rem;
+            font-weight: 700;
+            padding: 2px 8px;
+            border-radius: 20px;
+            text-transform: uppercase;
+        }
+        .product-list-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 10px 0;
+            border-bottom: 1px solid rgba(255,255,255,0.04);
+        }
+        .product-list-item:last-child { border-bottom: none; }
+    </style>
+
+    <!-- Back Link -->
+    <div style="margin-bottom:24px;">
+        <a href="categories.php" style="color:rgba(255,255,255,0.45); font-size:0.82rem; text-decoration:none; display:inline-flex; align-items:center; gap:6px; transition:color 0.2s;" onmouseover="this.style.color='#D4AF37'" onmouseout="this.style.color='rgba(255,255,255,0.45)'">
             <i class="fas fa-arrow-left"></i> Back to Categories
         </a>
     </div>
 
-    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:30px;">
-        <h2 style="font-size:1.8rem; text-transform:uppercase;">Edit Category</h2>
-        <div style="font-size:0.85rem; color:var(--text-muted);">Editing: <strong style="color:var(--gold-primary);"><?php echo htmlspecialchars($category['name']); ?></strong></div>
+    <!-- Page Header -->
+    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:32px;">
+        <div>
+            <h2 style="font-size:1.6rem; font-weight:800; color:#fff; margin:0 0 4px 0; letter-spacing:-0.3px;">Edit Category</h2>
+            <p style="font-size:0.85rem; color:rgba(255,255,255,0.45); margin:0;">Editing: <span style="color:#D4AF37; font-weight:600;"><?php echo htmlspecialchars($category['name']); ?></span></p>
+        </div>
+        <span style="font-size:0.75rem; color:rgba(255,255,255,0.3); background:rgba(255,255,255,0.04); padding:5px 12px; border-radius:6px;">ID: #<?php echo $edit_id; ?></span>
     </div>
 
+    <!-- Flash Messages -->
     <?php if ($action_msg): ?>
-        <div class="quantity-discount-widget" style="background-color:rgba(212,175,55,0.05); border-color:rgba(212,175,55,0.3); color:var(--success-color); margin-bottom:25px;">
-            ✅ <?php echo htmlspecialchars($action_msg); ?>
+        <div style="background:rgba(74,222,128,0.08); border:1px solid rgba(74,222,128,0.25); border-radius:10px; padding:14px 18px; margin-bottom:24px; display:flex; align-items:center; gap:10px;">
+            <i class="fas fa-check-circle" style="color:#4ade80; font-size:0.95rem;"></i>
+            <span style="color:#4ade80; font-size:0.88rem; font-weight:500;"><?php echo htmlspecialchars($action_msg); ?></span>
         </div>
     <?php endif; ?>
     <?php if ($action_error): ?>
-        <div class="quantity-discount-widget" style="background-color:rgba(255,50,50,0.05); border-color:rgba(255,50,50,0.3); color:#ff6b6b; margin-bottom:25px;">
-            ❌ <?php echo htmlspecialchars($action_error); ?>
+        <div style="background:rgba(239,68,68,0.08); border:1px solid rgba(239,68,68,0.25); border-radius:10px; padding:14px 18px; margin-bottom:24px; display:flex; align-items:center; gap:10px;">
+            <i class="fas fa-exclamation-circle" style="color:#ef4444; font-size:0.95rem;"></i>
+            <span style="color:#ef4444; font-size:0.88rem; font-weight:500;"><?php echo htmlspecialchars($action_error); ?></span>
         </div>
     <?php endif; ?>
 
-    <div style="display:grid; grid-template-columns: 1.5fr 1fr; gap:30px; align-items:start;">
+    <div style="display:grid; grid-template-columns:1.5fr 1fr; gap:24px; align-items:start;">
         
         <!-- Edit Form -->
-        <div class="glass-card" style="padding:30px; border-radius:8px;">
-            <h3 style="font-size:1.15rem; text-transform:uppercase; margin-bottom:20px; color:var(--gold-primary); border-bottom:1px solid var(--border-color); padding-bottom:10px;">
-                <i class="fas fa-edit" style="margin-right:8px;"></i> Category Details
-            </h3>
+        <div class="form-section-card">
+            <div class="form-section-title">
+                <i class="fas fa-pen"></i> Category Details
+            </div>
             
             <form action="category_edit.php?id=<?php echo $edit_id; ?>" method="POST">
                 <input type="hidden" name="category_id" value="<?php echo $edit_id; ?>">
 
-                <div class="form-group">
-                    <label for="cat-name">Category Name *</label>
-                    <input type="text" name="name" id="cat-name" class="form-control" 
-                        value="<?php echo htmlspecialchars($category['name']); ?>" 
-                        required oninput="autoSlugCat(this.value)">
+                <div style="margin-bottom:18px;">
+                    <label class="form-label">Category Name *</label>
+                    <input type="text" name="name" class="form-input" value="<?php echo htmlspecialchars($category['name']); ?>" required oninput="autoSlugCat(this.value)">
                 </div>
 
-                <div class="form-group">
-                    <label for="cat-slug">URL Slug</label>
-                    <input type="text" name="slug" id="cat-slug" class="form-control" 
-                        value="<?php echo htmlspecialchars($category['slug']); ?>">
-                    <small style="color:var(--text-muted); font-size:0.75rem; margin-top:4px; display:block;">wolfnutrition.in/category/<strong id="slug-preview"><?php echo htmlspecialchars($category['slug']); ?></strong></small>
+                <div style="margin-bottom:18px;">
+                    <label class="form-label">URL Slug</label>
+                    <input type="text" name="slug" id="cat-slug" class="form-input" value="<?php echo htmlspecialchars($category['slug']); ?>">
+                    <span class="form-hint">wolfnutrition.in/category/<strong id="slug-preview" style="color:rgba(255,255,255,0.6);"><?php echo htmlspecialchars($category['slug']); ?></strong></span>
                 </div>
 
-                <div class="form-group">
-                    <label for="cat-desc">Description</label>
-                    <textarea name="description" id="cat-desc" class="form-control" rows="3"><?php echo htmlspecialchars($category['description']); ?></textarea>
+                <div style="margin-bottom:18px;">
+                    <label class="form-label">Description</label>
+                    <textarea name="description" class="form-input" rows="3"><?php echo htmlspecialchars($category['description']); ?></textarea>
                 </div>
 
-                <div style="display:grid; grid-template-columns:1fr 1fr; gap:20px;">
-                    <div class="form-group">
-                        <label for="cat-order">Display Order</label>
-                        <input type="number" name="display_order" id="cat-order" class="form-control" 
-                            value="<?php echo $category['display_order']; ?>">
+                <div style="display:grid; grid-template-columns:1fr 1fr; gap:18px;">
+                    <div>
+                        <label class="form-label">Display Order</label>
+                        <input type="number" name="display_order" class="form-input" value="<?php echo $category['display_order']; ?>">
                     </div>
-                    <div class="form-group" style="display:flex; align-items:flex-end;">
-                        <label style="display:flex; align-items:center; gap:10px; cursor:pointer; font-size:0.9rem; padding-bottom:10px;">
-                            <input type="checkbox" name="is_active" value="1" 
-                                <?php echo $category['is_active'] ? 'checked' : ''; ?> 
-                                style="accent-color:var(--gold-primary); width:18px; height:18px;">
-                            <span>Active (visible on storefront)</span>
+                    <div style="display:flex; align-items:flex-end; padding-bottom:2px;">
+                        <label style="display:flex; align-items:center; gap:8px; cursor:pointer; font-size:0.85rem; color:rgba(255,255,255,0.7);">
+                            <input type="checkbox" name="is_active" value="1" <?php echo $category['is_active'] ? 'checked' : ''; ?> style="accent-color:#D4AF37; width:16px; height:16px;">
+                            <span>Active</span>
                         </label>
                     </div>
                 </div>
 
-                <div style="display:flex; gap:15px; margin-top:25px; padding-top:20px; border-top:1px solid var(--border-color);">
-                    <button type="submit" name="save_category" class="btn-gold" style="padding:12px 35px; font-size:0.9rem; font-weight:700;">
+                <div style="display:flex; gap:14px; margin-top:28px; padding-top:20px; border-top:1px solid rgba(255,255,255,0.06);">
+                    <button type="submit" name="save_category" class="btn-gold" style="padding:12px 32px; font-size:0.88rem; font-weight:700; display:inline-flex; align-items:center; gap:8px;">
                         <i class="fas fa-save"></i> Update Category
                     </button>
-                    <a href="categories.php" class="btn-outline-gold" style="padding:12px 25px; font-size:0.9rem; text-decoration:none; display:flex; align-items:center;">
+                    <a href="categories.php" class="btn-outline-gold" style="padding:12px 24px; font-size:0.85rem; text-decoration:none; display:inline-flex; align-items:center;">
                         Cancel
                     </a>
                 </div>
             </form>
         </div>
 
-        <!-- Category Info -->
+        <!-- Right Sidebar -->
         <div style="display:flex; flex-direction:column; gap:20px;">
             <!-- Stats -->
-            <div class="glass-card" style="padding:25px; border-radius:6px;">
-                <h3 style="font-size:1.15rem; text-transform:uppercase; margin-bottom:15px; color:var(--gold-primary); border-bottom:1px solid var(--border-color); padding-bottom:10px;">
-                    Category Stats
-                </h3>
-                <div style="display:flex; flex-direction:column; gap:12px;">
-                    <div style="display:flex; justify-content:space-between; font-size:0.9rem;">
-                        <span style="color:var(--text-muted);">Products in category</span>
-                        <strong style="color:#fff; font-size:1.1rem;"><?php echo $product_count; ?></strong>
+            <div class="form-section-card">
+                <div class="form-section-title">
+                    <i class="fas fa-chart-bar"></i> Category Stats
+                </div>
+                <div style="display:flex; flex-direction:column; gap:0;">
+                    <div class="stat-row">
+                        <span class="stat-label">Products in category</span>
+                        <span class="stat-value"><?php echo $product_count; ?></span>
                     </div>
-                    <div style="display:flex; justify-content:space-between; font-size:0.9rem;">
-                        <span style="color:var(--text-muted);">Status</span>
-                        <span class="admin-badge <?php echo $category['is_active'] ? 'badge-completed' : 'badge-failed'; ?>">
+                    <div class="stat-row">
+                        <span class="stat-label">Status</span>
+                        <span class="<?php echo $category['is_active'] ? 'badge-active' : 'badge-inactive'; ?>">
                             <?php echo $category['is_active'] ? 'Active' : 'Inactive'; ?>
                         </span>
                     </div>
-                    <div style="display:flex; justify-content:space-between; font-size:0.9rem;">
-                        <span style="color:var(--text-muted);">Display Order</span>
-                        <strong style="color:#fff;"><?php echo $category['display_order']; ?></strong>
+                    <div class="stat-row">
+                        <span class="stat-label">Display Order</span>
+                        <span class="stat-value"><?php echo $category['display_order']; ?></span>
+                    </div>
+                    <div class="stat-row">
+                        <span class="stat-label">Slug</span>
+                        <span style="font-size:0.78rem; color:rgba(255,255,255,0.5); font-family:monospace;"><?php echo htmlspecialchars($category['slug']); ?></span>
                     </div>
                 </div>
             </div>
 
             <!-- Products in this category -->
-            <div class="glass-card" style="padding:25px; border-radius:6px;">
-                <h3 style="font-size:1.15rem; text-transform:uppercase; margin-bottom:15px; color:var(--gold-primary); border-bottom:1px solid var(--border-color); padding-bottom:10px;">
-                    Products (<?php echo $product_count; ?>)
-                </h3>
+            <div class="form-section-card">
+                <div class="form-section-title">
+                    <i class="fas fa-box"></i> Products (<?php echo $product_count; ?>)
+                </div>
                 <?php if (empty($cat_products)): ?>
-                    <p style="color:var(--text-muted); text-align:center; padding:15px 0; font-size:0.85rem;">No products in this category yet.</p>
+                    <div style="text-align:center; padding:20px 0;">
+                        <i class="fas fa-inbox" style="font-size:1.3rem; color:rgba(255,255,255,0.1); margin-bottom:8px; display:block;"></i>
+                        <p style="color:rgba(255,255,255,0.35); font-size:0.82rem; margin:0;">No products in this category yet.</p>
+                    </div>
                 <?php else: ?>
-                    <div style="display:flex; flex-direction:column; gap:8px;">
+                    <div style="display:flex; flex-direction:column; gap:0;">
                         <?php foreach ($cat_products as $prod): ?>
-                            <div style="display:flex; justify-content:space-between; align-items:center; padding:8px 0; border-bottom:1px dashed rgba(255,255,255,0.05); font-size:0.85rem;">
-                                <a href="product_edit.php?id=<?php echo $prod['id']; ?>" style="color:#fff; text-decoration:none; font-weight:600;">
+                            <div class="product-list-item">
+                                <a href="product_edit.php?id=<?php echo $prod['id']; ?>" style="color:#fff; text-decoration:none; font-weight:600; font-size:0.82rem; transition:color 0.2s;" onmouseover="this.style.color='#D4AF37'" onmouseout="this.style.color='#fff'">
                                     <?php echo htmlspecialchars($prod['name']); ?>
                                 </a>
-                                <span class="admin-badge <?php echo $prod['is_active'] ? 'badge-completed' : 'badge-failed'; ?>" style="font-size:0.6rem;">
+                                <span class="<?php echo $prod['is_active'] ? 'badge-active' : 'badge-inactive'; ?>">
                                     <?php echo $prod['is_active'] ? 'Active' : 'Off'; ?>
                                 </span>
                             </div>
