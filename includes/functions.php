@@ -1,5 +1,6 @@
 <?php
 // includes/functions.php
+mb_internal_encoding('UTF-8');
 ob_start();
 if (session_status() == PHP_SESSION_NONE) {
     session_start();

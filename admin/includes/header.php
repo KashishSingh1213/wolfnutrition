@@ -199,6 +199,22 @@ $admin_name = $_SESSION['admin_name'];
             border-color: var(--gold-primary) !important;
             box-shadow: 0 0 10px rgba(212, 175, 55, 0.2) !important;
         }
+        /* Fix select dropdown option visibility */
+        .admin-content select.form-control {
+            color: #ffffff !important;
+            background-color: rgba(30, 30, 30, 0.95) !important;
+        }
+        .admin-content select.form-control option {
+            background-color: #1a1a2e !important;
+            color: #ffffff !important;
+            padding: 8px !important;
+        }
+        .admin-content select.form-control option:hover {
+            background-color: rgba(212, 175, 55, 0.2) !important;
+        }
+        .admin-content select.form-control option[value=""] {
+            color: #999 !important;
+        }
 
         /* Responsive Media Queries for Admin Panel Control Center */
         @media (max-width: 1024px) {

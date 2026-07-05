@@ -23,6 +23,22 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['add_cert'])) {
     }
 }
 
+// Handle Edit Certificate Update
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['edit_cert'])) {
+    $cert_id = (int)$_POST['cert_id'];
+    $title = trim($_POST['title']);
+    $url = trim($_POST['image_url']);
+    $order = (int)$_POST['display_order'];
+
+    if (empty($title) || empty($url)) {
+        $action_error = "Please fill in title and image path.";
+    } else {
+        $stmt_u = $pdo->prepare("UPDATE certificates SET title = ?, image_url = ?, display_order = ? WHERE id = ?");
+        $stmt_u->execute([$title, $url, $order, $cert_id]);
+        $action_msg = "Certificate updated successfully.";
+    }
+}
+
 // Handle Status Toggle
 if (isset($_GET['toggle_id'])) {
     $c_id = (int)$_GET['toggle_id'];
@@ -43,6 +59,15 @@ if (isset($_GET['delete_id'])) {
 $stmt = $pdo->prepare("SELECT * FROM certificates ORDER BY display_order ASC");
 $stmt->execute();
 $certs = $stmt->fetchAll();
+
+// Fetch edit certificate if editing
+$edit_cert = null;
+if (isset($_GET['edit_id'])) {
+    $edit_id = (int)$_GET['edit_id'];
+    $stmt = $pdo->prepare("SELECT * FROM certificates WHERE id = ?");
+    $stmt->execute([$edit_id]);
+    $edit_cert = $stmt->fetch();
+}
 ?>
 
     <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:30px;">
@@ -91,7 +116,8 @@ $certs = $stmt->fetchAll();
                                 </td>
                                 <td>
                                     <div style="display:flex; gap:10px;">
-                                        <a href="certificates.php?toggle_id=<?php echo $c['id']; ?>" style="color:var(--gold-primary); font-weight:700;">Toggle</a>
+                                        <a href="certificates.php?edit_id=<?php echo $c['id']; ?>" style="color:var(--gold-primary); font-weight:700;">Edit</a>
+                                        <a href="certificates.php?toggle_id=<?php echo $c['id']; ?>" style="color:var(--text-secondary); font-weight:700;">Toggle</a>
                                         <a href="certificates.php?delete_id=<?php echo $c['id']; ?>" style="color:var(--danger-color); font-weight:700;" onclick="return confirm('Delete this certificate record?')">Delete</a>
                                     </div>
                                 </td>
@@ -102,30 +128,55 @@ $certs = $stmt->fetchAll();
             <?php endif; ?>
         </div>
 
-        <!-- Add Certificate Form -->
+        <!-- Add/Edit Certificate Form -->
         <div class="glass-card" style="padding: 25px; border-radius:6px;">
             <h3 style="font-size:1.15rem; text-transform:uppercase; margin-bottom:15px; color:var(--gold-primary); border-bottom:1px solid var(--border-color); padding-bottom:10px;">
-                Add Quality Stamp
+                <?php echo $edit_cert ? 'Edit Certificate' : 'Add Quality Stamp'; ?>
             </h3>
             
-            <form action="certificates.php" method="POST">
-                <div class="form-group">
-                    <label for="c-title">Certificate Title *</label>
-                    <input type="text" name="title" id="c-title" class="form-control" style="font-size:0.85rem; padding:8px;" placeholder="e.g. ISO 9001:2015 stamp" required>
-                </div>
-                <div class="form-group">
-                    <label for="c-url">Image File Path *</label>
-                    <input type="text" name="image_url" id="c-url" class="form-control" style="font-size:0.85rem; padding:8px;" placeholder="e.g. assets/images/certs/fssai_cert.png" required>
-                </div>
-                <div class="form-group">
-                    <label for="c-order">Display Order</label>
-                    <input type="number" name="display_order" id="c-order" class="form-control" style="font-size:0.85rem; padding:8px;" value="0">
-                </div>
-                
-                <button type="submit" name="add_cert" class="btn-gold" style="width:100%; margin-top:10px; padding:10px; font-size:0.85rem;">
-                    Save Certificate
-                </button>
-            </form>
+            <?php if ($edit_cert): ?>
+                <form action="certificates.php" method="POST">
+                    <input type="hidden" name="cert_id" value="<?php echo $edit_cert['id']; ?>">
+                    <div class="form-group">
+                        <label for="c-title">Certificate Title *</label>
+                        <input type="text" name="title" id="c-title" class="form-control" style="font-size:0.85rem; padding:8px;" value="<?php echo htmlspecialchars($edit_cert['title']); ?>" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="c-url">Image File Path *</label>
+                        <input type="text" name="image_url" id="c-url" class="form-control" style="font-size:0.85rem; padding:8px;" value="<?php echo htmlspecialchars($edit_cert['image_url']); ?>" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="c-order">Display Order</label>
+                        <input type="number" name="display_order" id="c-order" class="form-control" style="font-size:0.85rem; padding:8px;" value="<?php echo $edit_cert['display_order']; ?>">
+                    </div>
+                    
+                    <div style="display:flex; gap:10px; margin-top:10px;">
+                        <button type="submit" name="edit_cert" class="btn-gold" style="flex:1; padding:10px; font-size:0.85rem;">
+                            Update Certificate
+                        </button>
+                        <a href="certificates.php" class="btn-outline-gold" style="padding:10px 20px; font-size:0.85rem; text-align:center;">Cancel</a>
+                    </div>
+                </form>
+            <?php else: ?>
+                <form action="certificates.php" method="POST">
+                    <div class="form-group">
+                        <label for="c-title">Certificate Title *</label>
+                        <input type="text" name="title" id="c-title" class="form-control" style="font-size:0.85rem; padding:8px;" placeholder="e.g. ISO 9001:2015 stamp" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="c-url">Image File Path *</label>
+                        <input type="text" name="image_url" id="c-url" class="form-control" style="font-size:0.85rem; padding:8px;" placeholder="e.g. assets/images/certs/fssai_cert.png" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="c-order">Display Order</label>
+                        <input type="number" name="display_order" id="c-order" class="form-control" style="font-size:0.85rem; padding:8px;" value="0">
+                    </div>
+                    
+                    <button type="submit" name="add_cert" class="btn-gold" style="width:100%; margin-top:10px; padding:10px; font-size:0.85rem;">
+                        Save Certificate
+                    </button>
+                </form>
+            <?php endif; ?>
         </div>
     </div>
 

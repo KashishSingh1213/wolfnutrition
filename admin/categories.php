@@ -1,81 +1,116 @@
 <?php
-// admin/categories.php
+// admin/categories.php — Category List
 require_once __DIR__ . '/includes/header.php';
 require_once __DIR__ . '/includes/sidebar.php';
 
 $action_msg = '';
 
-// Handle category updates
-if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['save_category'])) {
-    $cat_id = (int)$_POST['category_id'];
-    $name = trim($_POST['name']);
-    $desc = trim($_POST['description']);
-    $order = (int)$_POST['display_order'];
-    $status = isset($_POST['is_active']) ? 1 : 0;
-
-    if (empty($name)) {
-        $action_error = "Category name cannot be blank.";
+// Handle Delete Category
+if (isset($_GET['delete_id'])) {
+    $del_id = (int)$_GET['delete_id'];
+    $stmt_count = $pdo->prepare("SELECT COUNT(id) FROM products WHERE category_id = ?");
+    $stmt_count->execute([$del_id]);
+    $product_count = (int)$stmt_count->fetchColumn();
+    
+    if ($product_count > 0) {
+        $action_msg = "Cannot delete — category has $product_count product(s). Remove them first.";
     } else {
-        $stmt_u = $pdo->prepare("
-            UPDATE categories 
-            SET name = ?, description = ?, display_order = ?, is_active = ? 
-            WHERE id = ?
-        ");
-        $stmt_u->execute([$name, $desc, $order, $status, $cat_id]);
-        $action_msg = "Category updated successfully.";
+        $stmt_d = $pdo->prepare("DELETE FROM categories WHERE id = ?");
+        $stmt_d->execute([$del_id]);
+        header("Location: categories.php?msg=deleted");
+        exit();
     }
 }
 
-// Fetch all categories
-$stmt = $pdo->prepare("SELECT * FROM categories ORDER BY display_order ASC");
+// Success messages
+if (isset($_GET['msg'])) {
+    $msgs = ['added' => 'Category added successfully.', 'updated' => 'Category updated.', 'deleted' => 'Category deleted.'];
+    $action_msg = $msgs[$_GET['msg']] ?? $action_msg;
+}
+
+// Fetch categories with product count
+$stmt = $pdo->prepare("
+    SELECT c.*, COUNT(p.id) as product_count 
+    FROM categories c 
+    LEFT JOIN products p ON c.id = p.category_id 
+    GROUP BY c.id 
+    ORDER BY c.display_order ASC
+");
 $stmt->execute();
 $categories = $stmt->fetchAll();
 ?>
 
     <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:30px;">
         <h2 style="font-size:1.8rem; text-transform:uppercase;">Category Management</h2>
-        <div style="font-size:0.85rem; color:var(--text-muted);">Configure product grouping filters</div>
+        <div style="display:flex; gap:10px; align-items:center;">
+            <a href="category_add.php" class="btn-gold" style="padding:8px 16px; font-size:0.8rem; text-decoration:none;">
+                <i class="fas fa-plus"></i> Add Category
+            </a>
+            <div style="font-size:0.85rem; color:var(--text-muted);"><?php echo count($categories); ?> categories</div>
+        </div>
     </div>
 
     <?php if ($action_msg): ?>
-        <div class="quantity-discount-widget" style="background-color:rgba(212,175,55,0.05); border-color:rgba(212,175,55,0.3); color:var(--success-color); margin-bottom:25px;">
-            ✅ <?php echo htmlspecialchars($action_msg); ?>
+        <div class="quantity-discount-widget" style="background-color:rgba(212,175,55,0.05); border-color:rgba(212,175,55,0.3); color:<?php echo strpos($action_msg, 'Cannot') !== false ? '#ff6b6b' : 'var(--success-color)'; ?>; margin-bottom:25px;">
+            <?php echo strpos($action_msg, 'Cannot') !== false ? '❌' : '✅'; ?> <?php echo htmlspecialchars($action_msg); ?>
         </div>
     <?php endif; ?>
 
-    <div style="display:flex; flex-direction:column; gap:20px;">
-        <?php foreach ($categories as $cat): ?>
-            <div class="glass-card" style="padding:20px; border-radius:8px;">
-                <form action="categories.php" method="POST" style="display:grid; grid-template-columns: 2fr 1fr 1fr 120px; gap:20px; align-items:end;">
-                    <input type="hidden" name="category_id" value="<?php echo $cat['id']; ?>">
-                    
-                    <div class="form-group" style="margin:0;">
-                        <label style="font-size:0.75rem; color:var(--text-muted); display:block; margin-bottom:4px;">Category Name *</label>
-                        <input type="text" name="name" class="form-control" style="font-size:0.85rem; padding:8px;" value="<?php echo htmlspecialchars($cat['name']); ?>" required>
-                    </div>
-
-                    <div class="form-group" style="margin:0;">
-                        <label style="font-size:0.75rem; color:var(--text-muted); display:block; margin-bottom:4px;">Description</label>
-                        <input type="text" name="description" class="form-control" style="font-size:0.85rem; padding:8px;" value="<?php echo htmlspecialchars($cat['description']); ?>">
-                    </div>
-
-                    <div class="form-group" style="margin:0;">
-                        <label style="font-size:0.75rem; color:var(--text-muted); display:block; margin-bottom:4px;">Display Sort Order</label>
-                        <input type="number" name="display_order" class="form-control" style="font-size:0.85rem; padding:8px;" value="<?php echo $cat['display_order']; ?>">
-                    </div>
-
-                    <div style="display:flex; flex-direction:column; gap:10px; height:100%; justify-content:space-between; padding-bottom:5px;">
-                        <label style="display:flex; align-items:center; gap:8px; cursor:pointer; font-size:0.85rem;">
-                            <input type="checkbox" name="is_active" value="1" <?php echo $cat['is_active'] ? 'checked' : ''; ?> style="accent-color:var(--gold-primary);">
-                            <span>Active</span>
-                        </label>
-                        <button type="submit" name="save_category" class="btn-gold" style="padding:6px; font-size:0.8rem; width:100%;">
-                            Save
-                        </button>
-                    </div>
-                </form>
-            </div>
-        <?php endforeach; ?>
+    <div class="glass-card" style="padding:25px; border-radius:6px;">
+        <?php if (empty($categories)): ?>
+            <p style="color:var(--text-muted); text-align:center; padding:30px 0;">No categories created yet. Click "Add Category" to create one.</p>
+        <?php else: ?>
+            <table class="admin-table">
+                <thead>
+                    <tr>
+                        <th>Order</th>
+                        <th>Name</th>
+                        <th>Slug</th>
+                        <th>Description</th>
+                        <th>Products</th>
+                        <th>Status</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <?php foreach ($categories as $cat): ?>
+                        <tr>
+                            <td><strong style="color:#fff;"><?php echo $cat['display_order']; ?></strong></td>
+                            <td>
+                                <a href="category_edit.php?id=<?php echo $cat['id']; ?>" style="color:#fff; text-decoration:none; font-weight:700; font-size:1rem;">
+                                    <?php echo htmlspecialchars($cat['name']); ?>
+                                </a>
+                            </td>
+                            <td style="font-size:0.85rem; color:var(--gold-muted);"><?php echo htmlspecialchars($cat['slug']); ?></td>
+                            <td style="font-size:0.85rem; color:var(--text-secondary); max-width:200px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;">
+                                <?php echo htmlspecialchars($cat['description'] ?: '—'); ?>
+                            </td>
+                            <td>
+                                <strong style="color:#fff; font-size:1rem;"><?php echo $cat['product_count']; ?></strong>
+                            </td>
+                            <td>
+                                <span class="admin-badge <?php echo $cat['is_active'] ? 'badge-completed' : 'badge-failed'; ?>">
+                                    <?php echo $cat['is_active'] ? 'Active' : 'Inactive'; ?>
+                                </span>
+                            </td>
+                            <td>
+                                <div style="display:flex; gap:12px;">
+                                    <a href="category_edit.php?id=<?php echo $cat['id']; ?>" style="color:var(--gold-primary); font-weight:700;" title="Edit">
+                                        <i class="fas fa-edit"></i>
+                                    </a>
+                                    <a href="categories.php?delete_id=<?php echo $cat['id']; ?>" 
+                                       style="color:var(--danger-color); font-weight:700;" 
+                                       onclick="return confirm('Delete this category?')"
+                                       title="Delete">
+                                        <i class="fas fa-trash"></i>
+                                    </a>
+                                </div>
+                            </td>
+                        </tr>
+                    <?php endforeach; ?>
+                </tbody>
+            </table>
+        <?php endif; ?>
     </div>
 
 <?php 

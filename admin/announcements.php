@@ -15,11 +15,27 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['add_ann'])) {
         $action_error = "Announcement message cannot be blank.";
     } else {
         $stmt_i = $pdo->prepare("
-            INSERT INTO announcements (message, link, display_order, status) 
+            INSERT INTO announcements (message, link, display_order, status)
             VALUES (?, ?, ?, 1)
         ");
         $stmt_i->execute([$msg, $link, $order]);
         $action_msg = "Announcement added successfully.";
+    }
+}
+
+// Handle Edit Announcement
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['edit_ann'])) {
+    $eid = (int)$_POST['edit_id'];
+    $msg = trim($_POST['message']);
+    $link = trim($_POST['link']);
+    $order = (int)$_POST['display_order'];
+
+    if (empty($msg)) {
+        $action_error = "Announcement message cannot be blank.";
+    } else {
+        $stmt_u = $pdo->prepare("UPDATE announcements SET message = ?, link = ?, display_order = ? WHERE id = ?");
+        $stmt_u->execute([$msg, $link, $order, $eid]);
+        $action_msg = "Announcement updated successfully.";
     }
 }
 
@@ -37,6 +53,15 @@ if (isset($_GET['delete_id'])) {
     $stmt = $pdo->prepare("DELETE FROM announcements WHERE id = ?");
     $stmt->execute([$ann_id]);
     $action_msg = "Announcement deleted.";
+}
+
+// Fetch edit data
+$edit_ann = null;
+if (isset($_GET['edit_id'])) {
+    $e_id = (int)$_GET['edit_id'];
+    $stmt = $pdo->prepare("SELECT * FROM announcements WHERE id = ?");
+    $stmt->execute([$e_id]);
+    $edit_ann = $stmt->fetch();
 }
 
 // Fetch all announcements
@@ -62,15 +87,15 @@ $announcements = $stmt->fetchAll();
             <h3 style="font-size:1.15rem; text-transform:uppercase; margin-bottom:15px; color:var(--gold-primary); border-bottom:1px solid var(--border-color); padding-bottom:10px;">
                 Active Announcements
             </h3>
-            
+
             <?php if (empty($announcements)): ?>
                 <p style="color:var(--text-muted); text-align:center; padding:20px 0;">No announcements created yet.</p>
             <?php else: ?>
                 <table class="admin-table">
                     <thead>
                         <tr>
-                            <th>Display Order</th>
-                            <th>Announcement Message</th>
+                            <th>Order</th>
+                            <th>Message</th>
                             <th>Link</th>
                             <th>Status</th>
                             <th>Action</th>
@@ -89,7 +114,8 @@ $announcements = $stmt->fetchAll();
                                 </td>
                                 <td>
                                     <div style="display:flex; gap:10px;">
-                                        <a href="announcements.php?toggle_id=<?php echo $ann['id']; ?>" style="color:var(--gold-primary); font-weight:700;">Toggle</a>
+                                        <a href="announcements.php?edit_id=<?php echo $ann['id']; ?>" style="color:var(--gold-primary); font-weight:700;">Edit</a>
+                                        <a href="announcements.php?toggle_id=<?php echo $ann['id']; ?>" style="color:var(--success-color); font-weight:700;"><?php echo $ann['status'] ? 'Disable' : 'Enable'; ?></a>
                                         <a href="announcements.php?delete_id=<?php echo $ann['id']; ?>" style="color:var(--danger-color); font-weight:700;" onclick="return confirm('Delete this announcement?')">Delete</a>
                                     </div>
                                 </td>
@@ -100,29 +126,40 @@ $announcements = $stmt->fetchAll();
             <?php endif; ?>
         </div>
 
-        <!-- Add Announcement Form -->
+        <!-- Add/Edit Announcement Form -->
         <div class="glass-card" style="padding: 25px; border-radius:6px;">
             <h3 style="font-size:1.15rem; text-transform:uppercase; margin-bottom:15px; color:var(--gold-primary); border-bottom:1px solid var(--border-color); padding-bottom:10px;">
-                Add Announcement
+                <?php echo $edit_ann ? 'Edit Announcement' : 'Add Announcement'; ?>
             </h3>
-            
+
             <form action="announcements.php" method="POST">
+                <?php if ($edit_ann): ?>
+                    <input type="hidden" name="edit_id" value="<?php echo $edit_ann['id']; ?>">
+                <?php endif; ?>
+
                 <div class="form-group">
                     <label for="message">Message *</label>
-                    <input type="text" name="message" id="message" class="form-control" style="font-size:0.85rem; padding:8px;" placeholder="e.g. Free shipping on prepaid orders" required>
+                    <input type="text" name="message" id="message" class="form-control" style="font-size:0.85rem; padding:8px;" placeholder="e.g. Free shipping on prepaid orders" required
+                        value="<?php echo htmlspecialchars($edit_ann ? $edit_ann['message'] : ''); ?>">
                 </div>
                 <div class="form-group">
                     <label for="link">Voucher Link</label>
-                    <input type="text" name="link" id="link" class="form-control" style="font-size:0.85rem; padding:8px;" placeholder="e.g. /certificates.php">
+                    <input type="text" name="link" id="link" class="form-control" style="font-size:0.85rem; padding:8px;" placeholder="e.g. /certificates.php"
+                        value="<?php echo htmlspecialchars($edit_ann ? ($edit_ann['link'] ?? '') : ''); ?>">
                 </div>
                 <div class="form-group">
                     <label for="order">Display Order</label>
-                    <input type="number" name="display_order" id="order" class="form-control" style="font-size:0.85rem; padding:8px;" value="0">
+                    <input type="number" name="display_order" id="order" class="form-control" style="font-size:0.85rem; padding:8px;"
+                        value="<?php echo $edit_ann ? $edit_ann['display_order'] : '0'; ?>">
                 </div>
-                
-                <button type="submit" name="add_ann" class="btn-gold" style="width:100%; margin-top:10px; padding:10px; font-size:0.85rem;">
-                    Save Announcement
+
+                <button type="submit" name="<?php echo $edit_ann ? 'edit_ann' : 'add_ann'; ?>" class="btn-gold" style="width:100%; margin-top:10px; padding:10px; font-size:0.85rem;">
+                    <?php echo $edit_ann ? 'Update Announcement' : 'Save Announcement'; ?>
                 </button>
+
+                <?php if ($edit_ann): ?>
+                    <a href="announcements.php" style="display:block; text-align:center; margin-top:10px; color:var(--text-muted); font-size:0.85rem;">Cancel Edit</a>
+                <?php endif; ?>
             </form>
         </div>
     </div>
@@ -142,6 +179,6 @@ $announcements = $stmt->fetchAll();
         </ul>
     </div>
 
-<?php 
-require_once __DIR__ . '/includes/footer.php'; 
+<?php
+require_once __DIR__ . '/includes/footer.php';
 ?>

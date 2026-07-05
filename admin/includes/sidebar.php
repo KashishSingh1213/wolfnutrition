@@ -5,7 +5,8 @@ $active_subpage = basename($_SERVER['PHP_SELF']);
 // Set dynamic page title for mobile menu panel indicator
 $active_title = 'Menu Panel';
 if ($active_subpage === 'dashboard.php') $active_title = 'Dashboard';
-elseif ($active_subpage === 'products.php') $active_title = 'Catalog Management';
+elseif ($active_subpage === 'products.php' || $active_subpage === 'product_add.php' || $active_subpage === 'product_edit.php') $active_title = 'Products';
+elseif ($active_subpage === 'categories.php') $active_title = 'Categories';
 elseif ($active_subpage === 'orders.php') $active_title = 'Order Management';
 elseif ($active_subpage === 'bundles.php') $active_title = 'Bundle Stacks';
 elseif ($active_subpage === 'coupons.php') $active_title = 'Coupons & Promos';
@@ -76,13 +77,16 @@ elseif ($active_subpage === 'reports.php') $active_title = 'Financial Reports';
     <a href="dashboard.php" class="admin-sidebar-link <?php echo $active_subpage === 'dashboard.php' ? 'active' : ''; ?>">
         <i class="fas fa-chart-line"></i> Dashboard
     </a>
-    <a href="products.php" class="admin-sidebar-link <?php echo $active_subpage === 'products.php' ? 'active' : ''; ?>">
-        <i class="fas fa-capsules"></i> Catalog Management
+    <a href="products.php" class="admin-sidebar-link <?php echo ($active_subpage === 'products.php' || $active_subpage === 'product_add.php' || $active_subpage === 'product_edit.php') ? 'active' : ''; ?>">
+        <i class="fas fa-capsules"></i> Products
+    </a>
+    <a href="categories.php" class="admin-sidebar-link <?php echo ($active_subpage === 'categories.php' || $active_subpage === 'category_add.php' || $active_subpage === 'category_edit.php') ? 'active' : ''; ?>">
+        <i class="fas fa-tags"></i> Categories
     </a>
     <a href="orders.php" class="admin-sidebar-link <?php echo $active_subpage === 'orders.php' ? 'active' : ''; ?>">
         <i class="fas fa-receipt"></i> Order Management
     </a>
-    <a href="bundles.php" class="admin-sidebar-link <?php echo $active_subpage === 'bundles.php' ? 'active' : ''; ?>">
+    <a href="bundles.php" class="admin-sidebar-link <?php echo ($active_subpage === 'bundles.php' || $active_subpage === 'bundle_add.php' || $active_subpage === 'bundle_edit.php') ? 'active' : ''; ?>">
         <i class="fas fa-cubes"></i> Bundle Stacks
     </a>
     <a href="coupons.php" class="admin-sidebar-link <?php echo $active_subpage === 'coupons.php' ? 'active' : ''; ?>">
