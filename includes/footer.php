@@ -1,19 +1,7 @@
 <?php
 // includes/footer.php
 require_once __DIR__ . '/functions.php';
-
-$whatsapp = get_whatsapp_settings();
 ?>
-    <!-- WhatsApp Floating Chat Widget -->
-    <?php if ($whatsapp && $whatsapp['status'] == 1): ?>
-        <a href="https://wa.me/<?php echo preg_replace('/[^0-9]/', '', $whatsapp['phone_number']); ?>?text=<?php echo urlencode($whatsapp['greeting_message']); ?>" 
-           class="whatsapp-chat-widget" 
-           target="_blank" 
-           rel="noopener noreferrer" 
-           aria-label="Chat with us on WhatsApp">
-            <i class="fab fa-whatsapp"></i>
-        </a>
-    <?php endif; ?>
 
     <!-- Footer -->
     <footer>

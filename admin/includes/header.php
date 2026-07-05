@@ -26,12 +26,15 @@ $admin_name = $_SESSION['admin_name'];
         body {
             display: flex;
             flex-direction: column;
-            min-height: 100vh;
+            height: 100vh;
+            overflow: hidden;
             background: #080C10;
             font-family: 'Inter', system-ui, -apple-system, sans-serif;
             color: #ffffff;
             -webkit-font-smoothing: antialiased;
             -moz-osx-font-smoothing: grayscale;
+            margin: 0;
+            padding: 0;
         }
 
         /* ── Top Header Bar ── */
@@ -47,8 +50,7 @@ $admin_name = $_SESSION['admin_name'];
             -webkit-backdrop-filter: blur(16px);
             border-bottom: 1px solid rgba(255, 255, 255, 0.06);
             z-index: 200;
-            position: sticky;
-            top: 0;
+            flex-shrink: 0;
         }
         .admin-topbar-logo {
             display: flex;
@@ -102,8 +104,9 @@ $admin_name = $_SESSION['admin_name'];
         .admin-layout {
             display: grid;
             grid-template-columns: 260px 1fr;
-            flex: 1;
-            min-height: calc(100vh - 64px);
+            grid-template-rows: 1fr;
+            height: calc(100vh - 64px);
+            overflow: hidden;
         }
 
         /* ── Sidebar styles moved to sidebar.php ── */
@@ -112,7 +115,7 @@ $admin_name = $_SESSION['admin_name'];
         .admin-content {
             padding: 36px 40px;
             overflow-y: auto;
-            min-height: calc(100vh - 64px);
+            height: 100%;
         }
 
         /* ── Card Grid ── */
@@ -398,7 +401,7 @@ $admin_name = $_SESSION['admin_name'];
             }
             .admin-topbar-user span.full-name { display: none; }
             .admin-layout {
-                min-height: calc(100vh - 56px);
+                overflow: hidden;
             }
             /* Sidebar responsive handled in sidebar.php */
             .admin-content {

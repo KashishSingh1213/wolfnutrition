@@ -120,13 +120,38 @@ CREATE TABLE IF NOT EXISTS `blog_posts` (
   `title` VARCHAR(255) NOT NULL,
   `slug` VARCHAR(255) NOT NULL UNIQUE,
   `category_tag` VARCHAR(100) DEFAULT 'Wellness',
+  `article_type` VARCHAR(50) DEFAULT 'Blog',
   `cover_image` VARCHAR(255) NULL,
   `body` TEXT NOT NULL,
   `status` TINYINT(1) DEFAULT 1,
+  `author_user_id` INT NULL,
+  `custom_author` VARCHAR(150) NULL,
+  `editor_name` VARCHAR(150) NULL,
+  `reading_time` INT DEFAULT 5,
+  `excerpt` VARCHAR(300) NULL,
+  `alt_text` VARCHAR(255) NULL,
+  `tags` VARCHAR(255) NULL,
   `published_at` TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
--- 11. CMS Pages Table
+-- 11. Blog Categories Table
+CREATE TABLE IF NOT EXISTS `blog_categories` (
+  `id` INT AUTO_INCREMENT PRIMARY KEY,
+  `name` VARCHAR(100) NOT NULL,
+  `slug` VARCHAR(100) NOT NULL UNIQUE,
+  `display_order` INT DEFAULT 0,
+  `status` TINYINT(1) DEFAULT 1
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- 12. Blog Tags Table
+CREATE TABLE IF NOT EXISTS `blog_tags` (
+  `id` INT AUTO_INCREMENT PRIMARY KEY,
+  `name` VARCHAR(100) NOT NULL,
+  `slug` VARCHAR(100) NOT NULL UNIQUE,
+  `status` TINYINT(1) DEFAULT 1
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- 13. CMS Pages Table
 CREATE TABLE IF NOT EXISTS `cms_pages` (
   `id` INT AUTO_INCREMENT PRIMARY KEY,
   `slug` VARCHAR(100) NOT NULL UNIQUE,

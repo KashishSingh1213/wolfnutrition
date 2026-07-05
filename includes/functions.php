@@ -2,9 +2,10 @@
 // includes/functions.php
 mb_internal_encoding('UTF-8');
 ob_start();
-if (session_status() == PHP_SESSION_NONE) {
-    session_start();
-}
+
+// Load security hardening first
+require_once __DIR__ . '/security.php';
+secure_session_start();
 
 require_once __DIR__ . '/../config/db.php';
 
@@ -37,7 +38,7 @@ function get_logged_in_user() {
 }
 
 function is_admin_logged_in() {
-    return isset($_SESSION['admin_id']) && $_SESSION['admin_role'] === 'admin';
+    return isset($_SESSION['admin_id']) && isset($_SESSION['admin_role']) && $_SESSION['admin_role'] === 'admin';
 }
 
 function require_admin_login() {
@@ -358,11 +359,19 @@ function get_announcements() {
     return $stmt->fetchAll();
 }
 
-function get_whatsapp_settings() {
+function get_testimonials($featured_only = false, $limit = 0) {
     global $pdo;
-    $stmt = $pdo->prepare("SELECT phone_number, greeting_message, status FROM whatsapp_settings WHERE id = 1");
+    $sql = "SELECT * FROM testimonials WHERE status = 1";
+    if ($featured_only) {
+        $sql .= " AND is_featured = 1";
+    }
+    $sql .= " ORDER BY created_at DESC";
+    if ($limit > 0) {
+        $sql .= " LIMIT " . (int)$limit;
+    }
+    $stmt = $pdo->prepare($sql);
     $stmt->execute();
-    return $stmt->fetch();
+    return $stmt->fetchAll();
 }
 
 function get_certificates() {

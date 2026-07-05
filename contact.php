@@ -192,12 +192,6 @@ $csrf_token = $_SESSION['contact_csrf'];
 .hours-time{font-size:0.85rem;color:var(--gold-primary);font-weight:700;}
 .hours-closed{color:rgba(255,255,255,0.35);}
 
-/* ── WhatsApp CTA ── */
-.whatsapp-cta{background:linear-gradient(135deg,rgba(212,175,55,0.06) 0%,rgba(8,12,16,0.95) 100%);border:1px solid rgba(212,175,55,0.12);border-radius:18px;padding:28px;text-align:center;transition:all 0.3s;}
-.whatsapp-cta:hover{border-color:var(--gold-primary);box-shadow:0 10px 30px rgba(8,12,16,0.3);}
-.whatsapp-cta h4{font-size:1rem;text-transform:uppercase;color:#fff;margin-bottom:6px;font-family:var(--font-heading);font-weight:700;}
-.whatsapp-cta p{font-size:0.82rem;color:rgba(255,255,255,0.6);margin-bottom:16px;}
-
 /* ── Alerts ── */
 .alert-success{background:rgba(212,175,55,0.08);border:1px solid rgba(212,175,55,0.2);color:var(--gold-primary);padding:14px 18px;border-radius:12px;margin-bottom:20px;font-size:0.9rem;font-weight:600;display:flex;align-items:center;gap:10px;animation:slideDown 0.35s ease;}
 .alert-error{background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.12);color:rgba(255,255,255,0.8);padding:14px 18px;border-radius:12px;margin-bottom:20px;font-size:0.9rem;font-weight:600;display:flex;align-items:center;gap:10px;animation:slideDown 0.35s ease;}
@@ -231,7 +225,6 @@ $csrf_token = $_SESSION['contact_csrf'];
             <p>Got a question about your stack, order, or need a free dietitian consultation? We're here to help.</p>
             <div class="contact-hero-stats">
                 <div class="contact-hero-stat"><div class="contact-hero-stat-num"><i class="fas fa-clock" style="font-size:0.9rem;"></i></div><div class="contact-hero-stat-label">24hr Reply</div></div>
-                <div class="contact-hero-stat"><div class="contact-hero-stat-num"><i class="fab fa-whatsapp" style="font-size:0.9rem;"></i></div><div class="contact-hero-stat-label">WhatsApp</div></div>
                 <div class="contact-hero-stat"><div class="contact-hero-stat-num"><i class="fas fa-phone" style="font-size:0.9rem;"></i></div><div class="contact-hero-stat-label">Helpline</div></div>
             </div>
         </div>
@@ -322,13 +315,6 @@ $csrf_token = $_SESSION['contact_csrf'];
                 <div class="hours-row"><span class="hours-day">Monday - Friday</span><span class="hours-time">10:00 AM - 6:00 PM</span></div>
                 <div class="hours-row"><span class="hours-day">Saturday</span><span class="hours-time">10:00 AM - 4:00 PM</span></div>
                 <div class="hours-row"><span class="hours-day">Sunday</span><span class="hours-time hours-closed">Closed</span></div>
-            </div>
-
-            <div class="whatsapp-cta tilt-card spotlight-card">
-                <div class="tilt-shine"></div>
-                <h4><i class="fab fa-whatsapp" style="color:var(--gold-primary); margin-right:6px;"></i> Quick Chat</h4>
-                <p>Instant replies from our support team. Mon-Sat.</p>
-                <a href="https://wa.me/919876543210?text=Hi%20Wolf%20Nutrition,%20I%20have%20a%20query." target="_blank" class="btn-gold" style="padding:12px 28px; border-radius:30px; font-size:0.88rem; display:inline-flex; align-items:center; gap:8px;"><i class="fab fa-whatsapp"></i> Chat Now</a>
             </div>
 
             <div class="contact-info-card tilt-card spotlight-card">

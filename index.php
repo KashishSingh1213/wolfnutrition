@@ -8,6 +8,7 @@ foreach ($categories as $cat) {
 }
 try { $stmt = $pdo->prepare("SELECT * FROM bundles WHERE status = 1 LIMIT 1"); $stmt->execute(); $bundle = $stmt->fetch(); } catch (PDOException $e) { $bundle = null; }
 $certs = get_certificates();
+$testimonials = get_testimonials(false, 5);
 try { $stmt = $pdo->prepare("SELECT * FROM blog_posts WHERE status = 1 ORDER BY published_at DESC LIMIT 3"); $stmt->execute(); $blogs = $stmt->fetchAll(); } catch (PDOException $e) { $blogs = []; }
 ?>
 
@@ -388,6 +389,22 @@ try { $stmt = $pdo->prepare("SELECT * FROM blog_posts WHERE status = 1 ORDER BY 
 </section>
 
 <!-- ═══ SOCIAL PROOF ═══ -->
+<?php if (!empty($testimonials)): ?>
+<?php
+$featured = null;
+$others = [];
+foreach ($testimonials as $t) {
+    if (!$featured && $t['is_featured']) {
+        $featured = $t;
+    } else {
+        $others[] = $t;
+    }
+}
+if (!$featured && !empty($testimonials)) {
+    $featured = $testimonials[0];
+    $others = array_slice($testimonials, 1);
+}
+?>
 <section style="padding:80px 0; position:relative; z-index:2; background:radial-gradient(ellipse at 50% 50%,rgba(212,175,55,0.03) 0%,transparent 60%);">
     <div class="container">
         <!-- Section Header -->
@@ -397,6 +414,7 @@ try { $stmt = $pdo->prepare("SELECT * FROM blog_posts WHERE status = 1 ORDER BY 
             <p style="font-size:1rem; color:rgba(255,255,255,0.5);">Real reviews from real customers who transformed their lives</p>
         </div>
 
+        <?php if ($featured): ?>
         <!-- Featured Review (Big Card) -->
         <div class="tilt-card" style="background:linear-gradient(135deg,rgba(212,175,55,0.06) 0%,rgba(8,12,16,0.95) 40%); border:1px solid rgba(212,175,55,0.15); border-radius:24px; padding:45px 50px; margin-bottom:24px; position:relative; overflow:hidden;">
             <div style="position:absolute; top:-50px; right:-50px; width:200px; height:200px; background:radial-gradient(circle,rgba(212,175,55,0.1) 0%,transparent 70%); pointer-events:none;"></div>
@@ -404,18 +422,22 @@ try { $stmt = $pdo->prepare("SELECT * FROM blog_posts WHERE status = 1 ORDER BY 
                 <div>
                     <div style="font-size:4rem; line-height:1; color:rgba(212,175,55,0.12); font-family:Georgia,serif; margin-bottom:16px;">"</div>
                     <div style="display:flex; gap:4px; margin-bottom:18px;">
-                        <i class="fas fa-star" style="color:var(--gold-primary); font-size:1rem;"></i>
-                        <i class="fas fa-star" style="color:var(--gold-primary); font-size:1rem;"></i>
-                        <i class="fas fa-star" style="color:var(--gold-primary); font-size:1rem;"></i>
-                        <i class="fas fa-star" style="color:var(--gold-primary); font-size:1rem;"></i>
-                        <i class="fas fa-star" style="color:var(--gold-primary); font-size:1rem;"></i>
+                        <?php for ($i = 1; $i <= 5; $i++): ?>
+                            <i class="fas fa-star" style="color:var(--gold-primary); font-size:1rem;"></i>
+                        <?php endfor; ?>
                     </div>
-                    <p style="font-size:1.1rem; color:rgba(255,255,255,0.8); line-height:1.75; margin-bottom:24px; font-style:italic;">After 60 days of WOLFPACK, my gym performance and energy levels are completely different. The Shilajit quality is unmatched. I went from struggling with 5 reps to hitting personal records every week. This is the real deal.</p>
+                    <p style="font-size:1.1rem; color:rgba(255,255,255,0.8); line-height:1.75; margin-bottom:24px; font-style:italic;"><?php echo htmlspecialchars($featured['testimonial_text']); ?></p>
                     <div style="display:flex; align-items:center; gap:16px;">
-                        <div style="width:52px; height:52px; border-radius:50%; background:var(--gold-gradient); display:flex; align-items:center; justify-content:center; font-size:0.9rem; font-weight:800; color:#080C10; box-shadow:0 6px 16px rgba(212,175,55,0.2);">RK</div>
+                        <div style="width:52px; height:52px; border-radius:50%; background:var(--gold-gradient); display:flex; align-items:center; justify-content:center; overflow:hidden;">
+                            <?php if (!empty($featured['avatar_url'])): ?>
+                                <img src="<?php echo htmlspecialchars($featured['avatar_url']); ?>" alt="" style="width:100%; height:100%; object-fit:cover;">
+                            <?php else: ?>
+                                <span style="font-size:0.9rem; font-weight:800; color:#080C10;"><?php echo strtoupper(substr($featured['customer_name'], 0, 2)); ?></span>
+                            <?php endif; ?>
+                        </div>
                         <div>
-                            <div style="font-size:1rem; color:#fff; font-weight:700;">Rahul K.</div>
-                            <div style="font-size:0.78rem; color:var(--gold-primary); font-weight:600;">Verified Buyer &bull; WOLFPACK Vitality</div>
+                            <div style="font-size:1rem; color:#fff; font-weight:700;"><?php echo htmlspecialchars($featured['customer_name']); ?></div>
+                            <div style="font-size:0.78rem; color:var(--gold-primary); font-weight:600;"><?php echo htmlspecialchars($featured['customer_title'] ?: 'Verified Buyer'); ?></div>
                         </div>
                     </div>
                 </div>
@@ -426,71 +448,37 @@ try { $stmt = $pdo->prepare("SELECT * FROM blog_posts WHERE status = 1 ORDER BY 
                 </div>
             </div>
         </div>
+        <?php endif; ?>
 
-        <!-- 3 Smaller Review Cards -->
-        <div style="display:grid; grid-template-columns:repeat(3,1fr); gap:20px;">
-
-            <!-- Review 2 -->
+        <?php if (!empty($others)): ?>
+        <!-- Smaller Review Cards -->
+        <div style="display:grid; grid-template-columns:repeat(<?php echo count($others) > 3 ? 3 : count($others); ?>,1fr); gap:20px;">
+            <?php foreach (array_slice($others, 0, 3) as $t): ?>
             <div class="tilt-card" style="background:rgba(255,255,255,0.02); border:1px solid rgba(212,175,55,0.08); border-radius:20px; padding:28px 24px; position:relative; overflow:hidden; transition:all 0.4s;">
                 <div style="position:absolute; top:0; left:0; right:0; height:2px; background:var(--gold-gradient); opacity:0; transition:opacity 0.3s;"></div>
                 <div style="display:flex; gap:4px; margin-bottom:14px;">
-                    <i class="fas fa-star" style="color:var(--gold-primary); font-size:0.8rem;"></i>
-                    <i class="fas fa-star" style="color:var(--gold-primary); font-size:0.8rem;"></i>
-                    <i class="fas fa-star" style="color:var(--gold-primary); font-size:0.8rem;"></i>
-                    <i class="fas fa-star" style="color:var(--gold-primary); font-size:0.8rem;"></i>
-                    <i class="fas fa-star" style="color:var(--gold-primary); font-size:0.8rem;"></i>
+                    <?php for ($i = 1; $i <= 5; $i++): ?>
+                        <i class="fas fa-star" style="color:<?php echo $i <= $t['rating'] ? 'var(--gold-primary)' : 'rgba(255,255,255,0.1)'; ?>; font-size:0.8rem;"></i>
+                    <?php endfor; ?>
                 </div>
-                <p style="font-size:0.88rem; color:rgba(255,255,255,0.65); line-height:1.6; margin-bottom:20px; font-style:italic;">WOLFTOX completely changed my digestion and liver health. My doctor was impressed with the improvement in my enzyme levels.</p>
+                <p style="font-size:0.88rem; color:rgba(255,255,255,0.65); line-height:1.6; margin-bottom:20px; font-style:italic;">"<?php echo htmlspecialchars($t['testimonial_text']); ?>"</p>
                 <div style="display:flex; align-items:center; gap:12px; padding-top:14px; border-top:1px solid rgba(255,255,255,0.05);">
-                    <div style="width:38px; height:38px; border-radius:50%; background:var(--gold-gradient); display:flex; align-items:center; justify-content:center; font-size:0.7rem; font-weight:800; color:#080C10;">AS</div>
+                    <div style="width:38px; height:38px; border-radius:50%; background:var(--gold-gradient); display:flex; align-items:center; justify-content:center; overflow:hidden;">
+                        <?php if (!empty($t['avatar_url'])): ?>
+                            <img src="<?php echo htmlspecialchars($t['avatar_url']); ?>" alt="" style="width:100%; height:100%; object-fit:cover;">
+                        <?php else: ?>
+                            <span style="font-size:0.7rem; font-weight:800; color:#080C10;"><?php echo strtoupper(substr($t['customer_name'], 0, 2)); ?></span>
+                        <?php endif; ?>
+                    </div>
                     <div>
-                        <div style="font-size:0.85rem; color:#fff; font-weight:700;">Amit S.</div>
-                        <div style="font-size:0.68rem; color:var(--gold-primary); font-weight:600;">Verified Buyer</div>
+                        <div style="font-size:0.85rem; color:#fff; font-weight:700;"><?php echo htmlspecialchars($t['customer_name']); ?></div>
+                        <div style="font-size:0.68rem; color:var(--gold-primary); font-weight:600;"><?php echo htmlspecialchars($t['customer_title'] ?: 'Verified Buyer'); ?></div>
                     </div>
                 </div>
             </div>
-
-            <!-- Review 3 -->
-            <div class="tilt-card" style="background:rgba(255,255,255,0.02); border:1px solid rgba(212,175,55,0.08); border-radius:20px; padding:28px 24px; position:relative; overflow:hidden; transition:all 0.4s;">
-                <div style="position:absolute; top:0; left:0; right:0; height:2px; background:var(--gold-gradient); opacity:0; transition:opacity 0.3s;"></div>
-                <div style="display:flex; gap:4px; margin-bottom:14px;">
-                    <i class="fas fa-star" style="color:var(--gold-primary); font-size:0.8rem;"></i>
-                    <i class="fas fa-star" style="color:var(--gold-primary); font-size:0.8rem;"></i>
-                    <i class="fas fa-star" style="color:var(--gold-primary); font-size:0.8rem;"></i>
-                    <i class="fas fa-star" style="color:var(--gold-primary); font-size:0.8rem;"></i>
-                    <i class="fas fa-star" style="color:var(--gold-primary); font-size:0.8rem;"></i>
-                </div>
-                <p style="font-size:0.88rem; color:rgba(255,255,255,0.65); line-height:1.6; margin-bottom:20px; font-style:italic;">The free dietitian consultation was a game-changer. Shalini ma'am designed a perfect regimen for my goals. Premium quality.</p>
-                <div style="display:flex; align-items:center; gap:12px; padding-top:14px; border-top:1px solid rgba(255,255,255,0.05);">
-                    <div style="width:38px; height:38px; border-radius:50%; background:var(--gold-gradient); display:flex; align-items:center; justify-content:center; font-size:0.7rem; font-weight:800; color:#080C10;">VP</div>
-                    <div>
-                        <div style="font-size:0.85rem; color:#fff; font-weight:700;">Vikram P.</div>
-                        <div style="font-size:0.68rem; color:var(--gold-primary); font-weight:600;">VIP Member</div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Review 4 -->
-            <div class="tilt-card" style="background:rgba(255,255,255,0.02); border:1px solid rgba(212,175,55,0.08); border-radius:20px; padding:28px 24px; position:relative; overflow:hidden; transition:all 0.4s;">
-                <div style="position:absolute; top:0; left:0; right:0; height:2px; background:var(--gold-gradient); opacity:0; transition:opacity 0.3s;"></div>
-                <div style="display:flex; gap:4px; margin-bottom:14px;">
-                    <i class="fas fa-star" style="color:var(--gold-primary); font-size:0.8rem;"></i>
-                    <i class="fas fa-star" style="color:var(--gold-primary); font-size:0.8rem;"></i>
-                    <i class="fas fa-star" style="color:var(--gold-primary); font-size:0.8rem;"></i>
-                    <i class="fas fa-star" style="color:var(--gold-primary); font-size:0.8rem;"></i>
-                    <i class="fas fa-star" style="color:var(--gold-primary); font-size:0.8rem;"></i>
-                </div>
-                <p style="font-size:0.88rem; color:rgba(255,255,255,0.65); line-height:1.6; margin-bottom:20px; font-style:italic;">I've tried many supplements but Wolf Nutrition is different. Clean ingredients, real results, and the VIP program is incredible. Best investment in my health.</p>
-                <div style="display:flex; align-items:center; gap:12px; padding-top:14px; border-top:1px solid rgba(255,255,255,0.05);">
-                    <div style="width:38px; height:38px; border-radius:50%; background:var(--gold-gradient); display:flex; align-items:center; justify-content:center; font-size:0.7rem; font-weight:800; color:#080C10;">MR</div>
-                    <div>
-                        <div style="font-size:0.85rem; color:#fff; font-weight:700;">Mohit R.</div>
-                        <div style="font-size:0.68rem; color:var(--gold-primary); font-weight:600;">Verified Buyer</div>
-                    </div>
-                </div>
-            </div>
-
+            <?php endforeach; ?>
         </div>
+        <?php endif; ?>
 
         <!-- Trust Stats -->
         <div style="display:flex; justify-content:center; gap:50px; margin-top:45px; padding-top:35px; border-top:1px solid rgba(255,255,255,0.05);">
@@ -511,6 +499,7 @@ try { $stmt = $pdo->prepare("SELECT * FROM blog_posts WHERE status = 1 ORDER BY 
         </div>
     </div>
 </section>
+<?php endif; ?>
 
 <!-- ═══ COMBO BUNDLE ═══ -->
 <?php if ($bundle): ?>
@@ -633,7 +622,6 @@ try { $stmt = $pdo->prepare("SELECT * FROM blog_posts WHERE status = 1 ORDER BY 
                 </div>
                 <div style="display:flex; gap:18px; flex-wrap:wrap;">
                     <a href="category.php?slug=all" class="btn-gold" style="padding:15px 34px; font-size:0.92rem; font-weight:700;">Explore Products</a>
-                    <a href="https://wa.me/919876543210?text=Hi%20Wolf%20Nutrition,%20I%20would%20like%20to%20book%20a%20free%20dietitian%20consultation%20please." target="_blank" class="btn-outline-gold" style="padding:14px 34px; font-size:0.92rem; font-weight:700; display:inline-flex; align-items:center; gap:8px;"><i class="fab fa-whatsapp"></i> Chat with Dietitian</a>
                 </div>
             </div>
         </div>
@@ -717,7 +705,7 @@ try { $stmt = $pdo->prepare("SELECT * FROM blog_posts WHERE status = 1 ORDER BY 
 (function(){var c=document.getElementById('goldParticles');if(!c)return;var ctx=c.getContext('2d'),p=[];function r(){c.width=window.innerWidth;c.height=window.innerHeight;}r();window.addEventListener('resize',r);for(var i=0;i<40;i++)p.push({x:Math.random()*c.width,y:Math.random()*c.height,r:Math.random()*2+0.5,dx:(Math.random()-0.5)*0.3,dy:(Math.random()-0.5)*0.3,o:Math.random()*0.5+0.1});function d(){ctx.clearRect(0,0,c.width,c.height);for(var i=0;i<p.length;i++){var v=p[i];ctx.beginPath();ctx.arc(v.x,v.y,v.r,0,Math.PI*2);ctx.fillStyle='rgba(212,175,55,'+v.o+')';ctx.fill();v.x+=v.dx;v.y+=v.dy;if(v.x<0||v.x>c.width)v.dx*=-1;if(v.y<0||v.y>c.height)v.dy*=-1;}requestAnimationFrame(d);}d();})();
 
 // ── Scroll Reveal ──
-(function(){var els=document.querySelectorAll('.section-header,.category-tile,.product-card,.trust-item,.blog-card,.counter-item,.proof-card');els.forEach(function(el){el.style.opacity='0';el.style.transform='translateY(24px)';el.style.transition='opacity 0.55s ease, transform 0.55s ease';});var obs=new IntersectionObserver(function(entries){entries.forEach(function(e,i){if(e.isIntersecting){setTimeout(function(){e.target.style.opacity='1';e.target.style.transform='translateY(0)';},i*60);obs.unobserve(e.target);}});},{threshold:0.1});els.forEach(function(el){obs.observe(el);});})();
+(function(){var els=document.querySelectorAll('.section-header,.category-tile,.product-card,.trust-item,.blog-card,.counter-item,.proof-card,.tilt-card');els.forEach(function(el){el.style.opacity='0';el.style.transform='translateY(24px)';el.style.transition='opacity 0.55s ease, transform 0.55s ease';});var obs=new IntersectionObserver(function(entries){entries.forEach(function(e,i){if(e.isIntersecting){setTimeout(function(){e.target.style.opacity='1';e.target.style.transform='translateY(0)';},i*60);obs.unobserve(e.target);}});},{threshold:0.1});els.forEach(function(el){obs.observe(el);});})();
 
 // ── Counter Animation ──
 (function(){var counters=document.querySelectorAll('.counter-num[data-target]');var obs=new IntersectionObserver(function(entries){entries.forEach(function(e){if(e.isIntersecting){var el=e.target,target=parseInt(el.getAttribute('data-target')),current=0,increment=target/50;var timer=setInterval(function(){current+=increment;if(current>=target){current=target;clearInterval(timer);}el.textContent=Math.floor(current).toLocaleString()+(target>=1000?'+':'');},30);obs.unobserve(el);}});},{threshold:0.5});counters.forEach(function(c){obs.observe(c);});})();

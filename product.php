@@ -24,7 +24,12 @@ if ($total_reviews > 0) { $sum = 0; foreach ($reviews as $r) { $sum += $r['ratin
 $review_success = $review_error = null;
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['submit_review'])) {
     $rn = trim($_POST['user_name'] ?? ''); $rt = trim($_POST['title'] ?? ''); $rb = trim($_POST['review_text'] ?? ''); $rs = (int)($_POST['rating'] ?? 5);
-    $uid = is_logged_in() ? $_SESSION['user_id'] : null;
+    $uid = null;
+    if (is_logged_in() && isset($_SESSION['user_id'])) {
+        $stmt_uid = $pdo->prepare("SELECT id FROM users WHERE id = ?");
+        $stmt_uid->execute([$_SESSION['user_id']]);
+        if ($stmt_uid->fetch()) $uid = $_SESSION['user_id'];
+    }
     if (empty($rn) || empty($rb)) { $review_error = "Please fill in your name and review."; }
     elseif ($rs < 1 || $rs > 5) { $review_error = "Invalid rating."; }
     else { $pdo->prepare("INSERT INTO reviews (product_id,user_id,user_name,rating,title,review_text,is_approved) VALUES (?,?,?,?, ?,?,0)")->execute([$product['id'],$uid,$rn,$rs,$rt,$rb]); $review_success = "Review submitted! Pending approval."; }

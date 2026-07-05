@@ -22,7 +22,6 @@ $nav_groups = [
         'label' => 'Sales',
         'items' => [
             ['page' => 'orders.php',              'label' => 'Orders',            'icon' => 'fas fa-shopping-bag', 'match' => ['orders.php']],
-            ['page' => 'coupons.php',             'label' => 'Coupons',           'icon' => 'fas fa-ticket-alt',   'match' => ['coupons.php']],
             ['page' => 'quantity_discounts.php',  'label' => 'Discounts',         'icon' => 'fas fa-percentage',   'match' => ['quantity_discounts.php']],
         ]
     ],
@@ -30,21 +29,22 @@ $nav_groups = [
         'label' => 'Marketing',
         'items' => [
             ['page' => 'announcements.php',  'label' => 'Announcements', 'icon' => 'fas fa-bullhorn',  'match' => ['announcements.php']],
+            ['page' => 'testimonials.php',   'label' => 'Testimonials',  'icon' => 'fas fa-quote-left', 'match' => ['testimonials.php', 'testimonial_add.php', 'testimonial_edit.php']],
             ['page' => 'reviews.php',        'label' => 'Reviews',       'icon' => 'fas fa-star-half-alt', 'match' => ['reviews.php']],
         ]
     ],
     [
         'label' => 'Content',
         'items' => [
-            ['page' => 'blog.php',         'label' => 'Blog',          'icon' => 'fas fa-pen-nib',     'match' => ['blog.php']],
-            ['page' => 'cms.php',          'label' => 'Pages',         'icon' => 'fas fa-file-alt',    'match' => ['cms.php']],
+            ['page' => 'blog.php',              'label' => 'Blog',           'icon' => 'fas fa-pen-nib',     'match' => ['blog.php', 'blog_add.php', 'blog_edit.php']],
+            ['page' => 'blog_categories.php',   'label' => 'Blog Categories','icon' => 'fas fa-folder',      'match' => ['blog_categories.php']],
+            ['page' => 'blog_tags.php',         'label' => 'Blog Tags',      'icon' => 'fas fa-tags',        'match' => ['blog_tags.php']],
             ['page' => 'certificates.php', 'label' => 'Certificates',  'icon' => 'fas fa-award',       'match' => ['certificates.php']],
         ]
     ],
     [
         'label' => 'System',
         'items' => [
-            ['page' => 'whatsapp.php',  'label' => 'WhatsApp', 'icon' => 'fab fa-whatsapp', 'match' => ['whatsapp.php']],
             ['page' => 'reports.php',   'label' => 'Reports',  'icon' => 'fas fa-chart-bar', 'match' => ['reports.php']],
         ]
     ],
@@ -105,6 +105,21 @@ $nav_groups = [
 /* ═══════════════════════════════════════════════
    SIDEBAR STYLES — Premium Dark Glass Theme
    ═══════════════════════════════════════════════ */
+.admin-sidebar {
+    position: sticky;
+    top: 0;
+    height: 100%;
+    overflow-y: auto;
+    background: rgba(18, 18, 18, 0.85);
+    border-right: 1px solid rgba(255, 255, 255, 0.06);
+    display: flex;
+    flex-direction: column;
+    scrollbar-width: thin;
+    scrollbar-color: rgba(212, 175, 55, 0.15) transparent;
+}
+.admin-sidebar::-webkit-scrollbar { width: 3px; }
+.admin-sidebar::-webkit-scrollbar-track { background: transparent; }
+.admin-sidebar::-webkit-scrollbar-thumb { background: rgba(212, 175, 55, 0.15); border-radius: 3px; }
 
 /* Logo Section */
 .sidebar-logo {
@@ -307,10 +322,10 @@ $nav_groups = [
 @media (max-width: 1024px) {
     .admin-sidebar {
         position: fixed !important;
-        top: 0 !important;
+        top: 64px !important;
         left: 0;
         width: 260px;
-        height: 100vh;
+        height: calc(100vh - 64px);
         z-index: 160;
         transform: translateX(-100%);
         transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);

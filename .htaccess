@@ -1,0 +1,64 @@
+RewriteEngine On
+
+# --------------------------------------------------------
+# PROTECT SENSITIVE FILES
+# --------------------------------------------------------
+
+# Block access to .env file
+<Files ".env">
+    Order Allow,Deny
+    Deny from all
+</Files>
+
+# Block access to config/log/backup files
+<FilesMatch "\.(env|ini|log|sql|bak|config|dist|fla|psd|swp)$">
+    Order Allow,Deny
+    Deny from all
+</FilesMatch>
+
+# Block access to hidden files (.git, etc)
+<IfModule mod_rewrite.c>
+    RewriteRule (^|/)\.(?!well-known/) - [F]
+</IfModule>
+
+# --------------------------------------------------------
+# SECURITY HEADERS (only if mod_headers is loaded)
+# --------------------------------------------------------
+<IfModule mod_headers.c>
+    Header always set X-Frame-Options "DENY"
+    Header always set X-Content-Type-Options "nosniff"
+    Header always set X-XSS-Protection "1; mode=block"
+    Header always set Referrer-Policy "strict-origin-when-cross-origin"
+</IfModule>
+
+# --------------------------------------------------------
+# BLOCK COMMON ATTACK PATTERNS
+# --------------------------------------------------------
+
+# Block SQL injection attempts in URL
+<IfModule mod_rewrite.c>
+    RewriteCond %{QUERY_STRING} (\%27)|(\')|(\-\-)|(\%23)|(#) [OR]
+    RewriteCond %{QUERY_STRING} concat[\s]*%27 [OR]
+    RewriteCond %{QUERY_STRING} union[\s]+.*select[\s]+ [OR]
+    RewriteCond %{QUERY_STRING} union[\s]+.*select[\s] [NC]
+    RewriteRule .* - [F,L]
+</IfModule>
+
+# Block XSS attempts in URL
+<IfModule mod_rewrite.c>
+    RewriteCond %{QUERY_STRING} (\<script|\%3Cscript) [NC,OR]
+    RewriteCond %{QUERY_STRING} (\<iframe|\%3Ciframe) [NC,OR]
+    RewriteCond %{QUERY_STRING} (onload|onclick|onerror|onmouseover)= [NC]
+    RewriteRule .* - [F,L]
+</IfModule>
+
+# Block common exploit scanners
+<IfModule mod_rewrite.c>
+    RewriteCond %{HTTP_USER_AGENT} (nikto|masscan|sqlmap|nmap|dirbuster|gobuster|wfuzz|ffuf|nuclei|zgrab) [NC]
+    RewriteRule .* - [F,L]
+</IfModule>
+
+# Block phpmyadmin paths
+<IfModule mod_rewrite.c>
+    RewriteRule ^(phpmyadmin|phpMyAdmin|myadmin|pma|dbadmin) - [F,L]
+</IfModule>

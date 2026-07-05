@@ -1,43 +1,9 @@
 <?php
-// admin/announcements.php
+// admin/announcements.php — Announcement List
 require_once __DIR__ . '/includes/header.php';
 require_once __DIR__ . '/includes/sidebar.php';
 
 $action_msg = '';
-
-// Handle Add Announcement
-if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['add_ann'])) {
-    $msg = trim($_POST['message']);
-    $link = trim($_POST['link']);
-    $order = (int)$_POST['display_order'];
-
-    if (empty($msg)) {
-        $action_error = "Announcement message cannot be blank.";
-    } else {
-        $stmt_i = $pdo->prepare("
-            INSERT INTO announcements (message, link, display_order, status)
-            VALUES (?, ?, ?, 1)
-        ");
-        $stmt_i->execute([$msg, $link, $order]);
-        $action_msg = "Announcement added successfully.";
-    }
-}
-
-// Handle Edit Announcement
-if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['edit_ann'])) {
-    $eid = (int)$_POST['edit_id'];
-    $msg = trim($_POST['message']);
-    $link = trim($_POST['link']);
-    $order = (int)$_POST['display_order'];
-
-    if (empty($msg)) {
-        $action_error = "Announcement message cannot be blank.";
-    } else {
-        $stmt_u = $pdo->prepare("UPDATE announcements SET message = ?, link = ?, display_order = ? WHERE id = ?");
-        $stmt_u->execute([$msg, $link, $order, $eid]);
-        $action_msg = "Announcement updated successfully.";
-    }
-}
 
 // Handle Status Toggle
 if (isset($_GET['toggle_id'])) {
@@ -47,7 +13,7 @@ if (isset($_GET['toggle_id'])) {
     $action_msg = "Announcement status toggled.";
 }
 
-// Handle Delete Announcement
+// Handle Delete
 if (isset($_GET['delete_id'])) {
     $ann_id = (int)$_GET['delete_id'];
     $stmt = $pdo->prepare("DELETE FROM announcements WHERE id = ?");
@@ -55,180 +21,124 @@ if (isset($_GET['delete_id'])) {
     $action_msg = "Announcement deleted.";
 }
 
-// Fetch edit data
-$edit_ann = null;
-if (isset($_GET['edit_id'])) {
-    $e_id = (int)$_GET['edit_id'];
-    $stmt = $pdo->prepare("SELECT * FROM announcements WHERE id = ?");
-    $stmt->execute([$e_id]);
-    $edit_ann = $stmt->fetch();
-}
-
 // Fetch all announcements
 $stmt = $pdo->prepare("SELECT * FROM announcements ORDER BY display_order ASC");
 $stmt->execute();
 $announcements = $stmt->fetchAll();
+
+$total_count = count($announcements);
+$active_count = 0;
+foreach ($announcements as $a) { if ($a['status']) $active_count++; }
+$inactive_count = $total_count - $active_count;
 ?>
 
     <!-- Page Header -->
-    <div style="margin-bottom:32px;">
-        <h1 style="font-size:1.75rem; font-weight:800; color:#fff; margin-bottom:6px; text-transform:uppercase; letter-spacing:1px;">Announcement Bar</h1>
-        <p style="font-size:0.85rem; color:rgba(255,255,255,0.45); font-weight:400;">Manage header scrolling offer messages</p>
+    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:30px;">
+        <div>
+            <h2 style="font-size:1.8rem; text-transform:uppercase; margin-bottom:5px;">Announcements</h2>
+            <p style="font-size:0.85rem; color:var(--text-muted);">Manage scrolling header bar messages</p>
+        </div>
+        <a href="announcement_add.php" class="btn-gold" style="padding:10px 20px; font-size:0.85rem; text-decoration:none; display:inline-flex; align-items:center; gap:8px;">
+            <i class="fas fa-plus"></i> Add Announcement
+        </a>
     </div>
 
     <?php if ($action_msg): ?>
-        <div style="background:rgba(74,222,128,0.08); border:1px solid rgba(74,222,128,0.2); border-radius:10px; padding:14px 20px; margin-bottom:24px; display:flex; align-items:center; gap:10px;">
-            <i class="fas fa-check-circle" style="color:#4ade80; font-size:1rem;"></i>
+        <div style="background:rgba(74,222,128,0.06); border:1px solid rgba(74,222,128,0.15); border-radius:10px; padding:14px 20px; margin-bottom:24px; display:flex; align-items:center; gap:10px;">
+            <i class="fas fa-check-circle" style="color:#4ade80;"></i>
             <span style="color:#4ade80; font-size:0.875rem; font-weight:500;"><?php echo htmlspecialchars($action_msg); ?></span>
         </div>
     <?php endif; ?>
-    <?php if (isset($action_error) && $action_error): ?>
-        <div style="background:rgba(239,68,68,0.08); border:1px solid rgba(239,68,68,0.2); border-radius:10px; padding:14px 20px; margin-bottom:24px; display:flex; align-items:center; gap:10px;">
-            <i class="fas fa-exclamation-circle" style="color:#ef4444; font-size:1rem;"></i>
-            <span style="color:#ef4444; font-size:0.875rem; font-weight:500;"><?php echo htmlspecialchars($action_error); ?></span>
-        </div>
-    <?php endif; ?>
 
-    <div style="display:grid; grid-template-columns: 1fr 400px; gap:28px; align-items:start;">
-
-        <!-- Announcements List -->
-        <div class="glass-card" style="padding:0; overflow:hidden;">
-            <div style="padding:20px 24px; border-bottom:1px solid rgba(255,255,255,0.06); display:flex; align-items:center; justify-content:space-between;">
-                <div>
-                    <h3 style="font-size:1rem; font-weight:700; color:#fff; text-transform:uppercase; letter-spacing:0.5px;">Active Announcements</h3>
-                    <p style="font-size:0.75rem; color:rgba(255,255,255,0.45); margin-top:4px;"><?php echo count($announcements); ?> announcements configured</p>
-                </div>
-                <div style="width:36px; height:36px; border-radius:8px; background:rgba(212,175,55,0.1); display:flex; align-items:center; justify-content:center;">
-                    <i class="fas fa-bullhorn" style="color:#D4AF37; font-size:0.9rem;"></i>
-                </div>
+    <!-- Stats Cards -->
+    <div style="display:grid; grid-template-columns:repeat(3, 1fr); gap:16px; margin-bottom:28px;">
+        <div class="glass-card" style="padding:18px 22px; display:flex; align-items:center; gap:14px;">
+            <div style="width:44px; height:44px; border-radius:12px; background:rgba(212,175,55,0.1); display:flex; align-items:center; justify-content:center;">
+                <i class="fas fa-bullhorn" style="color:#D4AF37; font-size:1rem;"></i>
             </div>
-
-            <?php if (empty($announcements)): ?>
-                <div style="padding:48px 24px; text-align:center;">
-                    <i class="fas fa-bullhorn" style="font-size:2.5rem; color:rgba(255,255,255,0.1); margin-bottom:16px; display:block;"></i>
-                    <p style="color:rgba(255,255,255,0.45); font-size:0.9rem;">No announcements created yet.</p>
-                    <p style="color:rgba(255,255,255,0.3); font-size:0.8rem; margin-top:6px;">Use the form to create a scrolling bar message.</p>
-                </div>
-            <?php else: ?>
-                <div style="overflow-x:auto;">
-                    <table class="admin-table" style="margin-top:0; border:none; border-radius:0;">
-                        <thead>
-                            <tr>
-                                <th style="width:60px;">Order</th>
-                                <th>Message</th>
-                                <th>Link</th>
-                                <th>Status</th>
-                                <th>Actions</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <?php foreach ($announcements as $ann): ?>
-                                <tr>
-                                    <td>
-                                        <span style="width:28px; height:28px; border-radius:6px; background:rgba(255,255,255,0.05); display:flex; align-items:center; justify-content:center; font-weight:700; color:#fff; font-size:0.8rem;">
-                                            <?php echo $ann['display_order']; ?>
-                                        </span>
-                                    </td>
-                                    <td>
-                                        <span style="font-size:0.875rem; color:rgba(255,255,255,0.8); line-height:1.4; display:block; max-width:320px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;">
-                                            <?php echo htmlspecialchars($ann['message']); ?>
-                                        </span>
-                                    </td>
-                                    <td>
-                                        <?php if (!empty($ann['link'])): ?>
-                                            <span style="font-size:0.75rem; color:rgba(255,255,255,0.35); font-family:monospace; background:rgba(255,255,255,0.03); padding:3px 8px; border-radius:4px;">
-                                                <?php echo htmlspecialchars($ann['link']); ?>
-                                            </span>
-                                        <?php else: ?>
-                                            <span style="font-size:0.75rem; color:rgba(255,255,255,0.2);">—</span>
-                                        <?php endif; ?>
-                                    </td>
-                                    <td>
-                                        <span class="admin-badge <?php echo $ann['status'] ? 'badge-completed' : 'badge-pending'; ?>">
-                                            <?php echo $ann['status'] ? 'Active' : 'Inactive'; ?>
-                                        </span>
-                                    </td>
-                                    <td>
-                                        <div style="display:flex; gap:6px; align-items:center;">
-                                            <a href="announcements.php?edit_id=<?php echo $ann['id']; ?>" title="Edit" style="width:30px; height:30px; border-radius:6px; background:rgba(212,175,55,0.1); display:flex; align-items:center; justify-content:center; color:#D4AF37; font-size:0.75rem;">
-                                                <i class="fas fa-pen"></i>
-                                            </a>
-                                            <a href="announcements.php?toggle_id=<?php echo $ann['id']; ?>" title="<?php echo $ann['status'] ? 'Disable' : 'Enable'; ?>" style="width:30px; height:30px; border-radius:6px; background:rgba(74,222,128,0.1); display:flex; align-items:center; justify-content:center; color:#4ade80; font-size:0.75rem;">
-                                                <i class="fas fa-<?php echo $ann['status'] ? 'toggle-on' : 'toggle-off'; ?>"></i>
-                                            </a>
-                                            <a href="announcements.php?delete_id=<?php echo $ann['id']; ?>" title="Delete" onclick="return confirm('Delete this announcement?')" style="width:30px; height:30px; border-radius:6px; background:rgba(239,68,68,0.1); display:flex; align-items:center; justify-content:center; color:#ef4444; font-size:0.75rem;">
-                                                <i class="fas fa-trash"></i>
-                                            </a>
-                                        </div>
-                                    </td>
-                                </tr>
-                            <?php endforeach; ?>
-                        </tbody>
-                    </table>
-                </div>
-            <?php endif; ?>
-        </div>
-
-        <!-- Add/Edit Form -->
-        <div class="glass-card" style="padding:0; overflow:hidden; position:sticky; top:96px;">
-            <div style="padding:20px 24px; border-bottom:1px solid rgba(255,255,255,0.06); display:flex; align-items:center; gap:12px;">
-                <div style="width:36px; height:36px; border-radius:8px; background:rgba(212,175,55,0.1); display:flex; align-items:center; justify-content:center;">
-                    <i class="fas fa-<?php echo $edit_ann ? 'edit' : 'plus'; ?>" style="color:#D4AF37; font-size:0.9rem;"></i>
-                </div>
-                <h3 style="font-size:1rem; font-weight:700; color:#fff; text-transform:uppercase; letter-spacing:0.5px;">
-                    <?php echo $edit_ann ? 'Edit Announcement' : 'Add Announcement'; ?>
-                </h3>
+            <div>
+                <div style="font-size:1.6rem; font-weight:800; color:#fff; line-height:1;"><?php echo $total_count; ?></div>
+                <div style="font-size:0.7rem; color:rgba(255,255,255,0.45); text-transform:uppercase; letter-spacing:0.5px; margin-top:3px;">Total</div>
             </div>
-
-            <form action="announcements.php" method="POST" style="padding:24px;">
-                <?php if ($edit_ann): ?>
-                    <input type="hidden" name="edit_id" value="<?php echo $edit_ann['id']; ?>">
-                <?php endif; ?>
-
-                <div class="form-group">
-                    <label for="message" style="font-size:0.75rem; text-transform:uppercase; letter-spacing:0.8px; color:rgba(255,255,255,0.5); margin-bottom:8px;">Message *</label>
-                    <input type="text" name="message" id="message" class="form-control" placeholder="e.g. Free shipping on prepaid orders" required
-                        value="<?php echo htmlspecialchars($edit_ann ? $edit_ann['message'] : ''); ?>">
-                </div>
-
-                <div class="form-group">
-                    <label for="link" style="font-size:0.75rem; text-transform:uppercase; letter-spacing:0.8px; color:rgba(255,255,255,0.5); margin-bottom:8px;">Voucher Link</label>
-                    <input type="text" name="link" id="link" class="form-control" placeholder="e.g. /certificates.php"
-                        value="<?php echo htmlspecialchars($edit_ann ? ($edit_ann['link'] ?? '') : ''); ?>">
-                </div>
-
-                <div class="form-group">
-                    <label for="order" style="font-size:0.75rem; text-transform:uppercase; letter-spacing:0.8px; color:rgba(255,255,255,0.5); margin-bottom:8px;">Display Order</label>
-                    <input type="number" name="display_order" id="order" class="form-control"
-                        value="<?php echo $edit_ann ? $edit_ann['display_order'] : '0'; ?>">
-                </div>
-
-                <div style="display:flex; gap:10px; margin-top:8px;">
-                    <button type="submit" name="<?php echo $edit_ann ? 'edit_ann' : 'add_ann'; ?>" class="btn-gold" style="flex:1; padding:12px 20px;">
-                        <i class="fas fa-<?php echo $edit_ann ? 'save' : 'plus'; ?>"></i>
-                        <?php echo $edit_ann ? 'Update Announcement' : 'Save Announcement'; ?>
-                    </button>
-                </div>
-
-                <?php if ($edit_ann): ?>
-                    <a href="announcements.php" style="display:flex; align-items:center; justify-content:center; gap:6px; margin-top:12px; padding:10px; border-radius:8px; border:1px solid rgba(255,255,255,0.08); color:rgba(255,255,255,0.5); font-size:0.8rem; font-weight:500; transition:all 0.2s; text-decoration:none;">
-                        <i class="fas fa-times"></i> Cancel Edit
-                    </a>
-                <?php endif; ?>
-            </form>
-
-            <!-- Tip -->
-            <div style="margin:0 24px 24px; padding:16px; border-radius:8px; background:rgba(212,175,55,0.05); border:1px solid rgba(212,175,55,0.1);">
-                <div style="display:flex; align-items:center; gap:8px; margin-bottom:8px;">
-                    <i class="fas fa-lightbulb" style="color:#D4AF37; font-size:0.8rem;"></i>
-                    <span style="font-size:0.75rem; font-weight:700; color:#D4AF37; text-transform:uppercase; letter-spacing:0.5px;">Copywriting Tip</span>
-                </div>
-                <p style="font-size:0.78rem; color:rgba(255,255,255,0.45); line-height:1.6;">
-                    Use the announcement bar to drive quick sales or create urgency. Highlight prepaid perks, quality links, or redirect customers to key trust sections.
-                </p>
+        </div>
+        <div class="glass-card" style="padding:18px 22px; display:flex; align-items:center; gap:14px;">
+            <div style="width:44px; height:44px; border-radius:12px; background:rgba(74,222,128,0.1); display:flex; align-items:center; justify-content:center;">
+                <i class="fas fa-toggle-on" style="color:#4ade80; font-size:1rem;"></i>
+            </div>
+            <div>
+                <div style="font-size:1.6rem; font-weight:800; color:#fff; line-height:1;"><?php echo $active_count; ?></div>
+                <div style="font-size:0.7rem; color:rgba(255,255,255,0.45); text-transform:uppercase; letter-spacing:0.5px; margin-top:3px;">Active</div>
+            </div>
+        </div>
+        <div class="glass-card" style="padding:18px 22px; display:flex; align-items:center; gap:14px;">
+            <div style="width:44px; height:44px; border-radius:12px; background:rgba(239,68,68,0.1); display:flex; align-items:center; justify-content:center;">
+                <i class="fas fa-toggle-off" style="color:#ef4444; font-size:1rem;"></i>
+            </div>
+            <div>
+                <div style="font-size:1.6rem; font-weight:800; color:#fff; line-height:1;"><?php echo $inactive_count; ?></div>
+                <div style="font-size:0.7rem; color:rgba(255,255,255,0.45); text-transform:uppercase; letter-spacing:0.5px; margin-top:3px;">Inactive</div>
             </div>
         </div>
     </div>
+
+    <?php if (empty($announcements)): ?>
+        <div class="glass-card" style="padding:60px 40px; text-align:center; border:2px dashed rgba(212,175,55,0.15);">
+            <div style="width:70px; height:70px; background:rgba(212,175,55,0.06); border-radius:50%; display:flex; align-items:center; justify-content:center; margin:0 auto 18px;">
+                <i class="fas fa-bullhorn" style="font-size:1.8rem; color:rgba(212,175,55,0.3);"></i>
+            </div>
+            <h3 style="font-size:1.2rem; color:#fff; margin-bottom:8px;">No Announcements</h3>
+            <p style="color:var(--text-muted); font-size:0.85rem; margin-bottom:20px;">Create your first scrolling bar message.</p>
+            <a href="announcement_add.php" class="btn-gold" style="padding:12px 28px; text-decoration:none; display:inline-flex; align-items:center; gap:8px; font-size:0.88rem;">
+                <i class="fas fa-plus"></i> Create Announcement
+            </a>
+        </div>
+    <?php else: ?>
+        <div style="display:grid; grid-template-columns:repeat(auto-fill, minmax(480px, 1fr)); gap:16px;">
+            <?php foreach ($announcements as $ann): ?>
+                <div class="glass-card" style="padding:0; overflow:hidden; <?php echo !$ann['status'] ? 'opacity:0.5;' : ''; ?>">
+                    <div style="display:flex; align-items:stretch;">
+                        <!-- Order Badge -->
+                        <div style="width:56px; min-height:100%; background:rgba(212,175,55,0.06); border-right:1px solid rgba(255,255,255,0.05); display:flex; align-items:center; justify-content:center; flex-direction:column; gap:2px;">
+                            <span style="font-size:1.3rem; font-weight:800; color:var(--gold-primary); line-height:1;"><?php echo $ann['display_order']; ?></span>
+                            <span style="font-size:0.55rem; color:rgba(255,255,255,0.3); text-transform:uppercase; letter-spacing:0.5px;">Order</span>
+                        </div>
+
+                        <!-- Content -->
+                        <div style="flex:1; padding:16px 20px; display:flex; align-items:center; justify-content:space-between; gap:16px;">
+                            <div style="flex:1; min-width:0;">
+                                <p style="font-size:0.92rem; color:#fff; font-weight:600; margin:0 0 6px 0; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">
+                                    <?php echo htmlspecialchars($ann['message']); ?>
+                                </p>
+                                <div style="display:flex; align-items:center; gap:12px; flex-wrap:wrap;">
+                                    <span class="admin-badge <?php echo $ann['status'] ? 'badge-completed' : 'badge-pending'; ?>">
+                                        <?php echo $ann['status'] ? 'Active' : 'Inactive'; ?>
+                                    </span>
+                                    <?php if (!empty($ann['link'])): ?>
+                                        <span style="font-size:0.72rem; color:rgba(255,255,255,0.3); font-family:monospace;">
+                                            <i class="fas fa-link" style="margin-right:4px;"></i><?php echo htmlspecialchars($ann['link']); ?>
+                                        </span>
+                                    <?php endif; ?>
+                                </div>
+                            </div>
+
+                            <!-- Actions -->
+                            <div style="display:flex; gap:6px; flex-shrink:0;">
+                                <a href="announcement_edit.php?id=<?php echo $ann['id']; ?>" title="Edit" style="width:34px; height:34px; border-radius:8px; background:rgba(212,175,55,0.08); border:1px solid rgba(212,175,55,0.15); display:flex; align-items:center; justify-content:center; color:#D4AF37; font-size:0.8rem; text-decoration:none;">
+                                    <i class="fas fa-pen"></i>
+                                </a>
+                                <a href="announcements.php?toggle_id=<?php echo $ann['id']; ?>" title="<?php echo $ann['status'] ? 'Deactivate' : 'Activate'; ?>" style="width:34px; height:34px; border-radius:8px; background:<?php echo $ann['status'] ? 'rgba(74,222,128,0.08)' : 'rgba(255,255,255,0.04)'; ?>; border:1px solid <?php echo $ann['status'] ? 'rgba(74,222,128,0.15)' : 'rgba(255,255,255,0.08)'; ?>; display:flex; align-items:center; justify-content:center; color:<?php echo $ann['status'] ? '#4ade80' : 'rgba(255,255,255,0.35)'; ?>; font-size:0.8rem; text-decoration:none;">
+                                    <i class="fas fa-<?php echo $ann['status'] ? 'toggle-on' : 'toggle-off'; ?>"></i>
+                                </a>
+                                <a href="announcements.php?delete_id=<?php echo $ann['id']; ?>" title="Delete" onclick="return confirm('Delete this announcement?')" style="width:34px; height:34px; border-radius:8px; background:rgba(239,68,68,0.06); border:1px solid rgba(239,68,68,0.12); display:flex; align-items:center; justify-content:center; color:#ef4444; font-size:0.8rem; text-decoration:none;">
+                                    <i class="fas fa-trash"></i>
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            <?php endforeach; ?>
+        </div>
+    <?php endif; ?>
 
 <?php
 require_once __DIR__ . '/includes/footer.php';

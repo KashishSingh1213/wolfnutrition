@@ -162,9 +162,9 @@ foreach ($bundles as $b) {
                                 <h3 style="font-size:1.1rem; color:#fff; margin-bottom:4px; line-height:1.3;">
                                     <?php echo htmlspecialchars($b['title']); ?>
                                 </h3>
-                                <p style="font-size:0.8rem; color:var(--text-muted); line-height:1.4; display:-webkit-box; -webkit-line-clamp:2; -webkit-box-orient:vertical; overflow:hidden;">
-                                    <?php echo htmlspecialchars($b['description']); ?>
-                                </p>
+                                 <div style="font-size:0.8rem; color:var(--text-muted); line-height:1.4; display:-webkit-box; -webkit-line-clamp:2; -webkit-box-orient:vertical; overflow:hidden;">
+                                     <?php echo $b['description']; ?>
+                                 </div>
                             </div>
                         </div>
 

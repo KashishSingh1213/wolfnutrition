@@ -274,7 +274,6 @@
         <p>Explore our clinically validated formulations. From physical endurance stacks to complete toxin cleanses — select the support your body deserves.</p>
         <div style="display:flex; gap:16px; justify-content:center; flex-wrap:wrap; position:relative; z-index:2;">
             <a href="category.php?slug=all" class="btn-gold" style="padding:14px 36px; font-size:0.92rem; border-radius:30px;"><i class="fas fa-shopping-bag"></i> Shop Our Formulations</a>
-            <a href="https://wa.me/919876543210?text=Hi%20Wolf%20Nutrition,%20I%20would%20like%20a%20free%20dietitian%20consultation." target="_blank" class="btn-outline-gold" style="padding:13px 36px; font-size:0.92rem; border-radius:30px; display:inline-flex; align-items:center; gap:8px;"><i class="fab fa-whatsapp"></i> Free Consult</a>
         </div>
     </div>
 </div>
