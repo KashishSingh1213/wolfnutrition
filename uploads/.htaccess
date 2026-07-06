@@ -1,7 +1,7 @@
 RewriteEngine Off
 
-# Allow image files
-<FilesMatch "\.(jpg|jpeg|png|gif|webp|svg)$">
+# Allow image files and PDFs
+<FilesMatch "\.(jpg|jpeg|png|gif|webp|svg|pdf)$">
     Order Allow,Deny
     Allow from all
 </FilesMatch>

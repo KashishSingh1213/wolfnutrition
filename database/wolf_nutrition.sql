@@ -386,3 +386,14 @@ INSERT INTO `reviews` (`id`, `product_id`, `user_id`, `user_name`, `rating`, `ti
 (1, 1, 2, 'Yuvek Verma', 5, 'Absolute Game Changer!', 'I have been using the 60 Capsules pack of Wolfpack for over a month now. My stamina levels and gym performance have gone through the roof! It has a subtle energy release without any jitters. Highly recommended.', 1, 1),
 (2, 2, NULL, 'Karan Sharma', 5, 'Highly effective detox', 'I take Wolftox daily to protect my liver from a high-protein bodybuilding diet. It keeps my digestion smooth and completely removes bloating. 100% natural, no chemical taste.', 1, 1),
 (3, 1, NULL, 'Sanjay Sen', 4, 'Very good vitality supplement', 'Great ingredients. Standardized Shilajit + Ashwagandha really helps with office fatigue. Deducted 1 star because shipping took 5 days, but the product is excellent.', 1, 0);
+
+-- 18. Newsletter Subscribers Table
+CREATE TABLE IF NOT EXISTS `newsletter_subscribers` (
+  `id` INT AUTO_INCREMENT PRIMARY KEY,
+  `email` VARCHAR(255) NOT NULL UNIQUE,
+  `ip_address` VARCHAR(45) DEFAULT NULL,
+  `is_active` TINYINT(1) DEFAULT 1,
+  `created_at` TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  INDEX idx_email (email),
+  INDEX idx_active (is_active)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;

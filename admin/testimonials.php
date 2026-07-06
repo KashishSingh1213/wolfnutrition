@@ -52,8 +52,60 @@ foreach ($testimonials as $t) {
 $inactive_count = $total_count - $active_count;
 ?>
 
+    <style>
+        /* ── Responsive: Tablet ── */
+        @media (max-width: 1024px) {
+            .test-page-header {
+                flex-direction: column !important;
+                align-items: flex-start !important;
+                gap: 12px;
+            }
+            .test-stats-grid {
+                grid-template-columns: repeat(2, 1fr) !important;
+            }
+            .test-grid {
+                grid-template-columns: 1fr !important;
+            }
+        }
+
+        /* ── Responsive: Mobile ── */
+        @media (max-width: 768px) {
+            .test-page-header {
+                flex-direction: column !important;
+                align-items: flex-start !important;
+                gap: 12px;
+            }
+            .test-stats-grid {
+                grid-template-columns: 1fr 1fr !important;
+                gap: 10px !important;
+            }
+            .test-grid {
+                grid-template-columns: 1fr !important;
+                gap: 12px !important;
+            }
+            .test-card-header {
+                flex-direction: column !important;
+                align-items: flex-start !important;
+                gap: 10px;
+            }
+            .test-card-footer {
+                flex-direction: column !important;
+                align-items: flex-start !important;
+                gap: 10px;
+            }
+            .test-card-actions {
+                width: 100% !important;
+                justify-content: flex-end !important;
+            }
+            .test-card-actions a {
+                width: 34px !important;
+                height: 34px !important;
+            }
+        }
+    </style>
+
     <!-- Page Header -->
-    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:30px;">
+    <div class="test-page-header" style="display:flex; justify-content:space-between; align-items:center; margin-bottom:30px;">
         <div>
             <h2 style="font-size:1.8rem; text-transform:uppercase; margin-bottom:5px;">Testimonials</h2>
             <p style="font-size:0.85rem; color:var(--text-muted);">Manage customer reviews and testimonials</p>
@@ -71,7 +123,7 @@ $inactive_count = $total_count - $active_count;
     <?php endif; ?>
 
     <!-- Stats Cards -->
-    <div style="display:grid; grid-template-columns:repeat(4, 1fr); gap:16px; margin-bottom:28px;">
+    <div class="test-stats-grid" style="display:grid; grid-template-columns:repeat(4, 1fr); gap:16px; margin-bottom:28px;">
         <div class="glass-card" style="padding:18px 22px; display:flex; align-items:center; gap:14px;">
             <div style="width:44px; height:44px; border-radius:12px; background:rgba(212,175,55,0.1); display:flex; align-items:center; justify-content:center;">
                 <i class="fas fa-quote-left" style="color:#D4AF37; font-size:1rem;"></i>
@@ -122,11 +174,11 @@ $inactive_count = $total_count - $active_count;
             </a>
         </div>
     <?php else: ?>
-        <div style="display:grid; grid-template-columns:repeat(auto-fill, minmax(420px, 1fr)); gap:16px;">
+        <div class="test-grid" style="display:grid; grid-template-columns:repeat(auto-fill, minmax(420px, 1fr)); gap:16px;">
             <?php foreach ($testimonials as $t): ?>
                 <div class="glass-card" style="padding:0; overflow:hidden; <?php echo !$t['status'] ? 'opacity:0.5;' : ''; ?>">
                     <div style="padding:22px 24px;">
-                        <div style="display:flex; align-items:start; justify-content:space-between; gap:12px; margin-bottom:14px;">
+                        <div class="test-card-header" style="display:flex; align-items:start; justify-content:space-between; gap:12px; margin-bottom:14px;">
                             <div style="display:flex; align-items:center; gap:12px;">
                                 <div style="width:44px; height:44px; border-radius:50%; background:rgba(212,175,55,0.1); border:2px solid rgba(212,175,55,0.2); display:flex; align-items:center; justify-content:center; flex-shrink:0; overflow:hidden;">
                                     <?php if (!empty($t['avatar_url'])): ?>
@@ -153,7 +205,7 @@ $inactive_count = $total_count - $active_count;
                             "<?php echo htmlspecialchars($t['testimonial_text']); ?>"
                         </p>
 
-                        <div style="display:flex; align-items:center; justify-content:space-between; gap:8px; padding-top:14px; border-top:1px solid rgba(255,255,255,0.06);">
+                        <div class="test-card-footer" style="display:flex; align-items:center; justify-content:space-between; gap:8px; padding-top:14px; border-top:1px solid rgba(255,255,255,0.06);">
                             <div style="display:flex; gap:6px; align-items:center;">
                                 <span class="admin-badge <?php echo $t['status'] ? 'badge-completed' : 'badge-pending'; ?>">
                                     <?php echo $t['status'] ? 'Active' : 'Inactive'; ?>
@@ -163,7 +215,7 @@ $inactive_count = $total_count - $active_count;
                                 <?php endif; ?>
                                 <span style="font-size:0.65rem; color:rgba(255,255,255,0.3);">Order: <?php echo $t['display_order']; ?></span>
                             </div>
-                            <div style="display:flex; gap:5px; flex-shrink:0;">
+                            <div class="test-card-actions" style="display:flex; gap:5px; flex-shrink:0;">
                                 <a href="testimonial_edit.php?id=<?php echo $t['id']; ?>" title="Edit" style="width:30px; height:30px; border-radius:6px; background:rgba(212,175,55,0.08); border:1px solid rgba(212,175,55,0.15); display:flex; align-items:center; justify-content:center; color:#D4AF37; font-size:0.7rem; text-decoration:none;">
                                     <i class="fas fa-pen"></i>
                                 </a>

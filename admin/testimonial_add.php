@@ -46,13 +46,26 @@ $stmt_total->execute();
 $total_testimonials = (int)$stmt_total->fetchColumn();
 ?>
 
+    <style>
+        @media (max-width: 768px) {
+            .test-add-page-header {
+                flex-direction: column !important;
+                align-items: flex-start !important;
+                gap: 8px;
+            }
+            .test-add-form-grid {
+                grid-template-columns: 1fr !important;
+            }
+        }
+    </style>
+
     <div style="margin-bottom:20px;">
         <a href="testimonials.php" style="color:var(--gold-muted); font-size:0.9rem; text-decoration:none;">
             <i class="fas fa-arrow-left"></i> Back to Testimonials
         </a>
     </div>
 
-    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:30px;">
+    <div class="test-add-page-header" style="display:flex; justify-content:space-between; align-items:center; margin-bottom:30px;">
         <h2 style="font-size:1.8rem; text-transform:uppercase;">New Testimonial</h2>
         <div style="font-size:0.85rem; color:var(--text-muted);">Total testimonials: <strong style="color:var(--gold-primary);"><?php echo $total_testimonials; ?></strong></div>
     </div>
@@ -88,7 +101,7 @@ $total_testimonials = (int)$stmt_total->fetchColumn();
                 <textarea name="testimonial_text" class="form-control" rows="5" required placeholder="Write the customer's testimonial here..."></textarea>
             </div>
 
-            <div style="display:grid; grid-template-columns:1fr 1fr; gap:16px; margin-bottom:20px;">
+            <div class="test-add-form-grid" style="display:grid; grid-template-columns:1fr 1fr; gap:16px; margin-bottom:20px;">
                 <div class="form-group">
                     <label style="font-size:0.75rem; text-transform:uppercase; letter-spacing:0.8px; color:rgba(255,255,255,0.5); margin-bottom:8px; display:block;">Rating</label>
                     <select name="rating" class="form-control">

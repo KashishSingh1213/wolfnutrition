@@ -63,13 +63,37 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['update_testimonial'])
 }
 ?>
 
+    <style>
+        /* ── Responsive: Tablet ── */
+        @media (max-width: 1024px) {
+            .test-edit-grid {
+                grid-template-columns: 1fr !important;
+            }
+        }
+
+        /* ── Responsive: Mobile ── */
+        @media (max-width: 768px) {
+            .test-edit-grid {
+                grid-template-columns: 1fr !important;
+            }
+            .test-edit-page-header {
+                flex-direction: column !important;
+                align-items: flex-start !important;
+                gap: 12px;
+            }
+            .test-edit-form-grid {
+                grid-template-columns: 1fr !important;
+            }
+        }
+    </style>
+
     <div style="margin-bottom:20px;">
         <a href="testimonials.php" style="color:var(--gold-muted); font-size:0.9rem; text-decoration:none;">
             <i class="fas fa-arrow-left"></i> Back to Testimonials
         </a>
     </div>
 
-    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:30px;">
+    <div class="test-edit-page-header" style="display:flex; justify-content:space-between; align-items:center; margin-bottom:30px;">
         <h2 style="font-size:1.8rem; text-transform:uppercase;">Edit Testimonial</h2>
         <span class="admin-badge <?php echo $testimonial['status'] ? 'badge-completed' : 'badge-pending'; ?>" style="font-size:0.75rem;">
             <?php echo $testimonial['status'] ? 'Active' : 'Inactive'; ?>
@@ -89,7 +113,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['update_testimonial'])
         </div>
     <?php endif; ?>
 
-    <div style="display:grid; grid-template-columns:1fr 320px; gap:28px; align-items:start;">
+    <div class="test-edit-grid" style="display:grid; grid-template-columns:1fr 320px; gap:28px; align-items:start;">
 
         <!-- Edit Form -->
         <div class="glass-card" style="padding:0; overflow:hidden;">
@@ -116,7 +140,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['update_testimonial'])
                     <textarea name="testimonial_text" class="form-control" rows="5" required><?php echo htmlspecialchars($testimonial['testimonial_text']); ?></textarea>
                 </div>
 
-                <div style="display:grid; grid-template-columns:1fr 1fr; gap:16px; margin-bottom:20px;">
+                <div class="test-edit-form-grid" style="display:grid; grid-template-columns:1fr 1fr; gap:16px; margin-bottom:20px;">
                     <div class="form-group">
                         <label style="font-size:0.75rem; text-transform:uppercase; letter-spacing:0.8px; color:rgba(255,255,255,0.5); margin-bottom:8px; display:block;">Rating</label>
                         <select name="rating" class="form-control">

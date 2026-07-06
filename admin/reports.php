@@ -89,8 +89,19 @@ $bundle_sales_count = (int)$b_performance['bundle_sales'];
 $bundle_revenue_sum = (float)$b_performance['bundle_rev'];
 ?>
 
+    <style>
+        @media (max-width: 1024px) {
+            .rpt-page-header { flex-direction: column !important; align-items: flex-start !important; gap: 12px; }
+            .rpt-two-col { grid-template-columns: 1fr !important; }
+        }
+        @media (max-width: 768px) {
+            .rpt-page-header { flex-direction: column !important; align-items: flex-start !important; gap: 12px; }
+            .rpt-two-col { grid-template-columns: 1fr !important; }
+        }
+    </style>
+
     <!-- Page Header -->
-    <div style="display:flex; justify-content:space-between; align-items:flex-end; margin-bottom:35px;">
+    <div class="rpt-page-header" style="display:flex; justify-content:space-between; align-items:flex-end; margin-bottom:35px;">
         <div>
             <h2 style="font-size:1.8rem; text-transform:uppercase; letter-spacing:1.5px; margin-bottom:6px;">Financial Reports</h2>
             <p style="font-size:0.85rem; color:rgba(255,255,255,0.45); margin:0;">Revenue analytics and sales export tools</p>
@@ -137,7 +148,7 @@ $bundle_revenue_sum = (float)$b_performance['bundle_rev'];
     </div>
 
     <!-- Two Column Grid -->
-    <div style="display:grid; grid-template-columns:1fr 1fr; gap:28px; align-items:start;">
+    <div class="rpt-two-col" style="display:grid; grid-template-columns:1fr 1fr; gap:28px; align-items:start;">
 
         <!-- Combo Performance -->
         <div class="glass-card" style="padding:0; overflow:hidden;">

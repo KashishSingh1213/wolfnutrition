@@ -7,27 +7,45 @@ $coupon_msg = '';
 $coupon_success = false;
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    if (isset($_POST['apply_coupon_btn'])) {
-        $code = trim($_POST['coupon_code']);
-        $res = apply_coupon($code);
-        $coupon_msg = $res['message'];
-        $coupon_success = $res['success'];
-    }
-    
-    if (isset($_POST['remove_coupon_btn'])) {
-        unset($_SESSION['coupon']);
-        $coupon_msg = "Coupon removed.";
-        $coupon_success = true;
-    }
-    
-    if (isset($_POST['save_notes_btn'])) {
-        $_SESSION['cart_notes'] = trim($_POST['seller_notes']);
+    // CSRF check for all cart mutations
+    if (!isset($_POST['csrf_token']) || !hash_equals($_SESSION['csrf_token'] ?? '', $_POST['csrf_token'])) {
+        $coupon_msg = "Invalid form submission. Please try again.";
+        $coupon_success = false;
+    } else {
+        if (isset($_POST['apply_coupon_btn'])) {
+            $code = preg_replace('/[^A-Za-z0-9\-_]/', '', trim($_POST['coupon_code']));
+            if (strlen($code) > 50) $code = substr($code, 0, 50);
+            $res = apply_coupon($code);
+            $coupon_msg = $res['message'];
+            $coupon_success = $res['success'];
+        }
+
+        if (isset($_POST['remove_coupon_btn'])) {
+            unset($_SESSION['coupon']);
+            $coupon_msg = "Coupon removed.";
+            $coupon_success = true;
+        }
+
+        if (isset($_POST['save_notes_btn'])) {
+            $_SESSION['cart_notes'] = sanitize_string(trim($_POST['seller_notes']));
+        }
     }
 }
 
 $cart_items = get_cart_items();
 $totals = get_cart_totals();
 ?>
+
+<style>
+@media(max-width:900px){
+    .cart-grid{grid-template-columns:1fr !important; gap:24px !important;}
+    .summary-sidebar{position:static !important;}
+}
+@media(max-width:600px){
+    .cart-grid{gap:16px !important;}
+    .summary-sidebar{padding:20px !important;}
+}
+</style>
 
     <div class="container" style="margin-top: 40px; margin-bottom: 60px;">
         <div class="section-header">
@@ -42,7 +60,7 @@ $totals = get_cart_totals();
                 <a href="index.php" class="btn-gold" style="padding:12px 30px;">Shop Supplements</a>
             </div>
         <?php else: ?>
-            <div style="display:grid; grid-template-columns: 2.2fr 1.2fr; gap:40px; align-items:start;">
+            <div class="cart-grid" style="display:grid; grid-template-columns: 2.2fr 1.2fr; gap:40px; align-items:start;">
                 
                 <!-- Main Items List -->
                 <div>
@@ -57,7 +75,7 @@ $totals = get_cart_totals();
                             </thead>
                             <tbody>
                                 <?php foreach ($cart_items as $key => $item): ?>
-                                    <tr style="border-bottom: 1px solid rgba(255,255,255,0.05);">
+                                    <tr style="border-bottom: 1px solid rgba(255,255,255,0.05);" data-key="<?php echo htmlspecialchars($key); ?>">
                                         <!-- Product info -->
                                         <td style="padding: 20px 0; display:flex; gap:20px; align-items:center;">
                                             <img src="<?php echo htmlspecialchars($item['image']); ?>" alt="<?php echo htmlspecialchars($item['name']); ?>" style="width:70px; height:70px; object-fit:contain; background:#000; border-radius:4px; border:1px solid var(--border-color);">
@@ -65,32 +83,17 @@ $totals = get_cart_totals();
                                                 <h4 style="font-size:1rem; font-weight:700; margin-bottom:5px;"><?php echo htmlspecialchars($item['name']); ?></h4>
                                                 <div style="font-size:0.85rem; color:var(--text-muted);"><?php echo htmlspecialchars($item['size']); ?></div>
                                                 <div style="font-size:0.9rem; color:var(--gold-primary); font-weight:600; margin-top:5px;">₹<?php echo number_format($item['price'], 2); ?></div>
-                                                
-                                                <form action="cart_api.php" method="POST" style="display:inline;">
-                                                    <input type="hidden" name="action" value="remove">
-                                                    <input type="hidden" name="key" value="<?php echo $key; ?>">
-                                                    <button type="submit" style="background:none; border:none; color:var(--danger-color); font-size:0.8rem; cursor:pointer; padding:0; margin-top:8px;">
-                                                        <i class="fas fa-trash-alt"></i> Remove Item
-                                                    </button>
-                                                </form>
+                                                <button type="button" onclick="removeCartItem('<?php echo htmlspecialchars($key); ?>')" style="background:none; border:none; color:var(--danger-color); font-size:0.8rem; cursor:pointer; padding:0; margin-top:8px;">
+                                                    <i class="fas fa-trash-alt"></i> Remove Item
+                                                </button>
                                             </div>
                                         </td>
                                         <!-- Quantity controls -->
                                         <td style="padding: 20px 0; text-align:center;">
                                             <div style="display:inline-flex; align-items:center; border:1px solid var(--border-color); border-radius:3px; overflow:hidden;">
-                                                <form action="cart_api.php" method="POST" style="margin:0;">
-                                                    <input type="hidden" name="action" value="update">
-                                                    <input type="hidden" name="key" value="<?php echo $key; ?>">
-                                                    <input type="hidden" name="qty" value="<?php echo $item['qty'] - 1; ?>">
-                                                    <button type="submit" style="width:25px; height:25px; border:none; background:transparent; color:#fff; cursor:pointer;">-</button>
-                                                </form>
-                                                <span style="width:30px; text-align:center; font-weight:600;"><?php echo $item['qty']; ?></span>
-                                                <form action="cart_api.php" method="POST" style="margin:0;">
-                                                    <input type="hidden" name="action" value="update">
-                                                    <input type="hidden" name="key" value="<?php echo $key; ?>">
-                                                    <input type="hidden" name="qty" value="<?php echo $item['qty'] + 1; ?>">
-                                                    <button type="submit" style="width:25px; height:25px; border:none; background:transparent; color:#fff; cursor:pointer;">+</button>
-                                                </form>
+                                                <button type="button" onclick="updateCartQty('<?php echo htmlspecialchars($key); ?>', <?php echo $item['qty'] - 1; ?>)" style="width:25px; height:25px; border:none; background:transparent; color:#fff; cursor:pointer;">-</button>
+                                                <span class="cart-qty-val" style="width:30px; text-align:center; font-weight:600;"><?php echo $item['qty']; ?></span>
+                                                <button type="button" onclick="updateCartQty('<?php echo htmlspecialchars($key); ?>', <?php echo $item['qty'] + 1; ?>)" style="width:25px; height:25px; border:none; background:transparent; color:#fff; cursor:pointer;">+</button>
                                             </div>
                                         </td>
                                         <!-- Item subtotal -->
@@ -102,30 +105,8 @@ $totals = get_cart_totals();
                             </tbody>
                         </table>
                     </div>
-
-                    <!-- Notes & Estimation columns -->
-                    <div style="display:grid; grid-template-columns:1fr 1fr; gap:20px; margin-top:20px;">
-                        <!-- Notes For Seller -->
-                        <div class="glass-card" style="padding:20px; border-radius:8px;">
-                            <h4 style="font-size:0.95rem; text-transform:uppercase; margin-bottom:12px; color:var(--gold-muted);">Seller Note</h4>
-                            <form action="cart.php" method="POST">
-                                <textarea name="seller_notes" rows="3" class="form-control" placeholder="Special delivery instructions or order notes..." style="font-size:0.85rem; margin-bottom:10px;"><?php echo isset($_SESSION['cart_notes']) ? htmlspecialchars($_SESSION['cart_notes']) : ''; ?></textarea>
-                                <button type="submit" name="save_notes_btn" class="btn-outline-gold" style="padding:6px 15px; font-size:0.8rem;">Save Notes</button>
-                            </form>
-                        </div>
-                        
-                        <!-- Shipping Estimator -->
-                        <div class="glass-card" style="padding:20px; border-radius:8px;">
-                            <h4 style="font-size:0.95rem; text-transform:uppercase; margin-bottom:12px; color:var(--gold-muted);">Pincode Delivery Check</h4>
-                            <div class="pincode-estimator">
-                                <input type="text" id="pincode-input" class="form-control" style="font-size:0.85rem; padding:8px 12px;" placeholder="Pincode e.g. 110001" maxlength="6">
-                                <button id="pincode-check-btn" class="btn-gold" style="padding:8px 15px; font-size:0.8rem;">Verify</button>
-                            </div>
-                            <div id="pincode-result" class="pincode-result"></div>
-                        </div>
-                    </div>
                 </div>
-                
+
                 <!-- Sidebar Summary -->
                 <aside class="summary-sidebar">
                     <h3>Order Summary</h3>
@@ -154,27 +135,6 @@ $totals = get_cart_totals();
                         <span><?php echo $totals['shipping'] > 0 ? "₹" . number_format($totals['shipping'], 2) : "FREE"; ?></span>
                     </div>
 
-                    <!-- Coupon Input -->
-                    <form action="cart.php" method="POST" style="border-top:1px solid var(--border-color); border-bottom:1px solid var(--border-color); padding:15px 0; margin:15px 0;">
-                        <label style="font-size:0.85rem; font-weight:600; display:block; margin-bottom:8px;">Have a Promo Code?</label>
-                        <?php if (isset($_SESSION['coupon'])): ?>
-                            <div style="display:flex; justify-content:space-between; align-items:center; background:rgba(212,175,55,0.1); padding:8px 12px; border-radius:4px; border:1px solid rgba(212,175,55,0.2);">
-                                <span style="font-weight:700; color:var(--success-color);"><?php echo htmlspecialchars($_SESSION['coupon']['code']); ?></span>
-                                <button type="submit" name="remove_coupon_btn" style="background:none; border:none; color:var(--danger-color); cursor:pointer; font-weight:700;">Remove</button>
-                            </div>
-                        <?php else: ?>
-                            <div class="coupon-box">
-                                <input type="text" name="coupon_code" class="form-control" style="font-size:0.85rem; padding:8px;" placeholder="e.g. WOLF10" required>
-                                <button type="submit" name="apply_coupon_btn" class="btn-gold" style="padding:8px 15px; font-size:0.85rem;">Apply</button>
-                            </div>
-                        <?php endif; ?>
-                        <?php if ($coupon_msg): ?>
-                            <div style="font-size:0.8rem; margin-top:8px; color: <?php echo $coupon_success ? 'var(--success-color)' : 'var(--danger-color)'; ?>;">
-                                <?php echo htmlspecialchars($coupon_msg); ?>
-                            </div>
-                        <?php endif; ?>
-                    </form>
-
                     <div class="summary-total">
                         <span>Grand Total:</span>
                         <span>₹<?php echo number_format($totals['total'], 2); ?></span>
@@ -188,5 +148,51 @@ $totals = get_cart_totals();
             </div>
         <?php endif; ?>
     </div>
+
+    <script>
+    var cartCsrfToken = '<?php echo generate_csrf_token(); ?>';
+
+    function updateCartQty(key, qty) {
+        if (qty < 1) {
+            removeCartItem(key);
+            return;
+        }
+        var fd = new URLSearchParams();
+        fd.append('action', 'update');
+        fd.append('key', key);
+        fd.append('qty', qty);
+        fd.append('csrf_token', cartCsrfToken);
+
+        fetch('cart_api.php', { method: 'POST', body: fd })
+            .then(function(r) { return r.json(); })
+            .then(function(d) {
+                if (d.success) {
+                    location.reload();
+                } else {
+                    alert(d.message || 'Update failed');
+                }
+            })
+            .catch(function() { alert('Network error'); });
+    }
+
+    function removeCartItem(key) {
+        if (!confirm('Remove this item from cart?')) return;
+        var fd = new URLSearchParams();
+        fd.append('action', 'remove');
+        fd.append('key', key);
+        fd.append('csrf_token', cartCsrfToken);
+
+        fetch('cart_api.php', { method: 'POST', body: fd })
+            .then(function(r) { return r.json(); })
+            .then(function(d) {
+                if (d.success) {
+                    location.reload();
+                } else {
+                    alert(d.message || 'Remove failed');
+                }
+            })
+            .catch(function() { alert('Network error'); });
+    }
+    </script>
 
 <?php require_once __DIR__ . '/includes/footer.php'; ?>

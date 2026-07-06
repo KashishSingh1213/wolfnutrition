@@ -107,10 +107,88 @@ $categories = $stmt->fetchAll();
             transition: all 0.2s;
         }
         .action-btn:hover { transform: scale(1.1); }
+
+        /* ── Responsive: Tablet ── */
+        @media (max-width: 1024px) {
+            .cat-page-header {
+                flex-direction: column !important;
+                align-items: flex-start !important;
+                gap: 12px;
+            }
+        }
+
+        /* ── Responsive: Mobile ── */
+        @media (max-width: 768px) {
+            .cat-page-header {
+                flex-direction: column !important;
+                align-items: flex-start !important;
+                gap: 12px;
+            }
+            .cat-table-wrapper {
+                border: none !important;
+                background: transparent !important;
+                backdrop-filter: none !important;
+            }
+            .cat-table thead {
+                display: none !important;
+            }
+            .cat-table,
+            .cat-table tbody,
+            .cat-table tr,
+            .cat-table td {
+                display: block !important;
+                width: 100% !important;
+            }
+            .cat-table tbody tr {
+                background: rgba(18,18,18,0.6);
+                backdrop-filter: blur(16px);
+                -webkit-backdrop-filter: blur(16px);
+                border: 1px solid rgba(255,255,255,0.06);
+                border-radius: 12px;
+                padding: 16px;
+                margin-bottom: 12px;
+            }
+            .cat-table tbody td {
+                padding: 4px 0 !important;
+                border-bottom: none !important;
+                font-size: 0.85rem;
+            }
+            .cat-table tbody td::before {
+                content: attr(data-label);
+                display: block;
+                font-size: 0.65rem;
+                font-weight: 700;
+                text-transform: uppercase;
+                letter-spacing: 0.8px;
+                color: rgba(255,255,255,0.3);
+                margin-bottom: 2px;
+            }
+            .cat-table tbody td.td-name {
+                padding-top: 8px !important;
+                padding-bottom: 6px !important;
+                border-bottom: 1px solid rgba(255,255,255,0.04) !important;
+                margin-bottom: 4px;
+            }
+            .cat-table tbody td.td-name::before {
+                display: none;
+            }
+            .cat-table tbody td.td-actions {
+                padding-top: 10px !important;
+                border-top: 1px solid rgba(255,255,255,0.04);
+                margin-top: 4px;
+            }
+            .cat-table tbody td.td-actions::before {
+                display: none;
+            }
+            .cat-table tbody td .action-btn {
+                width: 36px !important;
+                height: 36px !important;
+            }
+        }
     </style>
 
     <!-- Page Header -->
-    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:32px;">
+    <div class="cat-page-header" style="display:flex; justify-content:space-between; align-items:center; margin-bottom:32px;">
         <div>
             <h2 style="font-size:1.6rem; font-weight:800; color:#fff; margin:0 0 4px 0; letter-spacing:-0.3px;">Category Management</h2>
             <p style="font-size:0.85rem; color:rgba(255,255,255,0.45); margin:0;"><?php echo count($categories); ?> categor<?php echo count($categories) !== 1 ? 'ies' : 'y'; ?> total</p>
@@ -155,27 +233,27 @@ $categories = $stmt->fetchAll();
                 <tbody>
                     <?php foreach ($categories as $cat): ?>
                         <tr>
-                            <td>
+                            <td data-label="Order">
                                 <span style="background:rgba(212,175,55,0.1); color:#D4AF37; font-size:0.78rem; font-weight:700; padding:3px 8px; border-radius:4px; min-width:24px; display:inline-block; text-align:center;"><?php echo $cat['display_order']; ?></span>
                             </td>
-                            <td>
+                            <td data-label="Category" class="td-name">
                                 <a href="category_edit.php?id=<?php echo $cat['id']; ?>" style="color:#fff; text-decoration:none; font-weight:700; font-size:0.92rem; transition:color 0.2s;" onmouseover="this.style.color='#D4AF37'" onmouseout="this.style.color='#fff'">
                                     <?php echo htmlspecialchars($cat['name']); ?>
                                 </a>
                             </td>
-                            <td style="font-size:0.8rem; color:rgba(255,255,255,0.35); font-family:monospace;"><?php echo htmlspecialchars($cat['slug']); ?></td>
-                            <td style="font-size:0.82rem; color:rgba(255,255,255,0.5); max-width:220px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;">
+                            <td data-label="Slug" style="font-size:0.8rem; color:rgba(255,255,255,0.35); font-family:monospace;"><?php echo htmlspecialchars($cat['slug']); ?></td>
+                            <td data-label="Description" style="font-size:0.82rem; color:rgba(255,255,255,0.5); max-width:220px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;">
                                 <?php echo htmlspecialchars($cat['description'] ?: '—'); ?>
                             </td>
-                            <td style="text-align:center;">
+                            <td data-label="Products" style="text-align:center;">
                                 <span style="font-weight:700; font-size:1rem; color:#fff;"><?php echo $cat['product_count']; ?></span>
                             </td>
-                            <td>
+                            <td data-label="Status">
                                 <span class="<?php echo $cat['is_active'] ? 'badge-active' : 'badge-inactive'; ?>">
                                     <?php echo $cat['is_active'] ? 'Active' : 'Inactive'; ?>
                                 </span>
                             </td>
-                            <td>
+                            <td data-label="" class="td-actions">
                                 <div style="display:flex; gap:6px; justify-content:center;">
                                     <a href="category_edit.php?id=<?php echo $cat['id']; ?>" class="action-btn" style="color:#D4AF37; text-decoration:none;" title="Edit">
                                         <i class="fas fa-pen" style="font-size:0.78rem;"></i>

@@ -9,6 +9,12 @@ if (empty($order_number)) {
     exit();
 }
 
+// Validate order number format (ORD-XXXX pattern)
+if (!preg_match('/^ORD-\d{4,}$/', $order_number)) {
+    header("Location: index.php");
+    exit();
+}
+
 // Fetch Order info
 $stmt = $pdo->prepare("SELECT * FROM orders WHERE order_number = ?");
 $stmt->execute([$order_number]);
@@ -16,6 +22,32 @@ $order = $stmt->fetch();
 
 if (!$order) {
     header("Location: index.php");
+    exit();
+}
+
+// CRITICAL: Ownership check — only the order owner (or admin) can view
+$is_owner = false;
+if (is_logged_in()) {
+    if (isset($_SESSION['admin_id'])) {
+        $is_owner = true; // Admins can view any order
+    } elseif (isset($_SESSION['user_id'])) {
+        // Check via user_id column (logged-in users)
+        if ($order['user_id'] == $_SESSION['user_id']) {
+            $is_owner = true;
+        } else {
+            // Fallback: check via email match
+            $stmt_user = $pdo->prepare("SELECT email FROM users WHERE id = ?");
+            $stmt_user->execute([$_SESSION['user_id']]);
+            $current_user = $stmt_user->fetch();
+            if ($current_user && $current_user['email'] === $order['customer_email']) {
+                $is_owner = true;
+            }
+        }
+    }
+}
+
+if (!$is_owner) {
+    header("Location: my-account.php");
     exit();
 }
 

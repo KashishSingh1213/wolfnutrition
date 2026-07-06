@@ -14,7 +14,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['create_cert'])) {
     // Handle file upload
     if (isset($_FILES['cert_image']) && $_FILES['cert_image']['error'] === UPLOAD_ERR_OK) {
         $file = $_FILES['cert_image'];
-        $allowed = ['image/jpeg', 'image/png', 'image/gif', 'image/webp'];
+        $allowed = ['image/jpeg', 'image/png', 'image/gif', 'image/webp', 'application/pdf'];
         if (in_array($file['type'], $allowed) && $file['size'] <= 5 * 1024 * 1024) {
             $upload_dir = __DIR__ . '/../uploads/certificates/';
             if (!is_dir($upload_dir)) mkdir($upload_dir, 0755, true);
@@ -42,13 +42,19 @@ $stmt_total->execute();
 $total_certs = (int)$stmt_total->fetchColumn();
 ?>
 
+    <style>
+        @media (max-width: 768px) {
+            .cert-add-page-header { flex-direction: column !important; align-items: flex-start !important; gap: 8px; }
+        }
+    </style>
+
     <div style="margin-bottom:20px;">
         <a href="certificates.php" style="color:var(--gold-muted); font-size:0.9rem; text-decoration:none;">
             <i class="fas fa-arrow-left"></i> Back to Certificates
         </a>
     </div>
 
-    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:30px;">
+    <div class="cert-add-page-header" style="display:flex; justify-content:space-between; align-items:center; margin-bottom:30px;">
         <h2 style="font-size:1.8rem; text-transform:uppercase;">New Certificate</h2>
         <div style="font-size:0.85rem; color:var(--text-muted);">Total certificates: <strong style="color:var(--gold-primary);"><?php echo $total_certs; ?></strong></div>
     </div>
@@ -75,12 +81,12 @@ $total_certs = (int)$stmt_total->fetchColumn();
             </div>
 
             <div class="form-group" style="margin-bottom:20px;">
-                <label style="font-size:0.75rem; text-transform:uppercase; letter-spacing:0.8px; color:rgba(255,255,255,0.5); margin-bottom:8px; display:block;">Upload Image *</label>
+                <label style="font-size:0.75rem; text-transform:uppercase; letter-spacing:0.8px; color:rgba(255,255,255,0.5); margin-bottom:8px; display:block;">Upload File *</label>
                 <div style="border:1px dashed rgba(212,175,55,0.25); border-radius:8px; padding:24px; text-align:center; background:rgba(212,175,55,0.02); cursor:pointer; position:relative;" id="upload-zone" onclick="document.getElementById('cert-image-input').click();">
                     <i class="fas fa-cloud-upload-alt" style="font-size:1.8rem; color:rgba(212,175,55,0.3); margin-bottom:10px; display:block;"></i>
                     <p style="font-size:0.85rem; color:rgba(255,255,255,0.45); margin:0 0 4px 0;">Click to upload or drag & drop</p>
-                    <p style="font-size:0.72rem; color:rgba(255,255,255,0.3); margin:0;">JPG, PNG, GIF, WEBP (Max 5MB)</p>
-                    <input type="file" name="cert_image" id="cert-image-input" accept="image/*" style="display:none;" required onchange="previewImage(this);">
+                    <p style="font-size:0.72rem; color:rgba(255,255,255,0.3); margin:0;">JPG, PNG, GIF, WEBP, PDF (Max 5MB)</p>
+                    <input type="file" name="cert_image" id="cert-image-input" accept="image/*,.pdf" style="display:none;" required onchange="previewImage(this);">
                 </div>
                 <div id="image-preview" style="margin-top:12px; display:none;">
                     <img id="preview-img" src="" alt="Preview" style="width:100%; max-height:180px; object-fit:contain; border-radius:8px; border:1px solid rgba(255,255,255,0.08);">

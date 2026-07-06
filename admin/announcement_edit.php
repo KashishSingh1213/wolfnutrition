@@ -40,13 +40,34 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['update_ann'])) {
 }
 ?>
 
+    <style>
+        /* ── Responsive: Tablet ── */
+        @media (max-width: 1024px) {
+            .ann-edit-grid {
+                grid-template-columns: 1fr !important;
+            }
+        }
+
+        /* ── Responsive: Mobile ── */
+        @media (max-width: 768px) {
+            .ann-edit-grid {
+                grid-template-columns: 1fr !important;
+            }
+            .ann-edit-page-header {
+                flex-direction: column !important;
+                align-items: flex-start !important;
+                gap: 12px;
+            }
+        }
+    </style>
+
     <div style="margin-bottom:20px;">
         <a href="announcements.php" style="color:var(--gold-muted); font-size:0.9rem; text-decoration:none;">
             <i class="fas fa-arrow-left"></i> Back to Announcements
         </a>
     </div>
 
-    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:30px;">
+    <div class="ann-edit-page-header" style="display:flex; justify-content:space-between; align-items:center; margin-bottom:30px;">
         <h2 style="font-size:1.8rem; text-transform:uppercase;">Edit Announcement</h2>
         <span class="admin-badge <?php echo $ann['status'] ? 'badge-completed' : 'badge-pending'; ?>" style="font-size:0.75rem;">
             <?php echo $ann['status'] ? 'Active' : 'Inactive'; ?>
@@ -66,7 +87,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['update_ann'])) {
         </div>
     <?php endif; ?>
 
-    <div style="display:grid; grid-template-columns:1fr 300px; gap:28px; align-items:start;">
+    <div class="ann-edit-grid" style="display:grid; grid-template-columns:1fr 300px; gap:28px; align-items:start;">
 
         <!-- Edit Form -->
         <div class="glass-card" style="padding:0; overflow:hidden;">

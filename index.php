@@ -9,7 +9,7 @@ foreach ($categories as $cat) {
 try { $stmt = $pdo->prepare("SELECT * FROM bundles WHERE status = 1 LIMIT 1"); $stmt->execute(); $bundle = $stmt->fetch(); } catch (PDOException $e) { $bundle = null; }
 $certs = get_certificates();
 $testimonials = get_testimonials(false, 5);
-try { $stmt = $pdo->prepare("SELECT * FROM blog_posts WHERE status = 1 ORDER BY published_at DESC LIMIT 3"); $stmt->execute(); $blogs = $stmt->fetchAll(); } catch (PDOException $e) { $blogs = []; }
+try { $stmt = $pdo->prepare("SELECT * FROM blog_posts WHERE status = 1 ORDER BY published_at DESC"); $stmt->execute(); $blogs = $stmt->fetchAll(); if (count($blogs) > 3) $blogs = array_slice($blogs, 0, 3); } catch (PDOException $e) { $blogs = []; }
 ?>
 
 <style>
@@ -103,10 +103,29 @@ try { $stmt = $pdo->prepare("SELECT * FROM blog_posts WHERE status = 1 ORDER BY 
     .counter-row{grid-template-columns:repeat(2,1fr);}
     .social-proof-grid{grid-template-columns:1fr;}
     .hero-section{min-height:70vh;}
+    .cat-card-grid{grid-template-columns:1fr !important;}
+    .cat-card-inner{grid-template-columns:1fr !important;}
+    .cat-card-img{width:100% !important; min-height:180px !important;}
+    .combo-card-inner{grid-template-columns:1fr !important; text-align:center !important;}
+    .combo-card-left,.combo-card-right{text-align:center !important;}
+    .combo-card-bottom{flex-direction:column; gap:12px; text-align:center;}
+    .product-grid{grid-template-columns:repeat(2,1fr) !important;}
+    .feature-grid{grid-template-columns:1fr !important;}
+    .blog-grid{grid-template-columns:1fr !important;}
+    .footer-grid{grid-template-columns:1fr !important; gap:30px !important;}
 }
 @media(max-width:600px){
     .counter-row{grid-template-columns:1fr 1fr;gap:12px;}
     .counter-num{font-size:2rem;}
+    .product-grid{grid-template-columns:1fr !important;}
+    .hero-slider img{height:auto; max-height:50vh;}
+    .cat-card-img{min-height:140px !important;}
+    .cat-card-content{padding:20px !important;}
+    .combo-card-inner{padding:20px !important;}
+    .combo-card-bottom{padding:0 20px 20px !important;}
+    .footer-grid{gap:24px !important;}
+    .newsletter-form{flex-direction:column !important;}
+    .newsletter-form input,.newsletter-form button{width:100% !important;}
 }
 </style>
 
@@ -152,7 +171,7 @@ try { $stmt = $pdo->prepare("SELECT * FROM blog_posts WHERE status = 1 ORDER BY 
         </div>
 
         <!-- 3 Feature Cards -->
-        <div style="display:grid; grid-template-columns:repeat(3,1fr); gap:24px; margin-bottom:40px;">
+        <div class="feature-grid" style="display:grid; grid-template-columns:repeat(3,1fr); gap:24px; margin-bottom:40px;">
             <div class="tilt-card spotlight-card" style="background:rgba(255,255,255,0.02); border:1px solid rgba(212,175,55,0.08); border-radius:18px; padding:30px 24px; text-align:center; position:relative; overflow:hidden; transition:all 0.4s;">
                 <div class="tilt-shine"></div>
                 <div style="width:56px; height:56px; border-radius:14px; background:rgba(212,175,55,0.08); border:1px solid rgba(212,175,55,0.18); display:flex; align-items:center; justify-content:center; margin:0 auto 16px; color:var(--gold-primary); font-size:1.3rem; position:relative; z-index:1;"><i class="fas fa-leaf"></i></div>
@@ -239,17 +258,17 @@ try { $stmt = $pdo->prepare("SELECT * FROM blog_posts WHERE status = 1 ORDER BY 
         </div>
 
         <!-- Category Cards - Horizontal Layout -->
-        <div style="display:flex; flex-direction:column; gap:20px;">
+        <div class="cat-card-grid" style="display:flex; flex-direction:column; gap:20px;">
 
             <!-- Vitality - Image Left -->
             <a href="category.php?slug=vitality" class="tilt-card" style="display:grid; grid-template-columns:auto 1fr; text-decoration:none; background:rgba(255,255,255,0.02); border:1px solid rgba(212,175,55,0.1); border-radius:24px; overflow:hidden; transition:all 0.4s; position:relative;">
                 <!-- Image Side -->
-                <div style="width:320px; min-height:220px; background:linear-gradient(135deg,rgba(212,175,55,0.1) 0%,rgba(8,12,16,0.95) 100%); display:flex; align-items:center; justify-content:center; position:relative; overflow:hidden;">
+                <div class="cat-card-img" style="width:320px; min-height:220px; background:linear-gradient(135deg,rgba(212,175,55,0.1) 0%,rgba(8,12,16,0.95) 100%); display:flex; align-items:center; justify-content:center; position:relative; overflow:hidden;">
                     <div style="position:absolute; top:0; right:0; width:120px; height:120px; background:radial-gradient(circle,rgba(212,175,55,0.15) 0%,transparent 70%); pointer-events:none;"></div>
                     <img src="assets/images/products/wolfpack.png" alt="Wolfpack Vitality" style="height:180px; object-fit:contain; filter:drop-shadow(0 20px 40px rgba(8,12,16,0.6)); transition:transform 0.5s ease; position:relative; z-index:2;">
                 </div>
                 <!-- Content Side -->
-                <div style="padding:35px 40px; display:flex; flex-direction:column; justify-content:center; position:relative;">
+                <div class="cat-card-content" style="padding:35px 40px; display:flex; flex-direction:column; justify-content:center; position:relative;">
                     <div style="position:absolute; top:20px; right:20px; background:var(--gold-gradient); color:#080C10; font-size:0.6rem; font-weight:800; padding:4px 12px; border-radius:20px; text-transform:uppercase; letter-spacing:0.5px;">Best Seller</div>
                     <div style="width:44px; height:44px; border-radius:12px; background:rgba(212,175,55,0.08); border:1px solid rgba(212,175,55,0.15); display:flex; align-items:center; justify-content:center; color:var(--gold-primary); font-size:1.1rem; margin-bottom:16px;"><i class="fas fa-fire"></i></div>
                     <h3 style="color:#fff; font-family:var(--font-heading); font-size:1.5rem; font-weight:800; text-transform:uppercase; letter-spacing:0.5px; margin:0 0 8px;">Vitality Stack</h3>
@@ -264,7 +283,7 @@ try { $stmt = $pdo->prepare("SELECT * FROM blog_posts WHERE status = 1 ORDER BY 
             <!-- Liver Detox - Image Right -->
             <a href="category.php?slug=liver-detox" class="tilt-card" style="display:grid; grid-template-columns:1fr auto; text-decoration:none; background:rgba(255,255,255,0.02); border:1px solid rgba(212,175,55,0.1); border-radius:24px; overflow:hidden; transition:all 0.4s; position:relative;">
                 <!-- Content Side -->
-                <div style="padding:35px 40px; display:flex; flex-direction:column; justify-content:center; position:relative;">
+                <div class="cat-card-content" style="padding:35px 40px; display:flex; flex-direction:column; justify-content:center; position:relative;">
                     <div style="width:44px; height:44px; border-radius:12px; background:rgba(212,175,55,0.08); border:1px solid rgba(212,175,55,0.15); display:flex; align-items:center; justify-content:center; color:var(--gold-primary); font-size:1.1rem; margin-bottom:16px;"><i class="fas fa-shield-halved"></i></div>
                     <h3 style="color:#fff; font-family:var(--font-heading); font-size:1.5rem; font-weight:800; text-transform:uppercase; letter-spacing:0.5px; margin:0 0 8px;">Liver & Detox Stack</h3>
                     <p style="color:rgba(255,255,255,0.55); font-size:0.9rem; line-height:1.6; margin:0 0 20px; max-width:450px;">Kutki, Milk Thistle, and Kalmegh. Complete liver cleanse, toxin removal, and digestive enzyme optimization.</p>
@@ -274,7 +293,7 @@ try { $stmt = $pdo->prepare("SELECT * FROM blog_posts WHERE status = 1 ORDER BY 
                     </div>
                 </div>
                 <!-- Image Side -->
-                <div style="width:320px; min-height:220px; background:linear-gradient(135deg,rgba(8,12,16,0.95) 0%,rgba(212,175,55,0.1) 100%); display:flex; align-items:center; justify-content:center; position:relative; overflow:hidden;">
+                <div class="cat-card-img" style="width:320px; min-height:220px; background:linear-gradient(135deg,rgba(8,12,16,0.95) 0%,rgba(212,175,55,0.1) 100%); display:flex; align-items:center; justify-content:center; position:relative; overflow:hidden;">
                     <div style="position:absolute; top:0; left:0; width:120px; height:120px; background:radial-gradient(circle,rgba(212,175,55,0.15) 0%,transparent 70%); pointer-events:none;"></div>
                     <img src="assets/images/products/wolftox.png" alt="Wolftox Detox" style="height:180px; object-fit:contain; filter:drop-shadow(0 20px 40px rgba(8,12,16,0.6)); transition:transform 0.5s ease; position:relative; z-index:2;">
                 </div>
@@ -283,9 +302,9 @@ try { $stmt = $pdo->prepare("SELECT * FROM blog_posts WHERE status = 1 ORDER BY 
             <!-- Combo - Image Center -->
             <a href="category.php?slug=all" class="tilt-card" style="display:block; text-decoration:none; background:linear-gradient(135deg,rgba(212,175,55,0.06) 0%,rgba(8,12,16,0.95) 50%,rgba(212,175,55,0.04) 100%); border:1px solid rgba(212,175,55,0.15); border-radius:24px; overflow:hidden; transition:all 0.4s; position:relative;">
                 <div style="position:absolute; top:0; left:0; right:0; height:3px; background:var(--gold-gradient);"></div>
-                <div style="display:grid; grid-template-columns:1fr auto 1fr; gap:30px; align-items:center; padding:40px;">
+                <div class="combo-card-inner" style="display:grid; grid-template-columns:1fr auto 1fr; gap:30px; align-items:center; padding:40px;">
                     <!-- Left Text -->
-                    <div style="text-align:right;">
+                    <div class="combo-card-left" style="text-align:right;">
                         <h3 style="color:#fff; font-family:var(--font-heading); font-size:1.3rem; font-weight:800; text-transform:uppercase; letter-spacing:0.5px; margin:0 0 6px;">WOLFPACK</h3>
                         <p style="color:rgba(255,255,255,0.45); font-size:0.82rem; margin:0;">Vitality + Strength</p>
                     </div>
@@ -296,13 +315,13 @@ try { $stmt = $pdo->prepare("SELECT * FROM blog_posts WHERE status = 1 ORDER BY 
                         <img src="assets/images/products/wolftox.png" alt="Wolftox" style="height:120px; object-fit:contain; filter:drop-shadow(0 12px 25px rgba(8,12,16,0.5));">
                     </div>
                     <!-- Right Text -->
-                    <div>
+                    <div class="combo-card-right">
                         <h3 style="color:#fff; font-family:var(--font-heading); font-size:1.3rem; font-weight:800; text-transform:uppercase; letter-spacing:0.5px; margin:0 0 6px;">WOLFTOX</h3>
                         <p style="color:rgba(255,255,255,0.45); font-size:0.82rem; margin:0;">Detox + Cleanse</p>
                     </div>
                 </div>
                 <!-- Bottom CTA -->
-                <div style="padding:0 40px 30px; display:flex; justify-content:space-between; align-items:center;">
+                <div class="combo-card-bottom" style="padding:0 40px 30px; display:flex; justify-content:space-between; align-items:center;">
                     <span style="display:inline-flex; align-items:center; gap:8px; color:var(--gold-primary); font-size:0.85rem; font-weight:700; text-transform:uppercase; letter-spacing:0.5px;">View All Combos <i class="fas fa-arrow-right"></i></span>
                     <div style="text-align:right;">
                         <span style="font-size:0.75rem; color:rgba(255,255,255,0.35); text-decoration:line-through; margin-right:6px;">₹2,998</span>
@@ -349,8 +368,8 @@ try { $stmt = $pdo->prepare("SELECT * FROM blog_posts WHERE status = 1 ORDER BY 
 
         <!-- Product Tabs -->
         <?php foreach ($categories as $i => $cat): ?>
-            <div id="cat-<?php echo $cat['slug']; ?>" class="tab-pane <?php echo $i===0?'active':''; ?>">
-                <div class="product-grid">
+                <div id="cat-<?php echo $cat['slug']; ?>" class="tab-pane <?php echo $i===0?'active':''; ?>">
+                <div class="product-grid" style="display:grid; grid-template-columns:repeat(auto-fill, minmax(300px,1fr)); gap:24px;">
                     <?php
                     $prods = $products_by_category[$cat['slug']] ?? [];
                     if (!empty($prods)): foreach ($prods as $prod):
@@ -661,9 +680,25 @@ if (!$featured && !empty($testimonials)) {
 <?php if (!empty($certs)): ?>
 <section class="container" style="margin-bottom:60px; position:relative; z-index:2;">
     <div class="section-header"><h2>Quality Certificates</h2><p>Our quality and safety registrations</p></div>
-    <div class="cert-gallery">
-        <?php foreach ($certs as $cert): ?>
-            <div class="cert-item tilt-card spotlight-card"><div class="tilt-shine"></div><a href="certificates.php"><img src="<?php echo htmlspecialchars($cert['image_url']); ?>" alt="<?php echo htmlspecialchars($cert['title']); ?>"></a><h4><?php echo htmlspecialchars($cert['title']); ?></h4></div>
+    <div class="cert-gallery" style="<?php echo count($certs) === 1 ? 'display:flex; justify-content:center;' : ''; ?>">
+        <?php foreach ($certs as $cert):
+            $cert_is_pdf = strtolower(pathinfo($cert['image_url'], PATHINFO_EXTENSION)) === 'pdf';
+        ?>
+            <div class="cert-item tilt-card spotlight-card" style="<?php echo count($certs) === 1 ? 'max-width:380px; width:100%;' : ''; ?>"><div class="tilt-shine"></div>
+                <a href="<?php echo $cert_is_pdf ? htmlspecialchars($cert['image_url']) : 'certificates.php'; ?>" <?php echo $cert_is_pdf ? 'target="_blank"' : ''; ?> style="text-decoration:none;">
+                    <?php if ($cert_is_pdf): ?>
+                        <div style="width:100%; height:180px; background:linear-gradient(135deg, rgba(212,175,55,0.08) 0%, rgba(212,175,55,0.02) 100%); border:1px solid rgba(212,175,55,0.2); border-radius:10px; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:12px; transition:all 0.3s;" onmouseover="this.style.borderColor='rgba(212,175,55,0.4)'" onmouseout="this.style.borderColor='rgba(212,175,55,0.2)'">
+                            <div style="width:60px; height:60px; border-radius:50%; background:rgba(212,175,55,0.1); display:flex; align-items:center; justify-content:center;">
+                                <i class="fas fa-file-pdf" style="font-size:1.8rem; color:#D4AF37;"></i>
+                            </div>
+                            <span style="font-size:0.8rem; color:rgba(255,255,255,0.6); font-weight:500;">Click to view certificate</span>
+                        </div>
+                    <?php else: ?>
+                        <img src="<?php echo htmlspecialchars($cert['image_url']); ?>" alt="<?php echo htmlspecialchars($cert['title']); ?>">
+                    <?php endif; ?>
+                </a>
+                <h4 style="margin-top:15px; text-align:center;"><?php echo htmlspecialchars($cert['title']); ?></h4>
+            </div>
         <?php endforeach; ?>
     </div>
 </section>
@@ -691,12 +726,70 @@ if (!$featured && !empty($testimonials)) {
         <div style="position:absolute; bottom:-60px; left:-60px; width:200px; height:200px; background:radial-gradient(circle,rgba(212,175,55,0.08) 0%,transparent 70%); pointer-events:none;"></div>
         <h2 style="font-size:2rem; text-transform:uppercase; margin-bottom:8px; font-family:var(--font-heading); position:relative; z-index:2;">Join the Wolf Pack</h2>
         <p style="color:rgba(255,255,255,0.65); font-size:0.95rem; margin-bottom:28px; max-width:460px; margin-left:auto; margin-right:auto; position:relative; z-index:2;">Exclusive discounts, stack guides, and early access. No spam, only gains.</p>
-        <form onsubmit="event.preventDefault(); this.querySelector('input').value=''; alert('Welcome to the pack! Check your inbox.');" style="display:flex; gap:10px; max-width:440px; margin:0 auto; position:relative; z-index:2;">
-            <input type="email" placeholder="Your email address" required style="flex:1; background:rgba(255,255,255,0.04); border:1px solid rgba(255,255,255,0.1); border-radius:30px; padding:13px 20px; color:#fff; font-size:0.9rem; outline:none; font-family:var(--font-body);">
-            <button type="submit" class="btn-gold" style="border-radius:30px; padding:13px 26px; white-space:nowrap; font-size:0.88rem;"><i class="fas fa-paper-plane"></i> Subscribe</button>
-        </form>
+
+        <?php if (is_logged_in()): ?>
+            <?php
+                $nl_user = get_logged_in_user();
+                $nl_email = $nl_user ? htmlspecialchars($nl_user['email']) : '';
+            ?>
+            <form class="newsletter-form" id="newsletter-form" onsubmit="return handleNewsletterSubmit(event);" style="display:flex; gap:10px; max-width:440px; margin:0 auto; position:relative; z-index:2;">
+                <input type="email" name="email" id="nl-email" value="<?php echo $nl_email; ?>" readonly required style="flex:1; background:rgba(255,255,255,0.04); border:1px solid rgba(255,255,255,0.1); border-radius:30px; padding:13px 20px; color:#fff; font-size:0.9rem; outline:none; font-family:var(--font-body); cursor:not-allowed; opacity:0.8;">
+                <button type="submit" id="nl-btn" class="btn-gold" style="border-radius:30px; padding:13px 26px; white-space:nowrap; font-size:0.88rem;"><i class="fas fa-paper-plane"></i> Subscribe</button>
+            </form>
+        <?php else: ?>
+            <div style="max-width:440px; margin:0 auto; position:relative; z-index:2;">
+                <p style="color:rgba(255,255,255,0.5); font-size:0.88rem; margin-bottom:14px;">Please log in to subscribe with your verified email.</p>
+                <a href="login.php?redirect=home" class="btn-gold" style="border-radius:30px; padding:13px 30px; font-size:0.88rem; text-decoration:none; display:inline-flex; align-items:center; gap:8px;">
+                    <i class="fas fa-sign-in-alt"></i> Login to Subscribe
+                </a>
+            </div>
+        <?php endif; ?>
+
+        <div id="nl-message" style="margin-top:12px; font-size:0.85rem; display:none; position:relative; z-index:2;"></div>
     </div>
 </section>
+
+<script>
+function handleNewsletterSubmit(e) {
+    e.preventDefault();
+    var email = document.getElementById('nl-email').value.trim();
+    var btn = document.getElementById('nl-btn');
+    var msg = document.getElementById('nl-message');
+
+    if (!email) return false;
+
+    btn.disabled = true;
+    btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Subscribing...';
+
+    var fd = new FormData();
+    fd.append('email', email);
+
+    fetch('newsletter_subscribe.php', { method: 'POST', body: fd })
+        .then(function(r) { return r.json(); })
+        .then(function(data) {
+            msg.style.display = 'block';
+            msg.style.color = data.success ? '#4ade80' : '#ef4444';
+            msg.textContent = data.message;
+            if (data.success) {
+                btn.innerHTML = '<i class="fas fa-check"></i> Subscribed!';
+                btn.style.background = 'linear-gradient(135deg, #4ade80, #22c55e)';
+            } else {
+                btn.disabled = false;
+                btn.innerHTML = '<i class="fas fa-paper-plane"></i> Subscribe';
+            }
+            setTimeout(function() { msg.style.display = 'none'; }, 5000);
+        })
+        .catch(function() {
+            msg.style.display = 'block';
+            msg.style.color = '#ef4444';
+            msg.textContent = 'Something went wrong. Please try again.';
+            btn.disabled = false;
+            btn.innerHTML = '<i class="fas fa-paper-plane"></i> Subscribe';
+        });
+
+    return false;
+}
+</script>
 
 <?php require_once __DIR__ . '/includes/footer.php'; ?>
 

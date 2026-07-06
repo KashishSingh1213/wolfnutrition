@@ -54,13 +54,24 @@ $tags->execute();
 $tags = $tags->fetchAll();
 ?>
 
+    <style>
+        @media (max-width: 1024px) {
+            .btag-grid { grid-template-columns: 1fr !important; }
+            .btag-page-header { flex-direction: column !important; align-items: flex-start !important; gap: 8px; }
+        }
+        @media (max-width: 768px) {
+            .btag-grid { grid-template-columns: 1fr !important; }
+            .btag-page-header { flex-direction: column !important; align-items: flex-start !important; gap: 8px; }
+        }
+    </style>
+
     <div style="margin-bottom:20px;">
         <a href="blog.php" style="color:var(--gold-muted); font-size:0.9rem; text-decoration:none;">
             <i class="fas fa-arrow-left"></i> Back to Blog
         </a>
     </div>
 
-    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:30px;">
+    <div class="btag-page-header" style="display:flex; justify-content:space-between; align-items:center; margin-bottom:30px;">
         <h2 style="font-size:1.8rem; text-transform:uppercase;">Blog Tags</h2>
         <span style="font-size:0.85rem; color:var(--text-muted);"><?php echo count($tags); ?> tags</span>
     </div>
@@ -78,7 +89,7 @@ $tags = $tags->fetchAll();
         </div>
     <?php endif; ?>
 
-    <div style="display:grid; grid-template-columns:1fr 360px; gap:28px; align-items:start;">
+    <div class="btag-grid" style="display:grid; grid-template-columns:1fr 360px; gap:28px; align-items:start;">
 
         <!-- Tags List -->
         <div class="glass-card" style="padding:0; overflow:hidden;">

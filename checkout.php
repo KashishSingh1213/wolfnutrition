@@ -24,15 +24,26 @@ $totals = get_cart_totals($payment_method);
 $checkout_error = '';
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['place_order'])) {
-    $cust_name = isset($_POST['customer_name']) ? trim($_POST['customer_name']) : '';
-    $cust_email = isset($_POST['customer_email']) ? trim($_POST['customer_email']) : '';
-    $cust_phone = isset($_POST['customer_phone']) ? trim($_POST['customer_phone']) : '';
-    $pincode = isset($_POST['pincode']) ? trim($_POST['pincode']) : '';
-    $address_line1 = isset($_POST['address_line1']) ? trim($_POST['address_line1']) : '';
-    $address_line2 = isset($_POST['address_line2']) ? trim($_POST['address_line2']) : '';
-    $city = isset($_POST['city']) ? trim($_POST['city']) : '';
-    $state = isset($_POST['state']) ? trim($_POST['state']) : '';
-    $note = isset($_SESSION['cart_notes']) ? $_SESSION['cart_notes'] : '';
+    // CSRF Check
+    if (!isset($_POST['csrf_token']) || !hash_equals($_SESSION['csrf_token'] ?? '', $_POST['csrf_token'])) {
+        $checkout_error = "Invalid form submission. Please try again.";
+    } else {
+        $cust_name = sanitize_string($_POST['customer_name'] ?? '');
+        $cust_email = sanitize_email($_POST['customer_email'] ?? '');
+        $cust_phone = preg_replace('/[^0-9]/', '', trim($_POST['customer_phone'] ?? ''));
+        $pincode = preg_replace('/[^0-9]/', '', trim($_POST['pincode'] ?? ''));
+        $address_line1 = sanitize_string($_POST['address_line1'] ?? '');
+        $address_line2 = sanitize_string($_POST['address_line2'] ?? '');
+        $city = sanitize_string($_POST['city'] ?? '');
+        $state = sanitize_string($_POST['state'] ?? '');
+        $note = sanitize_string($_SESSION['cart_notes'] ?? '');
+
+        // Payment method allowlist
+        $payment_method = $_POST['payment_method'] ?? 'UPI';
+        $allowed_methods = ['UPI', 'CARD', 'COD'];
+        if (!in_array($payment_method, $allowed_methods, true)) {
+            $payment_method = 'UPI';
+        }
     
     // Address selection from saved
     if ($user && isset($_POST['selected_address_id']) && $_POST['selected_address_id'] !== 'new') {
@@ -54,10 +65,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['place_order'])) {
     // Input Validations
     if (empty($cust_name) || empty($cust_email) || empty($cust_phone) || empty($pincode) || empty($address_line1) || empty($city) || empty($state)) {
         $checkout_error = "Please fill in all required shipping details.";
+    } elseif (!filter_var($cust_email, FILTER_VALIDATE_EMAIL)) {
+        $checkout_error = "Please enter a valid email address.";
     } elseif (!preg_match('/^[1-9][0-9]{5}$/', $pincode)) {
         $checkout_error = "Please enter a valid 6-digit India Pincode.";
     } elseif (!preg_match('/^[6-9][0-9]{9}$/', $cust_phone)) {
         $checkout_error = "Please enter a valid 10-digit mobile number.";
+    } elseif (strlen($cust_name) > 100 || strlen($address_line1) > 255 || strlen($city) > 100 || strlen($state) > 100) {
+        $checkout_error = "One or more fields exceed maximum length.";
     } else {
         // Run final calculations
         $totals = get_cart_totals($payment_method);
@@ -161,9 +176,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['place_order'])) {
             
         } catch (Exception $e) {
             $pdo->rollBack();
-            $checkout_error = "Failed to process order: " . $e->getMessage();
+            error_log("Checkout error: " . $e->getMessage());
+            $checkout_error = "Failed to process order. Please try again or contact support.";
         }
     }
+    } // End CSRF check
 }
 ?>
 
@@ -180,6 +197,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['place_order'])) {
         <?php endif; ?>
 
         <form action="checkout.php" method="POST" id="checkout-form">
+            <?php echo csrf_field(); ?>
             <div class="checkout-grid">
                 
                 <!-- Shipping Address Form -->

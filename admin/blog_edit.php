@@ -77,13 +77,24 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['update_post'])) {
 }
 ?>
 
+    <style>
+        @media (max-width: 1024px) {
+            .bedit-grid { grid-template-columns: 1fr !important; }
+            .bedit-page-header { flex-direction: column !important; align-items: flex-start !important; gap: 8px; }
+        }
+        @media (max-width: 768px) {
+            .bedit-grid { grid-template-columns: 1fr !important; }
+            .bedit-page-header { flex-direction: column !important; align-items: flex-start !important; gap: 8px; }
+        }
+    </style>
+
     <div style="margin-bottom:20px;">
         <a href="blog.php" style="color:var(--gold-muted); font-size:0.9rem; text-decoration:none;">
             <i class="fas fa-arrow-left"></i> Back to Blog
         </a>
     </div>
 
-    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:30px;">
+    <div class="bedit-page-header" style="display:flex; justify-content:space-between; align-items:center; margin-bottom:30px;">
         <h2 style="font-size:1.8rem; text-transform:uppercase;">Edit Article</h2>
         <span class="admin-badge <?php echo $post['status'] ? 'badge-completed' : 'badge-pending'; ?>" style="font-size:0.75rem;">
             <?php echo $post['status'] ? 'Published' : 'Draft'; ?>
@@ -104,7 +115,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['update_post'])) {
     <?php endif; ?>
 
     <form action="blog_edit.php?id=<?php echo $edit_id; ?>" method="POST" enctype="multipart/form-data">
-    <div style="display:grid; grid-template-columns:1fr 340px; gap:28px; align-items:start;">
+    <div class="bedit-grid" style="display:grid; grid-template-columns:1fr 340px; gap:28px; align-items:start;">
 
         <!-- Main Content -->
         <div>

@@ -42,6 +42,105 @@ if ($order_id > 0) {
 }
 ?>
 
+    <style>
+        /* ── Responsive: Tablet ── */
+        @media (max-width: 1024px) {
+            .order-detail-grid {
+                grid-template-columns: 1fr !important;
+            }
+            .order-page-header {
+                flex-direction: column !important;
+                align-items: flex-start !important;
+                gap: 12px;
+            }
+            .order-list-header {
+                flex-direction: column !important;
+                align-items: flex-start !important;
+                gap: 12px;
+            }
+        }
+
+        /* ── Responsive: Mobile ── */
+        @media (max-width: 768px) {
+            .order-detail-grid {
+                grid-template-columns: 1fr !important;
+            }
+            .order-page-header {
+                flex-direction: column !important;
+                align-items: flex-start !important;
+                gap: 12px;
+            }
+            .order-list-header {
+                flex-direction: column !important;
+                align-items: flex-start !important;
+                gap: 12px;
+            }
+            /* Customer info table: stack label+value */
+            .order-detail-grid .glass-card table tr {
+                display: flex;
+                flex-direction: column;
+                padding: 4px 0;
+            }
+            .order-detail-grid .glass-card table tr td {
+                padding: 2px 0 !important;
+                width: 100% !important;
+            }
+            .order-detail-grid .glass-card table tr td:first-child {
+                font-size: 0.68rem;
+                text-transform: uppercase;
+                letter-spacing: 0.5px;
+            }
+            /* Order list table → card layout */
+            .orders-list-table thead {
+                display: none !important;
+            }
+            .orders-list-table,
+            .orders-list-table tbody,
+            .orders-list-table tr,
+            .orders-list-table td {
+                display: block !important;
+                width: 100% !important;
+            }
+            .orders-list-table tbody tr {
+                background: rgba(18,18,18,0.4);
+                border: 1px solid rgba(255,255,255,0.06);
+                border-radius: 10px;
+                padding: 14px 16px;
+                margin-bottom: 10px;
+            }
+            .orders-list-table tbody td {
+                padding: 3px 0 !important;
+                border-bottom: none !important;
+                font-size: 0.85rem;
+            }
+            .orders-list-table tbody td::before {
+                content: attr(data-label);
+                display: block;
+                font-size: 0.62rem;
+                font-weight: 700;
+                text-transform: uppercase;
+                letter-spacing: 0.7px;
+                color: rgba(255,255,255,0.3);
+                margin-bottom: 1px;
+            }
+            .orders-list-table tbody td.ord-td-order::before { display: none; }
+            .orders-list-table tbody td.ord-td-order {
+                font-size: 1rem;
+                padding-bottom: 6px !important;
+                border-bottom: 1px solid rgba(255,255,255,0.04) !important;
+            }
+            .orders-list-table tbody td.ord-td-action::before { display: none; }
+            .orders-list-table tbody td.ord-td-action {
+                padding-top: 8px !important;
+                border-top: 1px solid rgba(255,255,255,0.04);
+            }
+            .orders-list-table tbody td.ord-td-action a {
+                width: 100%;
+                justify-content: center;
+            }
+        }
+    </style>
+
     <?php if ($order_id > 0 && $order): ?>
         <!-- Order Detail View -->
         <div style="margin-bottom:15px;">
@@ -51,7 +150,7 @@ if ($order_id > 0) {
         </div>
 
         <!-- Page Header -->
-        <div style="display:flex; justify-content:space-between; align-items:flex-end; margin-bottom:35px;">
+        <div class="order-page-header" style="display:flex; justify-content:space-between; align-items:flex-end; margin-bottom:35px;">
             <div>
                 <h2 style="font-size:1.8rem; text-transform:uppercase; letter-spacing:1.5px; margin-bottom:6px;">Order <span style="color:#D4AF37;">#<?php echo htmlspecialchars($order['order_number']); ?></span></h2>
                 <p style="font-size:0.85rem; color:rgba(255,255,255,0.45); margin:0;">Placed on <?php echo date('M d, Y \a\t h:i A', strtotime($order['created_at'])); ?></p>
@@ -68,7 +167,7 @@ if ($order_id > 0) {
             </div>
         <?php endif; ?>
 
-        <div style="display:grid; grid-template-columns:1.5fr 1fr; gap:30px; align-items:start;">
+        <div class="order-detail-grid" style="display:grid; grid-template-columns:1.5fr 1fr; gap:30px; align-items:start;">
             <!-- Left Panel -->
             <div>
                 <!-- Customer Info Card -->
@@ -114,7 +213,7 @@ if ($order_id > 0) {
                         </h3>
                     </div>
                     <div style="overflow-x:auto;">
-                        <table class="admin-table" style="margin:0; border:none; border-radius:0;">
+                    <table class="admin-table orders-list-table" style="margin:0; border:none; border-radius:0;">
                             <thead>
                                 <tr>
                                     <th>Item</th>
@@ -209,7 +308,7 @@ if ($order_id > 0) {
 
     <?php else: ?>
         <!-- Orders List View -->
-        <div style="display:flex; justify-content:space-between; align-items:flex-end; margin-bottom:35px;">
+        <div class="order-list-header" style="display:flex; justify-content:space-between; align-items:flex-end; margin-bottom:35px;">
             <div>
                 <h2 style="font-size:1.8rem; text-transform:uppercase; letter-spacing:1.5px; margin-bottom:6px;">Order Management</h2>
                 <p style="font-size:0.85rem; color:rgba(255,255,255,0.45); margin:0;">Pending orders and fulfillments</p>
@@ -242,14 +341,14 @@ if ($order_id > 0) {
                         <tbody>
                             <?php foreach ($orders as $ord): ?>
                                 <tr>
-                                    <td style="font-weight:700; color:#fff; font-family:var(--font-heading);">#<?php echo htmlspecialchars($ord['order_number']); ?></td>
-                                    <td style="color:rgba(255,255,255,0.6);"><?php echo date('M d, Y', strtotime($ord['created_at'])); ?></td>
-                                    <td>
+                                    <td data-label="Order" class="ord-td-order" style="font-weight:700; color:#fff; font-family:var(--font-heading);">#<?php echo htmlspecialchars($ord['order_number']); ?></td>
+                                    <td data-label="Date" style="color:rgba(255,255,255,0.6);"><?php echo date('M d, Y', strtotime($ord['created_at'])); ?></td>
+                                    <td data-label="Customer">
                                         <div style="font-weight:600; color:rgba(255,255,255,0.8);"><?php echo htmlspecialchars($ord['customer_name']); ?></div>
                                         <div style="font-size:0.7rem; color:rgba(255,255,255,0.45); margin-top:2px;"><?php echo htmlspecialchars($ord['customer_phone']); ?></div>
                                     </td>
-                                    <td style="font-weight:700; color:#D4AF37;">₹<?php echo number_format($ord['total'], 2); ?></td>
-                                    <td>
+                                    <td data-label="Total" style="font-weight:700; color:#D4AF37;">₹<?php echo number_format($ord['total'], 2); ?></td>
+                                    <td data-label="Payment">
                                         <?php if ($ord['payment_status'] === 'paid'): ?>
                                             <span class="admin-badge badge-completed" style="background:rgba(74,222,128,0.1); color:#4ade80; border:1px solid rgba(74,222,128,0.2);">Paid</span>
                                         <?php elseif ($ord['payment_status'] === 'failed'): ?>
@@ -258,7 +357,7 @@ if ($order_id > 0) {
                                             <span class="admin-badge badge-pending">Pending</span>
                                         <?php endif; ?>
                                     </td>
-                                    <td>
+                                    <td data-label="Shipping">
                                         <?php if ($ord['shipping_status'] === 'delivered'): ?>
                                             <span class="admin-badge badge-completed" style="background:rgba(74,222,128,0.1); color:#4ade80; border:1px solid rgba(74,222,128,0.2);">Delivered</span>
                                         <?php elseif ($ord['shipping_status'] === 'cancelled'): ?>
@@ -269,7 +368,7 @@ if ($order_id > 0) {
                                             <span class="admin-badge badge-pending">Pending</span>
                                         <?php endif; ?>
                                     </td>
-                                    <td>
+                                    <td data-label="" class="ord-td-action">
                                         <a href="orders.php?order_id=<?php echo $ord['id']; ?>" class="btn-outline-gold" style="padding:6px 14px; font-size:0.75rem; border-radius:6px;">Fulfill</a>
                                     </td>
                                 </tr>

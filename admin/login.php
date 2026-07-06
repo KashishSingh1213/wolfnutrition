@@ -181,7 +181,6 @@ $csrf_token = generate_csrf_token();
 
         .brand-logo img {
             height: 56px;
-            filter: brightness(0) invert(1);
         }
 
         .brand-title {
@@ -353,43 +352,6 @@ $csrf_token = generate_csrf_token();
             color: #d4af37;
         }
 
-        /* ---------- REMEMBER / FORGOT ROW ---------- */
-        .form-options {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            margin-bottom: 28px;
-        }
-
-        .remember-me {
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            cursor: pointer;
-            font-size: 0.82rem;
-            color: #666;
-            font-weight: 500;
-        }
-
-        .remember-me input[type="checkbox"] {
-            width: 16px;
-            height: 16px;
-            accent-color: #d4af37;
-            cursor: pointer;
-        }
-
-        .forgot-link {
-            font-size: 0.82rem;
-            color: #d4af37;
-            text-decoration: none;
-            font-weight: 600;
-            transition: color 0.2s;
-        }
-
-        .forgot-link:hover {
-            color: #b8942e;
-        }
-
         /* ---------- SUBMIT BUTTON ---------- */
         .submit-btn {
             width: 100%;
@@ -500,30 +462,6 @@ $csrf_token = generate_csrf_token();
         .back-link svg { transition: transform 0.2s; }
         .back-link:hover svg { transform: translateX(-3px); }
 
-        /* ---------- SECURITY TAG ---------- */
-        .security-tag {
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 6px;
-            margin-top: 20px;
-            font-size: 0.72rem;
-            color: #bbb;
-            font-weight: 500;
-        }
-
-        .security-tag svg {
-            color: #22c55e;
-        }
-
-        /* ---------- LOCKED STATE ---------- */
-        .login-panel.locked .field-group,
-        .login-panel.locked .submit-btn,
-        .login-panel.locked .form-options {
-            opacity: 0.4;
-            pointer-events: none;
-        }
-
         /* ---------- MOBILE ---------- */
         @media (max-width: 900px) {
             body { flex-direction: column; }
@@ -628,14 +566,6 @@ $csrf_token = generate_csrf_token();
                     </div>
                 </div>
 
-                <div class="form-options">
-                    <label class="remember-me">
-                        <input type="checkbox" name="remember">
-                        Remember me
-                    </label>
-                    <a href="#" class="forgot-link">Forgot password?</a>
-                </div>
-
                 <button type="submit" name="admin_login_btn" class="submit-btn" id="submitBtn">
                     Sign In to Dashboard
                 </button>
@@ -646,14 +576,8 @@ $csrf_token = generate_csrf_token();
                     <line x1="19" y1="12" x2="5" y2="12"/>
                     <polyline points="12 19 5 12 12 5"/>
                 </svg>
-                Back to store
-            </a>
-
-            <div class="security-tag">
-                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
-                Secured with 256-bit encryption
-            </div>
-        </div>
+            Back to store
+        </a>
     </div>
 
     <!-- Security: Client-side protections -->

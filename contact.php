@@ -13,11 +13,7 @@ if (empty($_SESSION['contact_csrf'])) {
 $csrf_token = $_SESSION['contact_csrf'];
 
 // ── Rate Limiting (5 messages per IP per hour) ──
-function get_client_ip() {
-    if (!empty($_SERVER['HTTP_CLIENT_IP'])) return $_SERVER['HTTP_CLIENT_IP'];
-    if (!empty($_SERVER['HTTP_X_FORWARDED_FOR'])) return explode(',', $_SERVER['HTTP_X_FORWARDED_FOR'])[0];
-    return $_SERVER['REMOTE_ADDR'];
-}
+// get_client_ip() is now provided by includes/security.php via includes/functions.php
 
 function is_rate_limited($pdo, $ip) {
     $stmt = $pdo->prepare("SELECT COUNT(*) FROM contact_messages WHERE ip_address = ? AND created_at > DATE_SUB(NOW(), INTERVAL 1 HOUR)");
@@ -54,7 +50,7 @@ $ip = get_client_ip();
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['contact_submit'])) {
 
     // 1. CSRF Check
-    if (!isset($_POST['csrf_token']) || !hash_equals($_SESSION['csrf_token'] ?? '', $_POST['csrf_token'])) {
+    if (!isset($_POST['csrf_token']) || !hash_equals($_SESSION['contact_csrf'] ?? '', $_POST['csrf_token'])) {
         $error = "Invalid form submission. Please try again.";
     }
     // 2. Honeypot Check (bot trap)
@@ -67,11 +63,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['contact_submit'])) {
     }
     else {
         // 4. Sanitize & Validate Inputs
-        $name    = trim($_POST['name'] ?? '');
-        $email   = trim($_POST['email'] ?? '');
-        $phone   = trim($_POST['phone'] ?? '');
-        $subject = trim($_POST['subject'] ?? '');
-        $message = trim($_POST['message'] ?? '');
+        $name    = sanitize_string(trim($_POST['name'] ?? ''));
+        $email   = sanitize_email(trim($_POST['email'] ?? ''));
+        $phone   = preg_replace('/[^0-9]/', '', trim($_POST['phone'] ?? ''));
+        $subject = sanitize_string(trim($_POST['subject'] ?? ''));
+        $message = sanitize_string(trim($_POST['message'] ?? ''));
 
         // Name: 2-100 chars, letters spaces hyphens apostrophes only
         if (empty($name) || !preg_match("/^[a-zA-Z\s\-\']{2,100}$/", $name)) {

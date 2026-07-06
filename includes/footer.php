@@ -43,10 +43,21 @@ require_once __DIR__ . '/functions.php';
                 <div class="footer-newsletter">
                     <h4>Join the Pack</h4>
                     <p>Subscribe to receive exclusive discounts, stack guides, and early access to new releases.</p>
-                    <form class="newsletter-form" onsubmit="event.preventDefault(); alert('Welcome to the pack! You have subscribed successfully.'); this.reset();">
-                        <input type="email" placeholder="Your Email Address" required>
-                        <button type="submit" class="btn-gold" style="padding:10px 15px;"><i class="fas fa-paper-plane"></i></button>
-                    </form>
+                    <?php if (is_logged_in()): ?>
+                        <?php
+                            $footer_user = get_logged_in_user();
+                            $footer_email = $footer_user ? htmlspecialchars($footer_user['email']) : '';
+                        ?>
+                        <form class="newsletter-form" id="footer-nl-form" onsubmit="return handleFooterNewsletterSubmit(event);" style="display:flex; gap:8px;">
+                            <input type="email" id="footer-nl-email" value="<?php echo $footer_email; ?>" readonly required placeholder="Your Email Address" style="flex:1;">
+                            <button type="submit" id="footer-nl-btn" class="btn-gold" style="padding:10px 15px;"><i class="fas fa-paper-plane"></i></button>
+                        </form>
+                        <div id="footer-nl-msg" style="margin-top:8px; font-size:0.75rem; display:none;"></div>
+                    <?php else: ?>
+                        <a href="login.php" style="display:inline-flex; align-items:center; gap:6px; color:var(--gold-primary); font-size:0.85rem; font-weight:600; text-decoration:none; margin-top:8px;">
+                            <i class="fas fa-sign-in-alt"></i> Login to Subscribe
+                        </a>
+                    <?php endif; ?>
                 </div>
             </div>
 
@@ -68,5 +79,41 @@ require_once __DIR__ . '/functions.php';
 
     <!-- Main Script JS -->
     <script src="assets/js/main.js"></script>
+    <script>
+    function handleFooterNewsletterSubmit(e) {
+        e.preventDefault();
+        var email = document.getElementById('footer-nl-email').value.trim();
+        var btn = document.getElementById('footer-nl-btn');
+        var msg = document.getElementById('footer-nl-msg');
+        if (!email) return false;
+        btn.disabled = true;
+        btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i>';
+        var fd = new FormData();
+        fd.append('email', email);
+        fetch('newsletter_subscribe.php', { method: 'POST', body: fd })
+            .then(function(r) { return r.json(); })
+            .then(function(data) {
+                msg.style.display = 'block';
+                msg.style.color = data.success ? '#4ade80' : '#ef4444';
+                msg.textContent = data.message;
+                if (data.success) {
+                    btn.innerHTML = '<i class="fas fa-check"></i>';
+                    btn.style.background = 'linear-gradient(135deg, #4ade80, #22c55e)';
+                } else {
+                    btn.disabled = false;
+                    btn.innerHTML = '<i class="fas fa-paper-plane"></i>';
+                }
+                setTimeout(function() { msg.style.display = 'none'; }, 4000);
+            })
+            .catch(function() {
+                msg.style.display = 'block';
+                msg.style.color = '#ef4444';
+                msg.textContent = 'Something went wrong.';
+                btn.disabled = false;
+                btn.innerHTML = '<i class="fas fa-paper-plane"></i>';
+            });
+        return false;
+    }
+    </script>
 </body>
 </html>

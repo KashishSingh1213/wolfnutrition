@@ -134,10 +134,68 @@ $products = $stmt->fetchAll();
         .status-inactive {
             color: rgba(255,255,255,0.45);
         }
+
+        /* ── Responsive: Tablet ── */
+        @media (max-width: 1024px) {
+            .page-header {
+                flex-direction: column !important;
+                align-items: flex-start !important;
+                gap: 12px;
+            }
+            .product-header-row {
+                flex-wrap: wrap;
+                gap: 12px;
+            }
+            .product-actions {
+                width: 100%;
+                justify-content: flex-start;
+                padding-top: 8px;
+                border-top: 1px solid rgba(255,255,255,0.04);
+                margin-top: 4px;
+            }
+        }
+
+        /* ── Responsive: Mobile ── */
+        @media (max-width: 768px) {
+            .variant-grid {
+                grid-template-columns: 1fr !important;
+            }
+            .variant-fields {
+                grid-template-columns: 1fr !important;
+            }
+            .add-variant-fields-top {
+                grid-template-columns: 1fr !important;
+            }
+            .add-variant-fields-bottom {
+                grid-template-columns: 1fr 1fr !important;
+            }
+            .product-card {
+                padding: 16px !important;
+            }
+            .variant-card {
+                padding: 14px !important;
+            }
+            .variant-add-card {
+                padding: 14px !important;
+            }
+            .product-img-thumb {
+                width: 48px !important;
+                height: 48px !important;
+            }
+            .product-actions .btn-outline-gold {
+                padding: 5px 10px !important;
+                font-size: 0.7rem !important;
+            }
+            .variant-header {
+                flex-direction: column !important;
+                align-items: flex-start !important;
+                gap: 6px;
+            }
+        }
     </style>
 
     <!-- Page Header -->
-    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:32px;">
+    <div class="page-header" style="display:flex; justify-content:space-between; align-items:center; margin-bottom:32px;">
         <div>
             <h2 style="font-size:1.6rem; font-weight:800; color:#fff; margin:0 0 4px 0; letter-spacing:-0.3px;">Catalog Management</h2>
             <p style="font-size:0.85rem; color:rgba(255,255,255,0.45); margin:0;">Manage products, variants & stock levels</p>
@@ -171,7 +229,7 @@ $products = $stmt->fetchAll();
         ?>
             <div class="product-card">
                 <!-- Product Header -->
-                <div style="display:flex; gap:16px; align-items:center; margin-bottom:20px; padding-bottom:16px; border-bottom:1px solid rgba(255,255,255,0.05);">
+                <div class="product-header-row" style="display:flex; gap:16px; align-items:center; margin-bottom:20px; padding-bottom:16px; border-bottom:1px solid rgba(255,255,255,0.05);">
                     <img src="../<?php echo htmlspecialchars($prod['image_url']); ?>" alt="<?php echo htmlspecialchars($prod['name']); ?>" class="product-img-thumb">
                     <div style="flex:1; min-width:0;">
                         <div style="display:flex; align-items:center; gap:10px; margin-bottom:4px;">
@@ -184,7 +242,7 @@ $products = $stmt->fetchAll();
                     </div>
 
                     <!-- Actions -->
-                    <div style="display:flex; align-items:center; gap:10px; flex-shrink:0;">
+                    <div class="product-actions" style="display:flex; align-items:center; gap:10px; flex-shrink:0;">
                         <span style="font-size:0.78rem; font-weight:600; padding:4px 10px; border-radius:6px; <?php echo $prod['is_active'] ? 'background:rgba(74,222,128,0.1); color:#4ade80;' : 'background:rgba(255,255,255,0.05); color:rgba(255,255,255,0.45);'; ?>">
                             <?php echo $prod['is_active'] ? 'Active' : 'Inactive'; ?>
                         </span>
@@ -203,13 +261,13 @@ $products = $stmt->fetchAll();
                 <!-- Variants Section -->
                 <div style="margin-bottom:8px;">
                     <h4 style="font-size:0.78rem; text-transform:uppercase; letter-spacing:0.8px; font-weight:700; color:rgba(255,255,255,0.45); margin:0 0 14px 0;">Pack Variations & Stock</h4>
-                    <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(360px, 1fr)); gap:16px;">
+                    <div class="variant-grid" style="display:grid; grid-template-columns:repeat(auto-fit, minmax(360px, 1fr)); gap:16px;">
                         <?php foreach ($variants as $v): ?>
                             <div class="variant-card">
                                 <form action="products.php" method="POST">
                                     <input type="hidden" name="variant_id" value="<?php echo $v['id']; ?>">
                                     
-                                    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:14px;">
+                                    <div class="variant-header" style="display:flex; justify-content:space-between; align-items:center; margin-bottom:14px;">
                                         <div>
                                             <span style="font-weight:700; color:#fff; font-size:0.88rem;"><?php echo htmlspecialchars($v['size_capsules']); ?></span>
                                             <span style="font-size:0.75rem; color:rgba(255,255,255,0.45); margin-left:6px;">SKU: <?php echo htmlspecialchars($v['sku']); ?></span>
@@ -224,7 +282,7 @@ $products = $stmt->fetchAll();
                                         </div>
                                     </div>
                                     
-                                    <div style="display:grid; grid-template-columns:1fr 1fr 1fr; gap:10px; margin-bottom:12px;">
+                                    <div class="variant-fields" style="display:grid; grid-template-columns:1fr 1fr 1fr; gap:10px; margin-bottom:12px;">
                                         <div>
                                             <label style="font-size:0.7rem; color:rgba(255,255,255,0.45); display:block; margin-bottom:4px; font-weight:600;">MRP (&#8377;)</label>
                                             <input type="number" step="0.01" name="price" class="form-control" style="font-size:0.82rem; padding:7px 10px; background:rgba(0,0,0,0.3); border:1px solid rgba(255,255,255,0.08); border-radius:6px; color:#fff;" value="<?php echo $v['price']; ?>" required>
@@ -253,7 +311,7 @@ $products = $stmt->fetchAll();
                                 <div style="font-weight:700; color:#D4AF37; font-size:0.85rem; margin-bottom:14px; display:flex; align-items:center; gap:6px;">
                                     <i class="fas fa-plus-circle"></i> Add New Variant
                                 </div>
-                                <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px; margin-bottom:10px;">
+                                <div class="add-variant-fields-top" style="display:grid; grid-template-columns:1fr 1fr; gap:10px; margin-bottom:10px;">
                                     <div>
                                         <label style="font-size:0.7rem; color:rgba(255,255,255,0.45); display:block; margin-bottom:4px; font-weight:600;">SKU *</label>
                                         <input type="text" name="sku" class="form-control" style="font-size:0.82rem; padding:7px 10px; background:rgba(0,0,0,0.3); border:1px solid rgba(255,255,255,0.08); border-radius:6px; color:#fff;" placeholder="e.g. WP30" required>
@@ -263,7 +321,7 @@ $products = $stmt->fetchAll();
                                         <input type="text" name="size_capsules" class="form-control" style="font-size:0.82rem; padding:7px 10px; background:rgba(0,0,0,0.3); border:1px solid rgba(255,255,255,0.08); border-radius:6px; color:#fff;" placeholder="e.g. 30 Veggie Capsules" required>
                                     </div>
                                 </div>
-                                <div style="display:grid; grid-template-columns:1fr 1fr 1fr; gap:10px; margin-bottom:10px;">
+                                <div class="add-variant-fields-bottom" style="display:grid; grid-template-columns:1fr 1fr 1fr; gap:10px; margin-bottom:10px;">
                                     <div>
                                         <label style="font-size:0.7rem; color:rgba(255,255,255,0.45); display:block; margin-bottom:4px; font-weight:600;">MRP (&#8377;) *</label>
                                         <input type="number" step="0.01" name="price" class="form-control" style="font-size:0.82rem; padding:7px 10px; background:rgba(0,0,0,0.3); border:1px solid rgba(255,255,255,0.08); border-radius:6px; color:#fff;" required>

@@ -137,7 +137,32 @@ if (empty($gallery)) $gallery = [$product['image_url']];
 .pd-disclaimer p{font-size:0.82rem; color:rgba(255,255,255,0.5); line-height:1.5; margin:0;}
 
 @keyframes fadeIn{from{opacity:0;transform:translateY(10px);}to{opacity:1;transform:translateY(0);}}
-@media(max-width:900px){.pd-grid{grid-template-columns:1fr; gap:30px;}.pd-gallery-main{height:350px;}.review-summary{grid-template-columns:1fr;}.review-avg{border-right:none; border-bottom:1px solid rgba(255,255,255,0.06); padding-bottom:20px;}}
+@keyframes slideInToast{from{transform:translateX(100px);opacity:0;}to{transform:translateX(0);opacity:1;}}
+@keyframes slideOutToast{from{transform:translateX(0);opacity:1;}to{transform:translateX(100px);opacity:0;}}
+@media(max-width:900px){
+    .pd-grid{grid-template-columns:1fr; gap:30px;}
+    .pd-gallery-main{height:350px;}
+    .review-summary{grid-template-columns:1fr;}
+    .review-avg{border-right:none; border-bottom:1px solid rgba(255,255,255,0.06); padding-bottom:20px;}
+    .pd-variants{flex-wrap:wrap;}
+    .pd-actions{flex-direction:column;}
+    .pd-qty{justify-content:center;}
+    .pd-benefits{grid-template-columns:1fr;}
+    .pd-tab-nav{overflow-x:auto; -webkit-overflow-scrolling:touch;}
+    .pd-tab-btn{padding:12px 16px; font-size:0.82rem;}
+}
+@media(max-width:600px){
+    .pd-gallery-main{height:280px; border-radius:14px;}
+    .pd-title{font-size:1.4rem;}
+    .pd-price-sale{font-size:1.6rem;}
+    .pd-gallery-thumbs{gap:8px;}
+    .pd-thumb{width:60px; height:60px;}
+    .pd-disclaimer{flex-direction:column; gap:8px;}
+    .review-summary{padding:20px;}
+    .review-avg-num{font-size:2.2rem;}
+    .pd-write-review{padding:20px;}
+    .pd-write-review > div[style*="grid-template-columns:1fr 1fr"]{grid-template-columns:1fr !important;}
+}
 </style>
 
 <canvas id="goldParticles"></canvas>
@@ -222,13 +247,6 @@ if (empty($gallery)) $gallery = [$product['image_url']];
                 <div class="pd-benefit"><i class="fas fa-shield-halved"></i> FSSAI Certified</div>
                 <div class="pd-benefit"><i class="fas fa-rotate-left"></i> Easy Returns</div>
             </div>
-
-            <!-- Pincode -->
-            <div class="pd-pincode">
-                <input type="text" id="pincode-input" placeholder="Check delivery pincode" maxlength="6">
-                <button class="btn-gold" style="padding:12px 18px; border-radius:10px; font-size:0.85rem;" onclick="checkPincode()">Check</button>
-            </div>
-            <div id="pincode-result" style="font-size:0.85rem; margin-bottom:10px;"></div>
 
             <!-- Disclaimer -->
             <?php if ($product['category_slug'] === 'vitality'): ?>
@@ -372,11 +390,21 @@ function changeQty(d){var inp=document.getElementById('pd-qty-input');var v=pars
 // Tabs
 function switchTab(btn,id){document.querySelectorAll('.pd-tab-btn').forEach(b=>b.classList.remove('active'));document.querySelectorAll('.pd-tab-pane').forEach(p=>p.classList.remove('active'));btn.classList.add('active');document.getElementById(id).classList.add('active');}
 
-// Pincode
-function checkPincode(){var pc=document.getElementById('pincode-input').value;var res=document.getElementById('pincode-result');if(pc.length!==6){res.innerHTML='<span style="color:rgba(255,255,255,0.5);">Enter valid 6-digit pincode</span>';return;}res.innerHTML='<span style="color:var(--gold-primary);"><i class="fas fa-spinner fa-spin"></i> Checking...</span>';setTimeout(function(){res.innerHTML='<span style="color:#2ecc71;"><i class="fas fa-check-circle"></i> Delivery available in 3-5 business days</span>';},1000);}
+// Add to Cart Toast
+function showAddToCartToast(){
+    var existing=document.getElementById('cart-toast');
+    if(existing)existing.remove();
+    var toast=document.createElement('div');
+    toast.id='cart-toast';
+    toast.style.cssText='position:fixed;bottom:30px;right:30px;z-index:9999;background:linear-gradient(135deg,#D4AF37,#F2D06B);color:#080C10;padding:16px 24px;border-radius:12px;font-weight:700;font-size:0.9rem;display:flex;align-items:center;gap:10px;box-shadow:0 8px 30px rgba(212,175,55,0.3);animation:slideInToast 0.3s ease;';
+    toast.innerHTML='<i class="fas fa-check-circle"></i> Added to cart!';
+    document.body.appendChild(toast);
+    setTimeout(function(){toast.style.animation='slideOutToast 0.3s ease forwards';setTimeout(function(){toast.remove();},300);},2000);
+}
 
 // Add to Cart
-function addToCart(){var qty=document.getElementById('pd-qty-input').value;fetch('cart_action.php',{method:'POST',headers:{'Content-Type':'application/x-www-form-urlencoded'},body:'action=add&product_id=<?php echo $product["id"];?>&variant_id='+currentVariantId+'&quantity='+qty}).then(function(r){return r.json();}).then(function(d){if(d.success){location.reload();}else{alert(d.message||'Failed to add to cart');}});}
+var csrfToken='<?php echo generate_csrf_token(); ?>';
+function addToCart(){var qty=document.getElementById('pd-qty-input').value;var fd=new URLSearchParams();fd.append('action','add');fd.append('product_id','<?php echo $product["id"];?>');fd.append('variant_id',currentVariantId);fd.append('quantity',qty);fd.append('csrf_token',csrfToken);fetch('cart_api.php',{method:'POST',headers:{'Content-Type':'application/x-www-form-urlencoded'},body:fd.toString()}).then(function(r){return r.json();}).then(function(d){if(d.success){showAddToCartToast();setTimeout(function(){location.reload();},1500);}else{alert(d.message||'Failed to add to cart');}});}
 
 // Review Stars
 document.getElementById('review-stars').addEventListener('click',function(e){var star=e.target.closest('i');if(!star)return;var val=parseInt(star.dataset.value);document.getElementById('review-rating-input').value=val;this.querySelectorAll('i').forEach(function(s,i){s.classList.toggle('active',i<val);});});

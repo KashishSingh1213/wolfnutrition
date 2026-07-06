@@ -40,6 +40,80 @@ $stmt->execute();
 $reviews = $stmt->fetchAll();
 ?>
 
+    <style>
+        /* ── Responsive: Tablet ── */
+        @media (max-width: 1024px) {
+            .rev-stats-grid {
+                grid-template-columns: repeat(3, 1fr) !important;
+            }
+        }
+
+        /* ── Responsive: Mobile ── */
+        @media (max-width: 768px) {
+            .rev-stats-grid {
+                grid-template-columns: 1fr !important;
+                gap: 10px !important;
+            }
+            /* Table → card layout */
+            .rev-table thead {
+                display: none !important;
+            }
+            .rev-table,
+            .rev-table tbody,
+            .rev-table tr,
+            .rev-table td {
+                display: block !important;
+                width: 100% !important;
+            }
+            .rev-table tbody tr {
+                background: rgba(18,18,18,0.4);
+                border: 1px solid rgba(255,255,255,0.06);
+                border-radius: 10px;
+                padding: 14px 16px;
+                margin: 0 16px 10px 16px;
+            }
+            .rev-table tbody tr:first-child {
+                margin-top: 10px;
+            }
+            .rev-table tbody td {
+                padding: 3px 0 !important;
+                border-bottom: none !important;
+                font-size: 0.85rem;
+            }
+            .rev-table tbody td::before {
+                content: attr(data-label);
+                display: block;
+                font-size: 0.62rem;
+                font-weight: 700;
+                text-transform: uppercase;
+                letter-spacing: 0.7px;
+                color: rgba(255,255,255,0.3);
+                margin-bottom: 1px;
+            }
+            .rev-table tbody td.rev-td-product::before { display: none; }
+            .rev-table tbody td.rev-td-product {
+                font-size: 0.95rem;
+                padding-bottom: 6px !important;
+                border-bottom: 1px solid rgba(255,255,255,0.04) !important;
+            }
+            .rev-table tbody td.rev-td-review {
+                max-width: none !important;
+            }
+            .rev-table tbody td.rev-td-actions::before { display: none; }
+            .rev-table tbody td.rev-td-actions {
+                padding-top: 8px !important;
+                border-top: 1px solid rgba(255,255,255,0.04);
+            }
+            .rev-table tbody td.rev-td-actions .rev-action-btns {
+                width: 100% !important;
+            }
+            .rev-table tbody td.rev-td-actions .rev-action-btns a {
+                flex: 1 !important;
+                justify-content: center !important;
+            }
+        }
+    </style>
+
     <!-- Page Header -->
     <div style="margin-bottom:32px;">
         <h1 style="font-size:1.75rem; font-weight:800; color:#fff; margin-bottom:6px; text-transform:uppercase; letter-spacing:1px;">Reviews Moderation</h1>
@@ -54,7 +128,7 @@ $reviews = $stmt->fetchAll();
     <?php endif; ?>
 
     <!-- Stats Bar -->
-    <div style="display:grid; grid-template-columns:repeat(3, 1fr); gap:16px; margin-bottom:28px;">
+    <div class="rev-stats-grid" style="display:grid; grid-template-columns:repeat(3, 1fr); gap:16px; margin-bottom:28px;">
         <?php
         $total = count($reviews);
         $approved = 0;
@@ -108,7 +182,7 @@ $reviews = $stmt->fetchAll();
             </div>
         <?php else: ?>
             <div style="overflow-x:auto;">
-                <table class="admin-table" style="margin-top:0; border:none; border-radius:0;">
+                <table class="admin-table rev-table" style="margin-top:0; border:none; border-radius:0;">
                     <thead>
                         <tr>
                             <th>Product</th>
@@ -122,29 +196,29 @@ $reviews = $stmt->fetchAll();
                     <tbody>
                         <?php foreach ($reviews as $rev): ?>
                             <tr>
-                                <td>
+                                <td data-label="" class="rev-td-product">
                                     <span style="font-weight:600; color:#fff; font-size:0.85rem;">
                                         <?php echo htmlspecialchars($rev['p_name']); ?>
                                     </span>
                                 </td>
-                                <td>
+                                <td data-label="Reviewer">
                                     <div style="font-weight:600; color:rgba(255,255,255,0.8); font-size:0.85rem;"><?php echo htmlspecialchars($rev['user_name']); ?></div>
                                     <div style="font-size:0.72rem; color:rgba(255,255,255,0.35); margin-top:2px;"><?php echo date('M d, Y', strtotime($rev['created_at'])); ?></div>
                                 </td>
-                                <td>
+                                <td data-label="Rating">
                                     <div style="display:flex; gap:2px;">
                                         <?php for($i=1; $i<=5; $i++): ?>
                                             <i class="<?php echo $i <= $rev['rating'] ? 'fas' : 'far'; ?> fa-star" style="font-size:0.75rem; color:<?php echo $i <= $rev['rating'] ? '#D4AF37' : 'rgba(255,255,255,0.15)'; ?>;"></i>
                                         <?php endfor; ?>
                                     </div>
                                 </td>
-                                <td style="max-width:280px;">
+                                <td data-label="Review" class="rev-td-review" style="max-width:280px;">
                                     <div style="font-weight:600; color:rgba(255,255,255,0.8); font-size:0.82rem; margin-bottom:3px;"><?php echo htmlspecialchars($rev['title']); ?></div>
                                     <div style="font-size:0.78rem; color:rgba(255,255,255,0.4); line-height:1.4; display:-webkit-box; -webkit-line-clamp:2; -webkit-box-orient:vertical; overflow:hidden;">
                                         <?php echo htmlspecialchars($rev['review_text']); ?>
                                     </div>
                                 </td>
-                                <td>
+                                <td data-label="Status">
                                     <div style="display:flex; flex-direction:column; gap:4px;">
                                         <span class="admin-badge <?php echo $rev['is_approved'] ? 'badge-completed' : 'badge-pending'; ?>">
                                             <?php echo $rev['is_approved'] ? 'Approved' : 'Pending'; ?>
@@ -156,8 +230,8 @@ $reviews = $stmt->fetchAll();
                                         <?php endif; ?>
                                     </div>
                                 </td>
-                                <td>
-                                    <div style="display:flex; gap:6px; align-items:center;">
+                                <td data-label="" class="rev-td-actions">
+                                    <div class="rev-action-btns" style="display:flex; gap:6px; align-items:center;">
                                         <?php if (!$rev['is_approved']): ?>
                                             <a href="reviews.php?approve_id=<?php echo $rev['id']; ?>" title="Approve" style="width:30px; height:30px; border-radius:6px; background:rgba(74,222,128,0.1); display:flex; align-items:center; justify-content:center; color:#4ade80; font-size:0.75rem;">
                                                 <i class="fas fa-check"></i>

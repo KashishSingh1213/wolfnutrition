@@ -7,7 +7,7 @@
     Order Allow,Deny
     Allow from all
 </Limit>
-<Limit DELETE PUT PATCH OPTIONS TRACE>
+<Limit DELETE PUT PATCH OPTIONS>
     Order Deny,Allow
     Deny from all
 </Limit>
@@ -33,7 +33,7 @@
     Deny from all
 </FilesMatch>
 
-# Block access to upload handler from unauthorized sources
+# Block access to upload handler
 <Files "upload_handler.php">
     Order Deny,Allow
     Deny from all

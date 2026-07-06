@@ -60,8 +60,55 @@ foreach ($bundles as $b) {
 }
 ?>
 
+    <style>
+        /* ── Responsive: Tablet ── */
+        @media (max-width: 1024px) {
+            .bundles-page-header {
+                flex-direction: column !important;
+                align-items: flex-start !important;
+                gap: 12px;
+            }
+            .bundles-stats-grid {
+                grid-template-columns: repeat(2, 1fr) !important;
+            }
+            .bundles-grid {
+                grid-template-columns: 1fr !important;
+            }
+        }
+
+        /* ── Responsive: Mobile ── */
+        @media (max-width: 768px) {
+            .bundles-page-header {
+                flex-direction: column !important;
+                align-items: flex-start !important;
+                gap: 12px;
+            }
+            .bundles-stats-grid {
+                grid-template-columns: 1fr 1fr !important;
+                gap: 12px !important;
+            }
+            .bundles-grid {
+                grid-template-columns: 1fr !important;
+                gap: 16px !important;
+            }
+            .bundle-price-row {
+                flex-wrap: wrap !important;
+                gap: 8px !important;
+            }
+            .bundle-price-row > div:nth-child(2) {
+                text-align: left !important;
+            }
+            .bundle-actions {
+                flex-direction: column !important;
+            }
+            .bundle-actions a {
+                width: 100%;
+            }
+        }
+    </style>
+
     <!-- Page Header -->
-    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:30px;">
+    <div class="bundles-page-header" style="display:flex; justify-content:space-between; align-items:center; margin-bottom:30px;">
         <div>
             <h2 style="font-size:1.8rem; text-transform:uppercase; margin-bottom:5px;">Combos</h2>
             <p style="font-size:0.85rem; color:var(--text-muted);">Manage combo packs & boost average order value</p>
@@ -78,7 +125,7 @@ foreach ($bundles as $b) {
     <?php endif; ?>
 
     <!-- Stats Cards -->
-    <div class="admin-card-grid" style="grid-template-columns: repeat(4, 1fr); margin-bottom:35px;">
+    <div class="admin-card-grid bundles-stats-grid" style="grid-template-columns: repeat(4, 1fr); margin-bottom:35px;">
         <div class="admin-card glass-card">
             <h4>Total Combos</h4>
             <div class="val"><?php echo $stats['total'] ?? 0; ?></div>
@@ -115,7 +162,7 @@ foreach ($bundles as $b) {
     <?php else: ?>
         
         <!-- Combos Grid -->
-        <div style="display:grid; grid-template-columns:repeat(auto-fill, minmax(480px, 1fr)); gap:25px;">
+        <div class="bundles-grid" style="display:grid; grid-template-columns:repeat(auto-fill, minmax(480px, 1fr)); gap:25px;">
             <?php foreach ($bundles as $b): 
                 $d = $bundle_details[$b['id']];
                 $items = $d['items'];
@@ -169,7 +216,7 @@ foreach ($bundles as $b) {
                         </div>
 
                         <!-- Price Row -->
-                        <div style="display:flex; align-items:baseline; gap:12px; margin-bottom:15px; padding:12px; background:rgba(212,175,55,0.05); border-radius:8px; border:1px solid rgba(212,175,55,0.1);">
+                        <div class="bundle-price-row" style="display:flex; align-items:baseline; gap:12px; margin-bottom:15px; padding:12px; background:rgba(212,175,55,0.05); border-radius:8px; border:1px solid rgba(212,175,55,0.1);">
                             <div>
                                 <div style="font-size:0.7rem; color:var(--text-muted); text-transform:uppercase; margin-bottom:2px;">Combo Price</div>
                                 <div style="font-size:1.5rem; font-weight:800; color:var(--gold-primary);">₹<?php echo number_format($b['combo_price'], 0); ?></div>
@@ -217,7 +264,7 @@ foreach ($bundles as $b) {
                         <?php endif; ?>
 
                         <!-- Action Buttons -->
-                        <div style="display:flex; gap:8px;">
+                        <div class="bundle-actions" style="display:flex; gap:8px;">
                             <a href="bundle_edit.php?id=<?php echo $b['id']; ?>" 
                                style="flex:1; padding:10px; text-align:center; background:rgba(212,175,55,0.1); color:var(--gold-primary); border:1px solid rgba(212,175,55,0.2); border-radius:6px; text-decoration:none; font-size:0.85rem; font-weight:600; transition:all 0.2s; display:flex; align-items:center; justify-content:center; gap:6px;">
                                 <i class="fas fa-edit"></i> Edit & Manage Items

@@ -29,7 +29,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['update_cert'])) {
     // Handle new file upload
     if (isset($_FILES['cert_image']) && $_FILES['cert_image']['error'] === UPLOAD_ERR_OK) {
         $file = $_FILES['cert_image'];
-        $allowed = ['image/jpeg', 'image/png', 'image/gif', 'image/webp'];
+        $allowed = ['image/jpeg', 'image/png', 'image/gif', 'image/webp', 'application/pdf'];
         if (in_array($file['type'], $allowed) && $file['size'] <= 5 * 1024 * 1024) {
             $upload_dir = __DIR__ . '/../uploads/certificates/';
             if (!is_dir($upload_dir)) mkdir($upload_dir, 0755, true);
@@ -57,13 +57,23 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['update_cert'])) {
 }
 ?>
 
+    <style>
+        @media (max-width: 1024px) {
+            .cert-edit-grid { grid-template-columns: 1fr !important; }
+        }
+        @media (max-width: 768px) {
+            .cert-edit-grid { grid-template-columns: 1fr !important; }
+            .cert-edit-page-header { flex-direction: column !important; align-items: flex-start !important; gap: 12px; }
+        }
+    </style>
+
     <div style="margin-bottom:20px;">
         <a href="certificates.php" style="color:var(--gold-muted); font-size:0.9rem; text-decoration:none;">
             <i class="fas fa-arrow-left"></i> Back to Certificates
         </a>
     </div>
 
-    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:30px;">
+    <div class="cert-edit-page-header" style="display:flex; justify-content:space-between; align-items:center; margin-bottom:30px;">
         <h2 style="font-size:1.8rem; text-transform:uppercase;">Edit Certificate</h2>
         <span class="admin-badge <?php echo $cert['status'] ? 'badge-completed' : 'badge-pending'; ?>" style="font-size:0.75rem;">
             <?php echo $cert['status'] ? 'Active' : 'Inactive'; ?>
@@ -83,7 +93,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['update_cert'])) {
         </div>
     <?php endif; ?>
 
-    <div style="display:grid; grid-template-columns:1fr 300px; gap:28px; align-items:start;">
+    <div class="cert-edit-grid" style="display:grid; grid-template-columns:1fr 300px; gap:28px; align-items:start;">
 
         <!-- Edit Form -->
         <div class="glass-card" style="padding:0; overflow:hidden;">
@@ -101,12 +111,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['update_cert'])) {
                 </div>
 
                 <div class="form-group" style="margin-bottom:20px;">
-                    <label style="font-size:0.75rem; text-transform:uppercase; letter-spacing:0.8px; color:rgba(255,255,255,0.5); margin-bottom:8px; display:block;">Upload New Image</label>
+                    <label style="font-size:0.75rem; text-transform:uppercase; letter-spacing:0.8px; color:rgba(255,255,255,0.5); margin-bottom:8px; display:block;">Upload New File</label>
                     <div style="border:1px dashed rgba(212,175,55,0.25); border-radius:8px; padding:24px; text-align:center; background:rgba(212,175,55,0.02); cursor:pointer; position:relative;" onclick="document.getElementById('cert-image-input').click();">
                         <i class="fas fa-cloud-upload-alt" style="font-size:1.8rem; color:rgba(212,175,55,0.3); margin-bottom:10px; display:block;"></i>
-                        <p style="font-size:0.85rem; color:rgba(255,255,255,0.45); margin:0 0 4px 0;">Click to upload new image (optional)</p>
-                        <p style="font-size:0.72rem; color:rgba(255,255,255,0.3); margin:0;">Leave empty to keep current image</p>
-                        <input type="file" name="cert_image" id="cert-image-input" accept="image/*" style="display:none;" onchange="previewImage(this);">
+                        <p style="font-size:0.85rem; color:rgba(255,255,255,0.45); margin:0 0 4px 0;">Click to upload new file (optional)</p>
+                        <p style="font-size:0.72rem; color:rgba(255,255,255,0.3); margin:0;">Leave empty to keep current file</p>
+                        <input type="file" name="cert_image" id="cert-image-input" accept="image/*,.pdf" style="display:none;" onchange="previewImage(this);">
                     </div>
                     <div id="image-preview" style="margin-top:12px; display:none;">
                         <img id="preview-img" src="" alt="Preview" style="width:100%; max-height:180px; object-fit:contain; border-radius:8px; border:1px solid rgba(255,255,255,0.08);">
@@ -153,11 +163,18 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['update_cert'])) {
             <!-- Current Image Preview -->
             <div class="glass-card" style="margin-top:16px; padding:0; overflow:hidden;">
                 <div style="padding:16px 20px; border-bottom:1px solid rgba(255,255,255,0.06);">
-                    <h4 style="font-size:0.8rem; font-weight:700; color:#fff; text-transform:uppercase; letter-spacing:0.5px;">Current Image</h4>
+                    <h4 style="font-size:0.8rem; font-weight:700; color:#fff; text-transform:uppercase; letter-spacing:0.5px;">Current File</h4>
                 </div>
                 <div style="padding:16px 20px; display:flex; align-items:center; justify-content:center;">
                     <div style="width:100%; height:140px; border-radius:8px; overflow:hidden; background:rgba(255,255,255,0.03); border:1px solid rgba(255,255,255,0.06); display:flex; align-items:center; justify-content:center;">
-                        <img src="../<?php echo htmlspecialchars($cert['image_url']); ?>" alt="Preview" style="max-width:100%; max-height:100%; object-fit:contain;">
+                        <?php if (strtolower(pathinfo($cert['image_url'], PATHINFO_EXTENSION)) === 'pdf'): ?>
+                            <a href="../<?php echo htmlspecialchars($cert['image_url']); ?>" target="_blank" style="text-decoration:none; display:flex; flex-direction:column; align-items:center; gap:8px;">
+                                <i class="fas fa-file-pdf" style="font-size:2.5rem; color:#D4AF37;"></i>
+                                <span style="font-size:0.75rem; color:rgba(255,255,255,0.4);">Click to view PDF</span>
+                            </a>
+                        <?php else: ?>
+                            <img src="../<?php echo htmlspecialchars($cert['image_url']); ?>" alt="Preview" style="max-width:100%; max-height:100%; object-fit:contain;">
+                        <?php endif; ?>
                     </div>
                 </div>
             </div>

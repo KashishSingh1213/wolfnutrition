@@ -13,11 +13,24 @@ $certs = get_certificates();
 
         <!-- Certificates Gallery Grid -->
         <?php if (!empty($certs)): ?>
-            <div style="display:grid; grid-template-columns: repeat(3, 1fr); gap:30px; margin-bottom:50px;">
-                <?php foreach ($certs as $cert): ?>
-                    <div class="glass-card" style="padding: 20px; border-radius:8px; text-align:center;">
-                        <img src="<?php echo htmlspecialchars($cert['image_url']); ?>" alt="<?php echo htmlspecialchars($cert['title']); ?>" style="width:100%; border-radius:4px; cursor:zoom-in; border:1px solid var(--border-color);" onclick="showCertModal('<?php echo htmlspecialchars($cert['image_url']); ?>', '<?php echo htmlspecialchars($cert['title']); ?>')">
-                        <h4 style="margin-top:15px; font-size:0.95rem; color:#fff;"><?php echo htmlspecialchars($cert['title']); ?></h4>
+            <div style="display:grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap:30px; margin-bottom:50px; <?php echo count($certs) === 1 ? 'max-width:500px; margin-left:auto; margin-right:auto;' : ''; ?>">
+                <?php foreach ($certs as $cert):
+                    $is_pdf = strtolower(pathinfo($cert['image_url'], PATHINFO_EXTENSION)) === 'pdf';
+                ?>
+                    <div class="glass-card" style="padding: 30px; border-radius:12px; text-align:center; border:1px solid rgba(212,175,55,0.12);">
+                        <?php if ($is_pdf): ?>
+                            <a href="<?php echo htmlspecialchars($cert['image_url']); ?>" target="_blank" style="display:block; text-decoration:none;">
+                                <div style="width:100%; height:220px; background:linear-gradient(135deg, rgba(212,175,55,0.08) 0%, rgba(212,175,55,0.02) 100%); border:1px solid rgba(212,175,55,0.2); border-radius:10px; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:14px; transition:all 0.3s;" onmouseover="this.style.borderColor='rgba(212,175,55,0.4)'" onmouseout="this.style.borderColor='rgba(212,175,55,0.2)'">
+                                    <div style="width:70px; height:70px; border-radius:50%; background:rgba(212,175,55,0.1); display:flex; align-items:center; justify-content:center;">
+                                        <i class="fas fa-file-pdf" style="font-size:2rem; color:#D4AF37;"></i>
+                                    </div>
+                                    <span style="font-size:0.85rem; color:rgba(255,255,255,0.6); font-weight:500;">Click to view certificate</span>
+                                </div>
+                            </a>
+                        <?php else: ?>
+                            <img src="<?php echo htmlspecialchars($cert['image_url']); ?>" alt="<?php echo htmlspecialchars($cert['title']); ?>" style="width:100%; border-radius:8px; cursor:zoom-in; border:1px solid var(--border-color);" onclick="showCertModal('<?php echo htmlspecialchars($cert['image_url']); ?>', '<?php echo htmlspecialchars($cert['title']); ?>')">
+                        <?php endif; ?>
+                        <h4 style="margin-top:18px; font-size:1rem; color:#fff;"><?php echo htmlspecialchars($cert['title']); ?></h4>
                     </div>
                 <?php endforeach; ?>
             </div>

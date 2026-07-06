@@ -9,14 +9,7 @@ if (is_logged_in()) {
 
 $login_error = '';
 
-function get_client_ip() {
-    if (!empty($_SERVER['HTTP_CLIENT_IP'])) {
-        return $_SERVER['HTTP_CLIENT_IP'];
-    } elseif (!empty($_SERVER['HTTP_X_FORWARDED_FOR'])) {
-        return explode(',', $_SERVER['HTTP_X_FORWARDED_FOR'])[0];
-    }
-    return $_SERVER['REMOTE_ADDR'];
-}
+// get_client_ip() is now provided by includes/security.php via includes/functions.php
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['login_btn'])) {
     $email = trim($_POST['email']);
@@ -79,8 +72,24 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['login_btn'])) {
 }
 ?>
 
+    <style>
+        @media (max-width: 480px) {
+            .login-card {
+                padding: 30px 20px !important;
+                margin: 0 12px !important;
+                border-radius: 12px !important;
+            }
+            .login-card img {
+                height: 50px !important;
+            }
+            .login-card h2 {
+                font-size: 1.5rem !important;
+            }
+        }
+    </style>
+
     <div class="container" style="margin-top: 60px; margin-bottom: 90px; max-width:480px;">
-        <div class="glass-card" style="padding: 45px 35px; border-radius: 16px; border: 1px solid rgba(212,175,55,0.15); box-shadow: 0 15px 35px rgba(8,12,16,0.4); background: rgba(18,18,18,0.65); backdrop-filter: blur(12px);">
+        <div class="glass-card login-card" style="padding: 45px 35px; border-radius: 16px; border: 1px solid rgba(212,175,55,0.15); box-shadow: 0 15px 35px rgba(8,12,16,0.4); background: rgba(18,18,18,0.65); backdrop-filter: blur(12px);">
             <div style="text-align: center; margin-bottom: 30px;">
                 <img src="assets/images/logo.png" alt="Wolf Nutrition Logo" style="height: 65px; margin-bottom: 15px;">
                 <h2 style="font-size:1.9rem; text-transform:uppercase; color:var(--text-primary); font-family:var(--font-heading); font-weight:800; letter-spacing:0.5px; margin:0;">

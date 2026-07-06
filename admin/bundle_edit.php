@@ -129,6 +129,45 @@ $stmt_items2->execute([$edit_id]);
 $items = $stmt_items2->fetchAll();
 ?>
 
+    <style>
+        /* ── Responsive: Tablet ── */
+        @media (max-width: 1024px) {
+            .bundle-edit-grid {
+                grid-template-columns: 1fr !important;
+            }
+        }
+
+        /* ── Responsive: Mobile ── */
+        @media (max-width: 768px) {
+            .bundle-edit-grid {
+                grid-template-columns: 1fr !important;
+            }
+            .bundle-edit-form-fields {
+                grid-template-columns: 1fr !important;
+            }
+            .bundle-edit-add-form {
+                grid-template-columns: 1fr !important;
+            }
+            .bundle-edit-add-form .btn-gold {
+                width: 100%;
+                justify-content: center;
+            }
+            .bundle-item-row {
+                flex-direction: column !important;
+                align-items: flex-start !important;
+                gap: 8px;
+            }
+            .bundle-banner-row {
+                flex-direction: column !important;
+                align-items: flex-start !important;
+                gap: 10px;
+            }
+            .bundle-banner-row img {
+                max-width: 100% !important;
+            }
+        }
+    </style>
+
     <div style="margin-bottom:20px;">
         <a href="bundles.php" style="color:var(--gold-muted); font-size:0.9rem; text-decoration:none;">
             <i class="fas fa-arrow-left"></i> Back to Combos
@@ -151,7 +190,7 @@ $items = $stmt_items2->fetchAll();
         </div>
     <?php endif; ?>
 
-    <div style="display:grid; grid-template-columns: 1.5fr 1fr; gap:30px; align-items:start;">
+    <div class="bundle-edit-grid" style="display:grid; grid-template-columns: 1.5fr 1fr; gap:30px; align-items:start;">
         
         <!-- Left: Edit Details + Items -->
         <div style="display:flex; flex-direction:column; gap:25px;">
@@ -175,7 +214,7 @@ $items = $stmt_items2->fetchAll();
                         <textarea name="description" id="b-desc" class="form-control" rows="3"><?php echo htmlspecialchars($bundle['description']); ?></textarea>
                     </div>
 
-                    <div style="display:grid; grid-template-columns:1fr 1fr; gap:20px; margin-bottom:20px;">
+                    <div class="bundle-edit-form-fields" style="display:grid; grid-template-columns:1fr 1fr; gap:20px; margin-bottom:20px;">
                         <div class="form-group">
                             <label for="b-price">Combo Price (₹) *</label>
                             <input type="number" step="0.01" name="combo_price" id="b-price" class="form-control" 
@@ -188,7 +227,7 @@ $items = $stmt_items2->fetchAll();
                         </div>
                     </div>
 
-                    <div style="display:grid; grid-template-columns:1fr 1fr; gap:20px; margin-bottom:20px;">
+                    <div class="bundle-edit-form-fields" style="display:grid; grid-template-columns:1fr 1fr; gap:20px; margin-bottom:20px;">
                         <div class="form-group">
                             <label for="b-order">Display Order</label>
                             <input type="number" name="display_order" id="b-order" class="form-control" 
@@ -204,7 +243,7 @@ $items = $stmt_items2->fetchAll();
 
                     <!-- Banner Image -->
                     <?php if ($bundle['banner_image']): ?>
-                        <div style="margin-bottom:15px; display:flex; align-items:center; gap:15px;">
+                        <div class="bundle-banner-row" style="margin-bottom:15px; display:flex; align-items:center; gap:15px;">
                             <span style="font-size:0.85rem; color:var(--text-muted);">Current banner:</span>
                             <img src="../<?php echo htmlspecialchars($bundle['banner_image']); ?>" alt="" style="height:60px; width:auto; max-width:200px; object-fit:contain; background:#111; border-radius:6px; border:1px solid var(--border-color);">
                         </div>
@@ -233,7 +272,7 @@ $items = $stmt_items2->fetchAll();
                 <?php else: ?>
                     <div style="margin-bottom:25px;">
                         <?php foreach ($items as $item): ?>
-                            <div style="display:flex; justify-content:space-between; align-items:center; padding:12px 15px; border-bottom:1px solid rgba(255,255,255,0.05); font-size:0.9rem;">
+                            <div class="bundle-item-row" style="display:flex; justify-content:space-between; align-items:center; padding:12px 15px; border-bottom:1px solid rgba(255,255,255,0.05); font-size:0.9rem;">
                                 <span>
                                     <i class="fas fa-check-circle" style="color:var(--gold-primary); margin-right:8px;"></i>
                                     <strong><?php echo htmlspecialchars($item['p_name']); ?></strong>
@@ -253,7 +292,7 @@ $items = $stmt_items2->fetchAll();
                 <!-- Add Item Form -->
                 <div style="background:var(--bg-primary); border:1px solid var(--border-color); padding:20px; border-radius:6px;">
                     <h4 style="font-size:0.9rem; color:var(--text-muted); margin-bottom:15px; text-transform:uppercase;">Add Item to Combo</h4>
-                    <form action="bundle_edit.php?id=<?php echo $edit_id; ?>" method="POST" style="display:grid; grid-template-columns: 2fr 2fr auto; gap:15px; align-items:end;">
+                    <form action="bundle_edit.php?id=<?php echo $edit_id; ?>" method="POST" class="bundle-edit-add-form" style="display:grid; grid-template-columns: 2fr 2fr auto; gap:15px; align-items:end;">
                         <div class="form-group" style="margin:0;">
                             <label style="font-size:0.75rem; color:var(--text-muted); display:block; margin-bottom:4px;">Select Product</label>
                             <select name="product_id" id="product_select" class="form-control" required onchange="updateVariants(this.value);">

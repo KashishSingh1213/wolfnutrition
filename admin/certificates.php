@@ -40,8 +40,32 @@ foreach ($certs as $c) { if ($c['status']) $active_count++; }
 $inactive_count = $total_count - $active_count;
 ?>
 
+    <style>
+        @media (max-width: 1024px) {
+            .cert-page-header { flex-direction: column !important; align-items: flex-start !important; gap: 12px; }
+        }
+        @media (max-width: 768px) {
+            .cert-page-header { flex-direction: column !important; align-items: flex-start !important; gap: 12px; }
+            .cert-stats-grid { grid-template-columns: 1fr !important; gap: 10px !important; }
+            .cert-table thead { display: none !important; }
+            .cert-table, .cert-table tbody, .cert-table tr, .cert-table td { display: block !important; width: 100% !important; }
+            .cert-table tbody tr { background: rgba(18,18,18,0.4); border: 1px solid rgba(255,255,255,0.06); border-radius: 10px; padding: 14px 16px; margin: 0 16px 10px 16px; }
+            .cert-table tbody tr:first-child { margin-top: 10px; }
+            .cert-table tbody td { padding: 3px 0 !important; border-bottom: none !important; font-size: 0.85rem; }
+            .cert-table tbody td::before { content: attr(data-label); display: block; font-size: 0.62rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.7px; color: rgba(255,255,255,0.3); margin-bottom: 1px; }
+            .cert-table tbody td.cert-td-preview { display: flex !important; justify-content: center !important; padding-bottom: 8px !important; border-bottom: 1px solid rgba(255,255,255,0.04) !important; }
+            .cert-table tbody td.cert-td-preview::before { display: none; }
+            .cert-table tbody td.cert-td-title::before { display: none; }
+            .cert-table tbody td.cert-td-title { font-size: 0.95rem; padding-bottom: 6px !important; border-bottom: 1px solid rgba(255,255,255,0.04) !important; }
+            .cert-table tbody td.cert-td-actions::before { display: none; }
+            .cert-table tbody td.cert-td-actions { padding-top: 8px !important; border-top: 1px solid rgba(255,255,255,0.04); }
+            .cert-table tbody td.cert-td-actions .cert-action-btns { width: 100% !important; }
+            .cert-table tbody td.cert-td-actions .cert-action-btns a { flex: 1 !important; justify-content: center !important; }
+        }
+    </style>
+
     <!-- Page Header -->
-    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:30px;">
+    <div class="cert-page-header" style="display:flex; justify-content:space-between; align-items:center; margin-bottom:30px;">
         <div>
             <h2 style="font-size:1.8rem; text-transform:uppercase; margin-bottom:5px;">Quality Certificates</h2>
             <p style="font-size:0.85rem; color:var(--text-muted);">Manage FSSAI, purity certificates and lab stamps</p>
@@ -59,7 +83,7 @@ $inactive_count = $total_count - $active_count;
     <?php endif; ?>
 
     <!-- Stats Cards -->
-    <div style="display:grid; grid-template-columns:repeat(3, 1fr); gap:16px; margin-bottom:28px;">
+    <div class="cert-stats-grid" style="display:grid; grid-template-columns:repeat(3, 1fr); gap:16px; margin-bottom:28px;">
         <div class="glass-card" style="padding:18px 22px; display:flex; align-items:center; gap:14px;">
             <div style="width:44px; height:44px; border-radius:12px; background:rgba(212,175,55,0.1); display:flex; align-items:center; justify-content:center;">
                 <i class="fas fa-certificate" style="color:#D4AF37; font-size:1rem;"></i>
@@ -103,7 +127,7 @@ $inactive_count = $total_count - $active_count;
     <?php else: ?>
         <div class="glass-card" style="padding:0; overflow:hidden;">
             <div style="overflow-x:auto;">
-                <table class="admin-table" style="margin-top:0;">
+                <table class="admin-table cert-table" style="margin-top:0;">
                     <thead>
                         <tr>
                             <th style="width:80px;">Preview</th>
@@ -114,28 +138,36 @@ $inactive_count = $total_count - $active_count;
                         </tr>
                     </thead>
                     <tbody>
-                        <?php foreach ($certs as $c): ?>
+                        <?php foreach ($certs as $c):
+                            $c_is_pdf = strtolower(pathinfo($c['image_url'], PATHINFO_EXTENSION)) === 'pdf';
+                        ?>
                             <tr>
-                                <td>
+                                <td data-label="" class="cert-td-preview">
                                     <div style="width:56px; height:56px; border-radius:8px; overflow:hidden; background:rgba(255,255,255,0.03); border:1px solid rgba(255,255,255,0.06); display:flex; align-items:center; justify-content:center;">
-                                        <img src="../<?php echo htmlspecialchars($c['image_url']); ?>" alt="Certificate" style="width:100%; height:100%; object-fit:cover;">
+                                        <?php if ($c_is_pdf): ?>
+                                            <a href="../<?php echo htmlspecialchars($c['image_url']); ?>" target="_blank" style="text-decoration:none;">
+                                                <i class="fas fa-file-pdf" style="font-size:1.5rem; color:#D4AF37;"></i>
+                                            </a>
+                                        <?php else: ?>
+                                            <img src="../<?php echo htmlspecialchars($c['image_url']); ?>" alt="Certificate" style="width:100%; height:100%; object-fit:cover;">
+                                        <?php endif; ?>
                                     </div>
                                 </td>
-                                <td>
+                                <td data-label="" class="cert-td-title">
                                     <span style="font-weight:600; color:#fff; font-size:0.875rem;"><?php echo htmlspecialchars($c['title']); ?></span>
                                 </td>
-                                <td>
+                                <td data-label="Order">
                                     <span style="width:28px; height:28px; border-radius:6px; background:rgba(255,255,255,0.05); display:flex; align-items:center; justify-content:center; font-weight:700; color:#fff; font-size:0.8rem;">
                                         <?php echo $c['display_order']; ?>
                                     </span>
                                 </td>
-                                <td>
+                                <td data-label="Status">
                                     <span class="admin-badge <?php echo $c['status'] ? 'badge-completed' : 'badge-pending'; ?>">
                                         <?php echo $c['status'] ? 'Active' : 'Inactive'; ?>
                                     </span>
                                 </td>
-                                <td>
-                                    <div style="display:flex; gap:6px; align-items:center;">
+                                <td data-label="" class="cert-td-actions">
+                                    <div class="cert-action-btns" style="display:flex; gap:6px; align-items:center;">
                                         <a href="certificate_edit.php?id=<?php echo $c['id']; ?>" title="Edit" style="width:34px; height:34px; border-radius:8px; background:rgba(212,175,55,0.08); border:1px solid rgba(212,175,55,0.15); display:flex; align-items:center; justify-content:center; color:#D4AF37; font-size:0.8rem; text-decoration:none;">
                                             <i class="fas fa-pen"></i>
                                         </a>

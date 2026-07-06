@@ -37,13 +37,108 @@ $draft_count = 0;
 foreach ($posts as $p) { if ($p['status']) $published_count++; else $draft_count++; }
 ?>
 
+    <style>
+        /* ── Responsive: Tablet ── */
+        @media (max-width: 1024px) {
+            .blog-page-header {
+                flex-direction: column !important;
+                align-items: flex-start !important;
+                gap: 12px;
+            }
+            .blog-header-actions {
+                width: 100% !important;
+            }
+        }
+
+        /* ── Responsive: Mobile ── */
+        @media (max-width: 768px) {
+            .blog-page-header {
+                flex-direction: column !important;
+                align-items: flex-start !important;
+                gap: 12px;
+            }
+            .blog-header-actions {
+                width: 100% !important;
+                flex-wrap: wrap !important;
+            }
+            .blog-header-actions a {
+                flex: 1 !important;
+                justify-content: center !important;
+                min-width: 0 !important;
+            }
+            .blog-stats-grid {
+                grid-template-columns: 1fr !important;
+                gap: 10px !important;
+            }
+            /* Table → cards */
+            .blog-table thead {
+                display: none !important;
+            }
+            .blog-table,
+            .blog-table tbody,
+            .blog-table tr,
+            .blog-table td {
+                display: block !important;
+                width: 100% !important;
+            }
+            .blog-table tbody tr {
+                background: rgba(18,18,18,0.4);
+                border: 1px solid rgba(255,255,255,0.06);
+                border-radius: 10px;
+                padding: 14px 16px;
+                margin: 0 16px 10px 16px;
+            }
+            .blog-table tbody tr:first-child {
+                margin-top: 10px;
+            }
+            .blog-table tbody td {
+                padding: 3px 0 !important;
+                border-bottom: none !important;
+                font-size: 0.85rem;
+            }
+            .blog-table tbody td::before {
+                content: attr(data-label);
+                display: block;
+                font-size: 0.62rem;
+                font-weight: 700;
+                text-transform: uppercase;
+                letter-spacing: 0.7px;
+                color: rgba(255,255,255,0.3);
+                margin-bottom: 1px;
+            }
+            .blog-table tbody td.blog-td-title::before { display: none; }
+            .blog-table tbody td.blog-td-title {
+                font-size: 0.95rem;
+                padding-bottom: 6px !important;
+                border-bottom: 1px solid rgba(255,255,255,0.04) !important;
+            }
+            .blog-table tbody td.blog-td-title img,
+            .blog-table tbody td.blog-td-title div > img {
+                width: 44px !important;
+                height: 44px !important;
+            }
+            .blog-table tbody td.blog-td-actions::before { display: none; }
+            .blog-table tbody td.blog-td-actions {
+                padding-top: 8px !important;
+                border-top: 1px solid rgba(255,255,255,0.04);
+            }
+            .blog-table tbody td.blog-td-actions .blog-action-btns {
+                width: 100% !important;
+            }
+            .blog-table tbody td.blog-td-actions .blog-action-btns a {
+                flex: 1 !important;
+                justify-content: center !important;
+            }
+        }
+    </style>
+
     <!-- Page Header -->
-    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:30px;">
+    <div class="blog-page-header" style="display:flex; justify-content:space-between; align-items:center; margin-bottom:30px;">
         <div>
             <h2 style="font-size:1.8rem; text-transform:uppercase; margin-bottom:5px;">Blog Manager</h2>
             <p style="font-size:0.85rem; color:var(--text-muted);">Author and publish wellness articles</p>
         </div>
-        <div style="display:flex; gap:10px;">
+        <div class="blog-header-actions" style="display:flex; gap:10px;">
             <a href="blog_categories.php" style="padding:10px 18px; font-size:0.85rem; text-decoration:none; display:inline-flex; align-items:center; gap:8px; border:1px solid rgba(212,175,55,0.2); color:var(--gold-primary); border-radius:10px; background:rgba(212,175,55,0.06);">
                 <i class="fas fa-folder"></i> Categories
             </a>
@@ -64,7 +159,7 @@ foreach ($posts as $p) { if ($p['status']) $published_count++; else $draft_count
     <?php endif; ?>
 
     <!-- Stats Cards -->
-    <div style="display:grid; grid-template-columns:repeat(3, 1fr); gap:16px; margin-bottom:28px;">
+    <div class="blog-stats-grid" style="display:grid; grid-template-columns:repeat(3, 1fr); gap:16px; margin-bottom:28px;">
         <div class="glass-card" style="padding:18px 22px; display:flex; align-items:center; gap:14px;">
             <div style="width:44px; height:44px; border-radius:12px; background:rgba(212,175,55,0.1); display:flex; align-items:center; justify-content:center;">
                 <i class="fas fa-newspaper" style="color:#D4AF37; font-size:1rem;"></i>
@@ -114,7 +209,7 @@ foreach ($posts as $p) { if ($p['status']) $published_count++; else $draft_count
                 <h3 style="font-size:0.95rem; font-weight:700; color:#fff; text-transform:uppercase; letter-spacing:0.5px; margin:0;">All Articles</h3>
             </div>
             <div style="overflow-x:auto;">
-                <table class="admin-table" style="margin-top:0; border:none; border-radius:0;">
+                <table class="admin-table blog-table" style="margin-top:0; border:none; border-radius:0;">
                     <thead>
                         <tr>
                             <th>Article</th>
@@ -128,7 +223,7 @@ foreach ($posts as $p) { if ($p['status']) $published_count++; else $draft_count
                     <tbody>
                         <?php foreach ($posts as $post): ?>
                             <tr>
-                                <td>
+                                <td data-label="" class="blog-td-title">
                                     <div style="display:flex; align-items:center; gap:12px;">
                                         <?php if ($post['cover_image']): ?>
                                             <img src="../<?php echo htmlspecialchars($post['cover_image']); ?>" alt="" style="width:52px; height:52px; border-radius:8px; object-fit:cover; border:1px solid rgba(255,255,255,0.08);">
@@ -152,26 +247,26 @@ foreach ($posts as $p) { if ($p['status']) $published_count++; else $draft_count
                                         </div>
                                     </div>
                                 </td>
-                                <td>
+                                <td data-label="Category">
                                     <span style="font-size:0.72rem; font-weight:600; color:#D4AF37; background:rgba(212,175,55,0.08); padding:4px 10px; border-radius:20px; border:1px solid rgba(212,175,55,0.12);">
                                         <?php echo htmlspecialchars($post['category_tag']); ?>
                                     </span>
                                 </td>
-                                <td>
+                                <td data-label="Author">
                                     <div style="font-size:0.82rem; color:rgba(255,255,255,0.6);">
                                         <?php echo htmlspecialchars($post['author_name'] ?? $post['custom_author'] ?? 'Admin'); ?>
                                     </div>
                                 </td>
-                                <td>
+                                <td data-label="Date">
                                     <div style="font-size:0.8rem; color:rgba(255,255,255,0.5);"><?php echo date('M d, Y', strtotime($post['published_at'])); ?></div>
                                 </td>
-                                <td>
+                                <td data-label="Status">
                                     <span class="admin-badge <?php echo $post['status'] ? 'badge-completed' : 'badge-pending'; ?>">
                                         <?php echo $post['status'] ? 'Published' : 'Draft'; ?>
                                     </span>
                                 </td>
-                                <td>
-                                    <div style="display:flex; gap:6px;">
+                                <td data-label="" class="blog-td-actions">
+                                    <div class="blog-action-btns" style="display:flex; gap:6px;">
                                         <a href="blog_edit.php?id=<?php echo $post['id']; ?>" title="Edit" style="width:32px; height:32px; border-radius:8px; background:rgba(212,175,55,0.08); border:1px solid rgba(212,175,55,0.15); display:flex; align-items:center; justify-content:center; color:#D4AF37; font-size:0.75rem; text-decoration:none;">
                                             <i class="fas fa-pen"></i>
                                         </a>

@@ -37,6 +37,18 @@ if ($active_page === 'product.php' && isset($_GET['slug'])) {
 } elseif ($active_page === 'contact.php') {
     $seo_title = "Contact Us & Expert Support | Wolf Nutrition";
     $seo_desc = "Get in touch with Wolf Nutrition. Ask questions about your stacks, shipping, or book your free dietitian Ayurvedic call.";
+} elseif ($active_page === 'blog-post.php' && isset($_GET['slug'])) {
+    $blog_slug = $_GET['slug'];
+    $stmt_blog = $pdo->prepare("SELECT title, body, cover_image, category_tag, excerpt FROM blog_posts WHERE slug = ? AND status = 1");
+    $stmt_blog->execute([$blog_slug]);
+    $blog_seo = $stmt_blog->fetch(PDO::FETCH_ASSOC);
+    if ($blog_seo) {
+        $seo_title = htmlspecialchars($blog_seo['title']) . " | Wolf Nutrition Blog";
+        $blog_excerpt = !empty($blog_seo['excerpt']) ? $blog_seo['excerpt'] : strip_tags($blog_seo['body']);
+        $seo_desc = htmlspecialchars(substr($blog_excerpt, 0, 160));
+        $seo_keywords = htmlspecialchars($blog_seo['category_tag']) . ", wolf nutrition, ayurvedic, wellness, blog";
+        $blog_og_image = !empty($blog_seo['cover_image']) ? $blog_seo['cover_image'] : 'assets/images/logo.png';
+    }
 }
 ?>
 <!DOCTYPE html>
@@ -54,18 +66,20 @@ if ($active_page === 'product.php' && isset($_GET['slug'])) {
     <link rel="canonical" href="<?php echo $canonical_url; ?>">
 
     <!-- Open Graph / Facebook / Instagram -->
-    <meta property="og:type" content="website">
+    <meta property="og:type" content="article">
     <meta property="og:url" content="<?php echo $canonical_url; ?>">
     <meta property="og:title" content="<?php echo $seo_title; ?>">
     <meta property="og:description" content="<?php echo $seo_desc; ?>">
-    <meta property="og:image" content="http://<?php echo $_SERVER['HTTP_HOST']; ?>/wolfnutrition/assets/images/logo.png">
+    <meta property="og:image" content="http://<?php echo $_SERVER['HTTP_HOST']; ?>/wolfnutrition/<?php echo isset($blog_og_image) ? $blog_og_image : 'assets/images/logo.png'; ?>">
+    <meta property="og:image:width" content="1200">
+    <meta property="og:image:height" content="630">
 
     <!-- Twitter -->
     <meta property="twitter:card" content="summary_large_image">
     <meta property="twitter:url" content="<?php echo $canonical_url; ?>">
     <meta property="twitter:title" content="<?php echo $seo_title; ?>">
     <meta property="twitter:description" content="<?php echo $seo_desc; ?>">
-    <meta property="twitter:image" content="http://<?php echo $_SERVER['HTTP_HOST']; ?>/wolfnutrition/assets/images/logo.png">
+    <meta property="twitter:image" content="http://<?php echo $_SERVER['HTTP_HOST']; ?>/wolfnutrition/<?php echo isset($blog_og_image) ? $blog_og_image : 'assets/images/logo.png'; ?>">
 
     <!-- JSON-LD Structured Data for Search Engine rich snippets -->
     <script type="application/ld+json">
@@ -89,6 +103,28 @@ if ($active_page === 'product.php' && isset($_GET['slug'])) {
                 "highPrice" => "1999.00",
                 "offerCount" => "1"
             ]
+        ], JSON_UNESCAPED_SLASHES | JSON_PRETTY_PRINT);
+    } elseif ($active_page === 'blog-post.php' && isset($blog_seo)) {
+        echo json_encode([
+            "@context" => "https://schema.org",
+            "@type" => "BlogPosting",
+            "headline" => $blog_seo['title'],
+            "description" => $seo_desc,
+            "image" => !empty($blog_seo['cover_image']) ? "http://" . $_SERVER['HTTP_HOST'] . "/wolfnutrition/" . $blog_seo['cover_image'] : "http://" . $_SERVER['HTTP_HOST'] . "/wolfnutrition/assets/images/logo.png",
+            "author" => [
+                "@type" => "Organization",
+                "name" => "Wolf Nutrition"
+            ],
+            "publisher" => [
+                "@type" => "Organization",
+                "name" => "Wolf Nutrition",
+                "logo" => [
+                    "@type" => "ImageObject",
+                    "url" => "http://" . $_SERVER['HTTP_HOST'] . "/wolfnutrition/assets/images/logo.png"
+                ]
+            ],
+            "datePublished" => date('c', strtotime($post['published_at'])),
+            "mainEntityOfPage" => $canonical_url
         ], JSON_UNESCAPED_SLASHES | JSON_PRETTY_PRINT);
     } else {
         echo json_encode([

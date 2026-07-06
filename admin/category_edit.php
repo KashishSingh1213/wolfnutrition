@@ -156,6 +156,39 @@ $cat_products = $stmt_products->fetchAll();
             border-bottom: 1px solid rgba(255,255,255,0.04);
         }
         .product-list-item:last-child { border-bottom: none; }
+
+        /* ── Responsive: Tablet ── */
+        @media (max-width: 1024px) {
+            .cat-edit-grid {
+                grid-template-columns: 1fr !important;
+            }
+        }
+
+        /* ── Responsive: Mobile ── */
+        @media (max-width: 768px) {
+            .cat-edit-grid {
+                grid-template-columns: 1fr !important;
+            }
+            .cat-edit-bottom-fields {
+                grid-template-columns: 1fr !important;
+            }
+            .cat-edit-actions {
+                flex-direction: column !important;
+            }
+            .cat-edit-actions .btn-gold,
+            .cat-edit-actions .btn-outline-gold {
+                width: 100%;
+                justify-content: center;
+            }
+            .form-section-card {
+                padding: 20px !important;
+            }
+            .product-list-item {
+                flex-direction: column !important;
+                align-items: flex-start !important;
+                gap: 6px;
+            }
+        }
     </style>
 
     <!-- Back Link -->
@@ -188,7 +221,7 @@ $cat_products = $stmt_products->fetchAll();
         </div>
     <?php endif; ?>
 
-    <div style="display:grid; grid-template-columns:1.5fr 1fr; gap:24px; align-items:start;">
+    <div class="cat-edit-grid" style="display:grid; grid-template-columns:1.5fr 1fr; gap:24px; align-items:start;">
         
         <!-- Edit Form -->
         <div class="form-section-card">
@@ -215,7 +248,7 @@ $cat_products = $stmt_products->fetchAll();
                     <textarea name="description" class="form-input" rows="3"><?php echo htmlspecialchars($category['description']); ?></textarea>
                 </div>
 
-                <div style="display:grid; grid-template-columns:1fr 1fr; gap:18px;">
+                <div class="cat-edit-bottom-fields" style="display:grid; grid-template-columns:1fr 1fr; gap:18px;">
                     <div>
                         <label class="form-label">Display Order</label>
                         <input type="number" name="display_order" class="form-input" value="<?php echo $category['display_order']; ?>">
@@ -228,7 +261,7 @@ $cat_products = $stmt_products->fetchAll();
                     </div>
                 </div>
 
-                <div style="display:flex; gap:14px; margin-top:28px; padding-top:20px; border-top:1px solid rgba(255,255,255,0.06);">
+                <div class="cat-edit-actions" style="display:flex; gap:14px; margin-top:28px; padding-top:20px; border-top:1px solid rgba(255,255,255,0.06);">
                     <button type="submit" name="save_category" class="btn-gold" style="padding:12px 32px; font-size:0.88rem; font-weight:700; display:inline-flex; align-items:center; gap:8px;">
                         <i class="fas fa-save"></i> Update Category
                     </button>

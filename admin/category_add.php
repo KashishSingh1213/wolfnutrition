@@ -116,6 +116,42 @@ $total_cats = (int)$stmt_total->fetchColumn();
             border-radius: 20px;
             text-transform: uppercase;
         }
+
+        /* ── Responsive: Tablet ── */
+        @media (max-width: 1024px) {
+            .cat-form-grid {
+                grid-template-columns: 1fr !important;
+            }
+        }
+
+        /* ── Responsive: Mobile ── */
+        @media (max-width: 768px) {
+            .cat-form-grid {
+                grid-template-columns: 1fr !important;
+            }
+            .cat-form-bottom-fields {
+                grid-template-columns: 1fr !important;
+            }
+            .cat-form-actions {
+                flex-direction: column !important;
+            }
+            .cat-form-actions .btn-gold,
+            .cat-form-actions .btn-outline-gold {
+                width: 100%;
+                justify-content: center;
+            }
+            .form-section-card {
+                padding: 20px !important;
+            }
+            .existing-cat-item {
+                flex-direction: column !important;
+                align-items: flex-start !important;
+                gap: 6px;
+            }
+            .existing-cat-item > div:last-child {
+                width: 100%;
+            }
+        }
     </style>
 
     <!-- Back Link -->
@@ -141,7 +177,7 @@ $total_cats = (int)$stmt_total->fetchColumn();
         </div>
     <?php endif; ?>
 
-    <div style="display:grid; grid-template-columns:1.5fr 1fr; gap:24px; align-items:start;">
+    <div class="cat-form-grid" style="display:grid; grid-template-columns:1.5fr 1fr; gap:24px; align-items:start;">
         
         <!-- Add Form -->
         <div class="form-section-card">
@@ -167,7 +203,7 @@ $total_cats = (int)$stmt_total->fetchColumn();
                     <textarea name="description" class="form-input" rows="3" placeholder="Short description for this category"></textarea>
                 </div>
 
-                <div style="display:grid; grid-template-columns:1fr 1fr; gap:18px;">
+                <div class="cat-form-bottom-fields" style="display:grid; grid-template-columns:1fr 1fr; gap:18px;">
                     <div>
                         <label class="form-label">Display Order</label>
                         <input type="number" name="display_order" class="form-input" value="0">
@@ -181,7 +217,7 @@ $total_cats = (int)$stmt_total->fetchColumn();
                     </div>
                 </div>
 
-                <div style="display:flex; gap:14px; margin-top:28px; padding-top:20px; border-top:1px solid rgba(255,255,255,0.06);">
+                <div class="cat-form-actions" style="display:flex; gap:14px; margin-top:28px; padding-top:20px; border-top:1px solid rgba(255,255,255,0.06);">
                     <button type="submit" name="add_category" class="btn-gold" style="padding:12px 32px; font-size:0.88rem; font-weight:700; display:inline-flex; align-items:center; gap:8px;">
                         <i class="fas fa-plus"></i> Create Category
                     </button>

@@ -73,13 +73,24 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['create_post'])) {
 $total_posts = (int)$pdo->query("SELECT COUNT(id) FROM blog_posts")->fetchColumn();
 ?>
 
+    <style>
+        @media (max-width: 1024px) {
+            .badd-grid { grid-template-columns: 1fr !important; }
+            .badd-page-header { flex-direction: column !important; align-items: flex-start !important; gap: 8px; }
+        }
+        @media (max-width: 768px) {
+            .badd-grid { grid-template-columns: 1fr !important; }
+            .badd-page-header { flex-direction: column !important; align-items: flex-start !important; gap: 8px; }
+        }
+    </style>
+
     <div style="margin-bottom:20px;">
         <a href="blog.php" style="color:var(--gold-muted); font-size:0.9rem; text-decoration:none;">
             <i class="fas fa-arrow-left"></i> Back to Blog
         </a>
     </div>
 
-    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:30px;">
+    <div class="badd-page-header" style="display:flex; justify-content:space-between; align-items:center; margin-bottom:30px;">
         <h2 style="font-size:1.8rem; text-transform:uppercase;">New Article</h2>
         <div style="font-size:0.85rem; color:var(--text-muted);">Total articles: <strong style="color:var(--gold-primary);"><?php echo $total_posts; ?></strong></div>
     </div>
@@ -92,7 +103,7 @@ $total_posts = (int)$pdo->query("SELECT COUNT(id) FROM blog_posts")->fetchColumn
     <?php endif; ?>
 
     <form action="blog_add.php" method="POST" enctype="multipart/form-data">
-    <div style="display:grid; grid-template-columns:1fr 340px; gap:28px; align-items:start;">
+    <div class="badd-grid" style="display:grid; grid-template-columns:1fr 340px; gap:28px; align-items:start;">
 
         <!-- Main Content -->
         <div>

@@ -27,13 +27,23 @@ $stmt_total->execute();
 $total_ann = (int)$stmt_total->fetchColumn();
 ?>
 
+    <style>
+        @media (max-width: 768px) {
+            .ann-add-page-header {
+                flex-direction: column !important;
+                align-items: flex-start !important;
+                gap: 8px;
+            }
+        }
+    </style>
+
     <div style="margin-bottom:20px;">
         <a href="announcements.php" style="color:var(--gold-muted); font-size:0.9rem; text-decoration:none;">
             <i class="fas fa-arrow-left"></i> Back to Announcements
         </a>
     </div>
 
-    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:30px;">
+    <div class="ann-add-page-header" style="display:flex; justify-content:space-between; align-items:center; margin-bottom:30px;">
         <h2 style="font-size:1.8rem; text-transform:uppercase;">New Announcement</h2>
         <div style="font-size:0.85rem; color:var(--text-muted);">Total announcements: <strong style="color:var(--gold-primary);"><?php echo $total_ann; ?></strong></div>
     </div>

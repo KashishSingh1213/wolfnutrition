@@ -1,14 +1,25 @@
 <?php
 // register.php
 require_once __DIR__ . '/config/db.php';
+require_once __DIR__ . '/includes/security.php';
 
 // Handle Real-Time AJAX validations (runs before header to avoid HTML output corruption)
 if (isset($_GET['check_field']) && isset($_GET['value'])) {
     header('Content-Type: application/json');
+
+    // Rate limit AJAX lookups: max 20 per IP per minute
+    $ip = get_client_ip();
+    $stmt_rl = $pdo->prepare("SELECT COUNT(*) FROM login_attempts WHERE ip_address = ? AND attempt_time > DATE_SUB(NOW(), INTERVAL 1 MINUTE)");
+    $stmt_rl->execute([$ip]);
+    if ($stmt_rl->fetchColumn() >= 20) {
+        echo json_encode(['exists' => false, 'rate_limited' => true]);
+        exit();
+    }
+
     $field = $_GET['check_field'];
     $val = trim($_GET['value']);
     $response = ['exists' => false];
-    
+
     if ($field === 'email' && filter_var($val, FILTER_VALIDATE_EMAIL)) {
         $stmt = $pdo->prepare("SELECT id FROM users WHERE email = ?");
         $stmt->execute([$val]);
@@ -37,10 +48,14 @@ $register_error = '';
 $register_success = '';
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['register_btn'])) {
-    $name = trim($_POST['name']);
-    $email = trim($_POST['email']);
-    $phone = trim($_POST['phone']);
-    $password = trim($_POST['password']);
+    // CSRF Check
+    if (!isset($_POST['csrf_token']) || !hash_equals($_SESSION['csrf_token'] ?? '', $_POST['csrf_token'])) {
+        $register_error = "Invalid form submission. Please try again.";
+    } else {
+        $name = sanitize_string(trim($_POST['name']));
+        $email = sanitize_email(trim($_POST['email']));
+        $phone = preg_replace('/[^0-9]/', '', trim($_POST['phone']));
+        $password = trim($_POST['password']);
 
     // Server-Side Validations
     $password_regex = '/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/';
@@ -79,7 +94,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['register_btn'])) {
                     $_SESSION['user_id'] = $new_id;
                     $_SESSION['user_name'] = $name;
                     $_SESSION['user_role'] = 'customer';
-                    
+                    regenerate_session();
+
                     if (isset($_GET['redirect']) && $_GET['redirect'] === 'checkout') {
                         header("Location: checkout.php");
                     } else {
@@ -92,11 +108,28 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['register_btn'])) {
             }
         }
     }
+    } // End CSRF check
 }
 ?>
 
+    <style>
+        @media (max-width: 480px) {
+            .register-card {
+                padding: 30px 20px !important;
+                margin: 0 12px !important;
+                border-radius: 12px !important;
+            }
+            .register-card img {
+                height: 50px !important;
+            }
+            .register-card h2 {
+                font-size: 1.5rem !important;
+            }
+        }
+    </style>
+
     <div class="container" style="margin-top: 60px; margin-bottom: 90px; max-width:480px;">
-        <div class="glass-card" style="padding: 45px 35px; border-radius: 16px; border: 1px solid rgba(212,175,55,0.15); box-shadow: 0 15px 35px rgba(8,12,16,0.4); background: rgba(18,18,18,0.65); backdrop-filter: blur(12px);">
+        <div class="glass-card register-card" style="padding: 45px 35px; border-radius: 16px; border: 1px solid rgba(212,175,55,0.15); box-shadow: 0 15px 35px rgba(8,12,16,0.4); background: rgba(18,18,18,0.65); backdrop-filter: blur(12px);">
             <div style="text-align: center; margin-bottom: 30px;">
                 <img src="assets/images/logo.png" alt="Wolf Nutrition Logo" style="height: 65px; margin-bottom: 15px;">
                 <h2 style="font-size:1.9rem; text-transform:uppercase; color:var(--text-primary); font-family:var(--font-heading); font-weight:800; letter-spacing:0.5px; margin:0;">
@@ -114,6 +147,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['register_btn'])) {
             <?php endif; ?>
 
             <form action="register.php<?php echo isset($_GET['redirect']) ? '?redirect=' . htmlspecialchars($_GET['redirect']) : ''; ?>" method="POST" style="margin-top: 10px;">
+                <?php echo csrf_field(); ?>
                 <div class="form-group" style="margin-bottom: 20px;">
                     <label for="name" style="font-size: 0.88rem; text-transform: uppercase; letter-spacing: 0.5px; font-weight: 700; color: var(--text-secondary); margin-bottom: 8px;">Full Name</label>
                     <input type="text" name="name" id="name" class="form-control" placeholder="e.g. Yuvek Verma" required style="border-radius: 8px; border-color: rgba(255,255,255,0.08); font-size: 0.95rem; height: auto; padding: 13px 16px;">

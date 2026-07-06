@@ -401,9 +401,9 @@ $admin_name = $_SESSION['admin_name'];
             }
             .admin-topbar-user span.full-name { display: none; }
             .admin-layout {
+                height: calc(100vh - 56px);
                 overflow: hidden;
             }
-            /* Sidebar responsive handled in sidebar.php */
             .admin-content {
                 padding: 20px 16px;
             }

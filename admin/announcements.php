@@ -32,8 +32,74 @@ foreach ($announcements as $a) { if ($a['status']) $active_count++; }
 $inactive_count = $total_count - $active_count;
 ?>
 
+    <style>
+        /* ── Responsive: Tablet ── */
+        @media (max-width: 1024px) {
+            .ann-page-header {
+                flex-direction: column !important;
+                align-items: flex-start !important;
+                gap: 12px;
+            }
+            .ann-stats-grid {
+                grid-template-columns: repeat(3, 1fr) !important;
+            }
+            .ann-grid {
+                grid-template-columns: 1fr !important;
+            }
+        }
+
+        /* ── Responsive: Mobile ── */
+        @media (max-width: 768px) {
+            .ann-page-header {
+                flex-direction: column !important;
+                align-items: flex-start !important;
+                gap: 12px;
+            }
+            .ann-stats-grid {
+                grid-template-columns: 1fr !important;
+                gap: 10px !important;
+            }
+            .ann-grid {
+                grid-template-columns: 1fr !important;
+                gap: 12px !important;
+            }
+            .ann-card-inner {
+                flex-direction: column !important;
+            }
+            .ann-card-order {
+                width: 100% !important;
+                min-height: auto !important;
+                flex-direction: row !important;
+                padding: 10px 16px !important;
+                gap: 8px !important;
+                border-right: none !important;
+                border-bottom: 1px solid rgba(255,255,255,0.05) !important;
+            }
+            .ann-card-order span:first-child {
+                font-size: 1rem !important;
+            }
+            .ann-card-content {
+                padding: 14px 16px !important;
+                flex-direction: column !important;
+                align-items: flex-start !important;
+                gap: 12px !important;
+            }
+            .ann-card-msg {
+                white-space: normal !important;
+            }
+            .ann-card-actions {
+                width: 100% !important;
+                justify-content: flex-end !important;
+            }
+            .ann-card-actions a {
+                width: 38px !important;
+                height: 38px !important;
+            }
+        }
+    </style>
+
     <!-- Page Header -->
-    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:30px;">
+    <div class="ann-page-header" style="display:flex; justify-content:space-between; align-items:center; margin-bottom:30px;">
         <div>
             <h2 style="font-size:1.8rem; text-transform:uppercase; margin-bottom:5px;">Announcements</h2>
             <p style="font-size:0.85rem; color:var(--text-muted);">Manage scrolling header bar messages</p>
@@ -51,7 +117,7 @@ $inactive_count = $total_count - $active_count;
     <?php endif; ?>
 
     <!-- Stats Cards -->
-    <div style="display:grid; grid-template-columns:repeat(3, 1fr); gap:16px; margin-bottom:28px;">
+    <div class="ann-stats-grid" style="display:grid; grid-template-columns:repeat(3, 1fr); gap:16px; margin-bottom:28px;">
         <div class="glass-card" style="padding:18px 22px; display:flex; align-items:center; gap:14px;">
             <div style="width:44px; height:44px; border-radius:12px; background:rgba(212,175,55,0.1); display:flex; align-items:center; justify-content:center;">
                 <i class="fas fa-bullhorn" style="color:#D4AF37; font-size:1rem;"></i>
@@ -93,20 +159,20 @@ $inactive_count = $total_count - $active_count;
             </a>
         </div>
     <?php else: ?>
-        <div style="display:grid; grid-template-columns:repeat(auto-fill, minmax(480px, 1fr)); gap:16px;">
+        <div class="ann-grid" style="display:grid; grid-template-columns:repeat(auto-fill, minmax(480px, 1fr)); gap:16px;">
             <?php foreach ($announcements as $ann): ?>
                 <div class="glass-card" style="padding:0; overflow:hidden; <?php echo !$ann['status'] ? 'opacity:0.5;' : ''; ?>">
-                    <div style="display:flex; align-items:stretch;">
+                    <div class="ann-card-inner" style="display:flex; align-items:stretch;">
                         <!-- Order Badge -->
-                        <div style="width:56px; min-height:100%; background:rgba(212,175,55,0.06); border-right:1px solid rgba(255,255,255,0.05); display:flex; align-items:center; justify-content:center; flex-direction:column; gap:2px;">
+                        <div class="ann-card-order" style="width:56px; min-height:100%; background:rgba(212,175,55,0.06); border-right:1px solid rgba(255,255,255,0.05); display:flex; align-items:center; justify-content:center; flex-direction:column; gap:2px;">
                             <span style="font-size:1.3rem; font-weight:800; color:var(--gold-primary); line-height:1;"><?php echo $ann['display_order']; ?></span>
                             <span style="font-size:0.55rem; color:rgba(255,255,255,0.3); text-transform:uppercase; letter-spacing:0.5px;">Order</span>
                         </div>
 
                         <!-- Content -->
-                        <div style="flex:1; padding:16px 20px; display:flex; align-items:center; justify-content:space-between; gap:16px;">
+                        <div class="ann-card-content" style="flex:1; padding:16px 20px; display:flex; align-items:center; justify-content:space-between; gap:16px;">
                             <div style="flex:1; min-width:0;">
-                                <p style="font-size:0.92rem; color:#fff; font-weight:600; margin:0 0 6px 0; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">
+                                <p class="ann-card-msg" style="font-size:0.92rem; color:#fff; font-weight:600; margin:0 0 6px 0; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">
                                     <?php echo htmlspecialchars($ann['message']); ?>
                                 </p>
                                 <div style="display:flex; align-items:center; gap:12px; flex-wrap:wrap;">
@@ -122,7 +188,7 @@ $inactive_count = $total_count - $active_count;
                             </div>
 
                             <!-- Actions -->
-                            <div style="display:flex; gap:6px; flex-shrink:0;">
+                            <div class="ann-card-actions" style="display:flex; gap:6px; flex-shrink:0;">
                                 <a href="announcement_edit.php?id=<?php echo $ann['id']; ?>" title="Edit" style="width:34px; height:34px; border-radius:8px; background:rgba(212,175,55,0.08); border:1px solid rgba(212,175,55,0.15); display:flex; align-items:center; justify-content:center; color:#D4AF37; font-size:0.8rem; text-decoration:none;">
                                     <i class="fas fa-pen"></i>
                                 </a>

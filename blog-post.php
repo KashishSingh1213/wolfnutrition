@@ -46,9 +46,49 @@ try {
                 
                 <h1 style="font-size:2.4rem; line-height:1.2; margin: 10px 0 15px 0; color:#fff;"><?php echo htmlspecialchars($post['title']); ?></h1>
                 
-                <div style="font-size:0.85rem; color:var(--text-muted); margin-bottom:30px;">
+                <div style="font-size:0.85rem; color:var(--text-muted); margin-bottom:20px;">
                     <i class="far fa-calendar-alt" style="margin-right:5px;"></i> Published on <?php echo date('F d, Y', strtotime($post['published_at'])); ?>
                 </div>
+
+                <!-- Social Share Buttons -->
+                <div style="display:flex; align-items:center; gap:10px; margin-bottom:25px; padding:14px 18px; background:rgba(255,255,255,0.03); border:1px solid rgba(255,255,255,0.06); border-radius:8px;">
+                    <span style="font-size:0.78rem; color:rgba(255,255,255,0.45); font-weight:600; text-transform:uppercase; letter-spacing:0.5px; margin-right:4px;">Share:</span>
+                    <a href="https://www.facebook.com/sharer/sharer.php?u=<?php echo urlencode($canonical_url); ?>" target="_blank" rel="noopener noreferrer" title="Share on Facebook" style="width:34px; height:34px; border-radius:8px; background:rgba(59,89,152,0.15); border:1px solid rgba(59,89,152,0.25); display:flex; align-items:center; justify-content:center; color:#3b5998; font-size:0.85rem; text-decoration:none; transition:all 0.2s;">
+                        <i class="fab fa-facebook-f"></i>
+                    </a>
+                    <a href="https://twitter.com/intent/tweet?url=<?php echo urlencode($canonical_url); ?>&text=<?php echo urlencode($post['title']); ?>" target="_blank" rel="noopener noreferrer" title="Share on Twitter" style="width:34px; height:34px; border-radius:8px; background:rgba(29,161,242,0.15); border:1px solid rgba(29,161,242,0.25); display:flex; align-items:center; justify-content:center; color:#1da1f2; font-size:0.85rem; text-decoration:none; transition:all 0.2s;">
+                        <i class="fab fa-twitter"></i>
+                    </a>
+                    <a href="https://wa.me/?text=<?php echo urlencode($post['title'] . ' ' . $canonical_url); ?>" target="_blank" rel="noopener noreferrer" title="Share on WhatsApp" style="width:34px; height:34px; border-radius:8px; background:rgba(37,211,102,0.15); border:1px solid rgba(37,211,102,0.25); display:flex; align-items:center; justify-content:center; color:#25d366; font-size:0.85rem; text-decoration:none; transition:all 0.2s;">
+                        <i class="fab fa-whatsapp"></i>
+                    </a>
+                    <a href="https://www.linkedin.com/shareArticle?mini=true&url=<?php echo urlencode($canonical_url); ?>&title=<?php echo urlencode($post['title']); ?>" target="_blank" rel="noopener noreferrer" title="Share on LinkedIn" style="width:34px; height:34px; border-radius:8px; background:rgba(0,119,181,0.15); border:1px solid rgba(0,119,181,0.25); display:flex; align-items:center; justify-content:center; color:#0077b5; font-size:0.85rem; text-decoration:none; transition:all 0.2s;">
+                        <i class="fab fa-linkedin-in"></i>
+                    </a>
+                    <a href="https://t.me/share/url?url=<?php echo urlencode($canonical_url); ?>&text=<?php echo urlencode($post['title']); ?>" target="_blank" rel="noopener noreferrer" title="Share on Telegram" style="width:34px; height:34px; border-radius:8px; background:rgba(0,136,204,0.15); border:1px solid rgba(0,136,204,0.25); display:flex; align-items:center; justify-content:center; color:#0088cc; font-size:0.85rem; text-decoration:none; transition:all 0.2s;">
+                        <i class="fab fa-telegram-plane"></i>
+                    </a>
+                    <button onclick="copyBlogLink()" id="copy-link-btn" title="Copy Link" style="width:34px; height:34px; border-radius:8px; background:rgba(212,175,55,0.1); border:1px solid rgba(212,175,55,0.2); display:flex; align-items:center; justify-content:center; color:#D4AF37; font-size:0.85rem; cursor:pointer; transition:all 0.2s;">
+                        <i class="fas fa-link"></i>
+                    </button>
+                </div>
+                <script>
+                function copyBlogLink() {
+                    navigator.clipboard.writeText('<?php echo $canonical_url; ?>').then(function() {
+                        var btn = document.getElementById('copy-link-btn');
+                        btn.innerHTML = '<i class="fas fa-check"></i>';
+                        btn.style.background = 'rgba(74,222,128,0.15)';
+                        btn.style.borderColor = 'rgba(74,222,128,0.3)';
+                        btn.style.color = '#4ade80';
+                        setTimeout(function() {
+                            btn.innerHTML = '<i class="fas fa-link"></i>';
+                            btn.style.background = 'rgba(212,175,55,0.1)';
+                            btn.style.borderColor = 'rgba(212,175,55,0.2)';
+                            btn.style.color = '#D4AF37';
+                        }, 2000);
+                    });
+                }
+                </script>
 
                 <?php if ($post['cover_image']): ?>
                     <div style="width:100%; height:380px; overflow:hidden; border-radius:6px; margin-bottom:35px; border:1px solid var(--border-color);">
