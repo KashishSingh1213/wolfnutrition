@@ -30,6 +30,37 @@ try { $stmt = $pdo->prepare("SELECT * FROM blog_posts WHERE status = 1 ORDER BY 
 .hero-section .hero-slide.active{opacity:1;position:relative;z-index:2;}
 .hero-section .hero-slide img{width:100%;height:auto;display:block;}
 
+/* ── Hero Mobile Banner ── */
+.hero-mobile-banner{display:none;background:linear-gradient(135deg,rgba(8,12,16,0.95) 0%,rgba(18,18,18,0.98) 100%);padding:50px 25px;text-align:center;position:relative;}
+.hero-mobile-badge{display:inline-block;font-size:0.65rem;font-weight:800;letter-spacing:2px;color:var(--gold-primary);text-transform:uppercase;margin-bottom:18px;background:rgba(212,175,55,0.08);border:1px solid rgba(212,175,55,0.15);padding:5px 16px;border-radius:20px;}
+.hero-mobile-content h2{font-size:1.8rem;font-weight:800;text-transform:uppercase;line-height:1.15;margin-bottom:14px;background:var(--gold-gradient);-webkit-background-clip:text;-webkit-text-fill-color:transparent;}
+.hero-mobile-content p{font-size:0.9rem;color:rgba(255,255,255,0.65);margin-bottom:24px;line-height:1.6;}
+.hero-mobile-btns{display:flex;flex-direction:column;gap:12px;align-items:center;}
+.hero-mobile-btns .btn-gold,.hero-mobile-btns .btn-outline-gold{width:100%;max-width:280px;padding:14px 20px;font-size:0.85rem;text-align:center;}
+
+/* ── Feature Cards ── */
+.feature-card{background:rgba(255,255,255,0.02);border:1px solid rgba(212,175,55,0.08);border-radius:18px;padding:30px 24px;text-align:center;position:relative;overflow:hidden;transition:all 0.4s;}
+.feature-icon{width:56px;height:56px;border-radius:14px;background:rgba(212,175,55,0.08);border:1px solid rgba(212,175,55,0.18);display:flex;align-items:center;justify-content:center;margin:0 auto 16px;color:var(--gold-primary);font-size:1.3rem;position:relative;z-index:1;}
+.feature-title{font-size:1.05rem;color:#fff;margin-bottom:6px;text-transform:uppercase;font-family:var(--font-heading);font-weight:700;position:relative;z-index:1;}
+.feature-desc{font-size:0.85rem;color:rgba(255,255,255,0.55);line-height:1.6;position:relative;z-index:1;}
+
+/* ── Performance Section ── */
+.perf-right-col{}
+.perf-badge{display:inline-block;font-size:0.85rem;color:var(--gold-primary);text-transform:uppercase;letter-spacing:2px;margin-bottom:10px;font-weight:700;}
+.perf-heading{font-size:2.6rem;text-transform:uppercase;margin-bottom:22px;line-height:1.12;font-weight:800;font-family:var(--font-heading);}
+.perf-subtext{font-size:1.02rem;color:rgba(255,255,255,0.65);line-height:1.7;margin-bottom:35px;}
+.perf-features{display:flex;flex-direction:column;gap:28px;margin-bottom:35px;}
+.perf-feat-row{display:flex;gap:22px;align-items:flex-start;}
+.perf-feat-icon{width:52px;height:52px;background:rgba(212,175,55,0.06);border:1px solid rgba(212,175,55,0.18);border-radius:14px;display:flex;align-items:center;justify-content:center;color:var(--gold-primary);font-size:1.3rem;flex-shrink:0;box-shadow:var(--gold-glow);transition:all 0.3s;}
+.perf-feat-text h4{font-size:1.15rem;color:#fff;margin-bottom:5px;text-transform:uppercase;letter-spacing:0.5px;}
+.perf-feat-text p{font-size:0.92rem;color:rgba(255,255,255,0.6);line-height:1.6;}
+.perf-cta{padding:15px 34px;font-size:0.92rem;font-weight:700;}
+@media(max-width:400px){
+    .hero-mobile-content h2{font-size:1.4rem;}
+    .hero-mobile-content p{font-size:0.8rem;}
+    .hero-mobile-banner{padding:35px 20px;}
+}
+
 /* ── Marquee ── */
 @keyframes marqueeScroll{0%{transform:translateX(0)}100%{transform:translateX(-50%)}}
 
@@ -48,6 +79,13 @@ try { $stmt = $pdo->prepare("SELECT * FROM blog_posts WHERE status = 1 ORDER BY 
 .counter-item:hover::before{opacity:1;}
 .counter-num{font-size:2.6rem;font-weight:800;font-family:var(--font-heading);background:var(--gold-gradient);-webkit-background-clip:text;-webkit-text-fill-color:transparent;line-height:1;}
 .counter-label{font-size:0.72rem;color:rgba(255,255,255,0.5);text-transform:uppercase;letter-spacing:1.2px;margin-top:8px;font-weight:600;}
+
+/* ── Trust Stats Row ── */
+.trust-stats-row{display:flex;justify-content:center;align-items:center;gap:40px;margin-top:45px;padding-top:35px;border-top:1px solid rgba(255,255,255,0.05);}
+.trust-stat-item{text-align:center;}
+.trust-stat-num{font-size:1.6rem;font-weight:800;color:var(--gold-primary);font-family:var(--font-heading);}
+.trust-stat-label{font-size:0.7rem;color:rgba(255,255,255,0.4);text-transform:uppercase;letter-spacing:1px;font-weight:600;margin-top:4px;}
+.trust-stat-divider{width:1px;height:40px;background:rgba(255,255,255,0.06);}
 
 /* ── Category Tiles ── */
 .category-tile{position:relative;overflow:hidden;border-radius:16px;}
@@ -99,10 +137,13 @@ try { $stmt = $pdo->prepare("SELECT * FROM blog_posts WHERE status = 1 ORDER BY 
 /* ── Float Badge ── */
 @keyframes floatBadge{0%,100%{transform:translateY(0)}50%{transform:translateY(-6px)}}
 
+@media(max-width:1024px){
+    .why-shop-section{display:none !important;}
+}
 @media(max-width:900px){
     .counter-row{grid-template-columns:repeat(2,1fr);}
     .social-proof-grid{grid-template-columns:1fr;}
-    .hero-section{min-height:70vh;}
+    .hero-section{min-height:auto !important;}
     .cat-card-grid{grid-template-columns:1fr !important;}
     .cat-card-inner{grid-template-columns:1fr !important;}
     .cat-card-img{width:100% !important; min-height:180px !important;}
@@ -115,24 +156,72 @@ try { $stmt = $pdo->prepare("SELECT * FROM blog_posts WHERE status = 1 ORDER BY 
     .footer-grid{grid-template-columns:1fr !important; gap:30px !important;}
 }
 @media(max-width:600px){
-    .counter-row{grid-template-columns:1fr 1fr;gap:12px;}
-    .counter-num{font-size:2rem;}
-    .product-grid{grid-template-columns:1fr !important;}
-    .hero-slider img{height:auto; max-height:50vh;}
-    .cat-card-img{min-height:140px !important;}
+    body{overflow-x:hidden;}
+    #goldParticles{display:none !important;}
+    .hero-rings{display:none !important;height:0 !important;overflow:hidden !important;}
+    .hero-section{overflow:hidden;padding:0 !important;margin:0 !important;}
+    .hero-slide:not(.active){display:none !important;}
+    .hero-mobile-banner{display:none;}
+    /* Statement */
+    .statement-section{padding:40px 0 !important;}
+    .statement-text{font-size:clamp(1.3rem,6vw,1.8rem) !important;padding:0 15px !important;line-height:1.15 !important;}
+    .statement-sub{font-size:0.82rem !important;padding:0 15px !important;margin-top:12px !important;line-height:1.5 !important;}
+    /* Feature Cards */
+    .feature-grid{grid-template-columns:1fr !important;gap:12px !important;margin-bottom:25px !important;}
+    .feature-card{padding:16px !important;display:flex !important;align-items:center !important;gap:12px !important;text-align:left !important;border-radius:14px !important;}
+    .feature-icon{width:38px !important;height:38px !important;min-width:38px !important;margin:0 !important;font-size:0.95rem !important;border-radius:10px !important;}
+    .feature-title{font-size:0.75rem !important;line-height:1.3 !important;margin-bottom:2px !important;}
+    .feature-desc{font-size:0.68rem !important;line-height:1.4 !important;color:rgba(255,255,255,0.5) !important;}
+    /* CTA Buttons */
+    .cta-buttons-wrap{flex-direction:column !important;gap:10px !important;}
+    .cta-buttons-wrap a{width:100% !important;padding:13px 20px !important;font-size:0.85rem !important;margin-right:0 !important;}
+    /* Counters */
+    .counter-row{grid-template-columns:1fr 1fr !important;gap:10px !important;padding:30px 0 !important;}
+    .counter-item{padding:20px 12px !important;border-radius:14px !important;}
+    .counter-num{font-size:1.8rem !important;}
+    .counter-label{font-size:0.6rem !important;letter-spacing:0.8px !important;}
+    /* Performance Section */
+    .perf-right-col{overflow:hidden !important;padding:0 20px 0 20px !important;}
+    .perf-badge{font-size:0.65rem !important;letter-spacing:1px !important;}
+    .perf-heading{font-size:1.3rem !important;line-height:1.12 !important;margin-bottom:12px !important;}
+    .perf-subtext{font-size:0.78rem !important;line-height:1.5 !important;margin-bottom:20px !important;}
+    .perf-features{gap:16px !important;margin-bottom:20px !important;}
+    .perf-feat-row{gap:12px !important;}
+    .perf-feat-icon{width:38px !important;height:38px !important;min-width:38px !important;font-size:0.95rem !important;border-radius:10px !important;}
+    .perf-feat-text{overflow:hidden !important;}
+    .perf-feat-text h4{font-size:0.75rem !important;line-height:1.3 !important;letter-spacing:0.3px !important;}
+    .perf-feat-text p{font-size:0.68rem !important;line-height:1.4 !important;}
+    .perf-cta{width:100% !important;text-align:center !important;padding:13px 20px !important;font-size:0.85rem !important;}
+    /* Category Cards */
+    .cat-card-grid > a{display:block !important;grid-template-columns:1fr !important;}
+    .cat-card-img{width:100% !important;min-height:160px !important;}
+    .cat-card-img img{height:140px !important;}
     .cat-card-content{padding:20px !important;}
-    .combo-card-inner{padding:20px !important;}
-    .combo-card-bottom{padding:0 20px 20px !important;}
+    .cat-card-content h3{font-size:1.1rem !important;}
+    .cat-card-content p{font-size:0.8rem !important;line-height:1.5 !important;}
+    .combo-card-inner{grid-template-columns:1fr !important;text-align:center !important;padding:24px 16px !important;gap:16px !important;}
+    .combo-card-left,.combo-card-right{text-align:center !important;}
+    .combo-card-bottom{flex-direction:column !important;gap:10px !important;padding:0 16px 20px !important;}
+    /* Product Grid */
+    .product-grid{grid-template-columns:1fr !important;gap:16px !important;}
+    /* Trust Stats */
+    .trust-stats-row{flex-direction:column;gap:18px;padding:20px 0;}
+    .trust-stat-divider{width:50px;height:1px;}
+    .trust-stat-num{font-size:1.3rem;}
+    .trust-stat-label{font-size:0.6rem;}
+    /* Blog */
+    .blog-grid{grid-template-columns:1fr !important;gap:16px !important;}
+    /* Footer */
     .footer-grid{gap:24px !important;}
     .newsletter-form{flex-direction:column !important;}
     .newsletter-form input,.newsletter-form button{width:100% !important;}
 }
 </style>
 
-<canvas id="goldParticles"></canvas>
+<div style="position:fixed;top:0;left:0;width:100%;height:0;overflow:hidden;pointer-events:none;z-index:0;"><canvas id="goldParticles"></canvas></div>
 
 <!-- ═══ HERO ═══ -->
-<section class="hero-section" style="min-height:auto; padding:0;">
+<section class="hero-section" style="margin-top:0; padding:0;">
     <div class="hero-rings">
         <div class="hero-ring"></div>
         <div class="hero-ring"></div>
@@ -149,7 +238,7 @@ try { $stmt = $pdo->prepare("SELECT * FROM blog_posts WHERE status = 1 ORDER BY 
 
 <!-- Gold Marquee -->
 <div style="overflow:hidden; background:var(--gold-gradient); padding:11px 0;">
-    <div style="display:flex; white-space:nowrap; animation:marqueeScroll 25s linear infinite;">
+    <div style="display:flex; white-space:nowrap; animation:marqueeScroll 12s linear infinite;">
         <?php $mq=['100% Ayurvedic','FSSAI Certified','Veggie Capsules','Free Dietitian Consult','Zero Fillers','Lab Tested','Free Shipping']; for($m=0;$m<2;$m++): foreach($mq as $item): ?>
             <span style="font-family:var(--font-heading); font-weight:800; font-size:0.78rem; color:#080C10; text-transform:uppercase; letter-spacing:2px; padding:0 32px;"><?php echo $item; ?></span>
             <span style="color:#080C10; font-size:0.55rem;">&#9670;</span>
@@ -172,28 +261,28 @@ try { $stmt = $pdo->prepare("SELECT * FROM blog_posts WHERE status = 1 ORDER BY 
 
         <!-- 3 Feature Cards -->
         <div class="feature-grid" style="display:grid; grid-template-columns:repeat(3,1fr); gap:24px; margin-bottom:40px;">
-            <div class="tilt-card spotlight-card" style="background:rgba(255,255,255,0.02); border:1px solid rgba(212,175,55,0.08); border-radius:18px; padding:30px 24px; text-align:center; position:relative; overflow:hidden; transition:all 0.4s;">
+            <div class="tilt-card spotlight-card feature-card">
                 <div class="tilt-shine"></div>
-                <div style="width:56px; height:56px; border-radius:14px; background:rgba(212,175,55,0.08); border:1px solid rgba(212,175,55,0.18); display:flex; align-items:center; justify-content:center; margin:0 auto 16px; color:var(--gold-primary); font-size:1.3rem; position:relative; z-index:1;"><i class="fas fa-leaf"></i></div>
-                <h4 style="font-size:1.05rem; color:#fff; margin-bottom:6px; text-transform:uppercase; font-family:var(--font-heading); font-weight:700; position:relative; z-index:1;">100% Ayurvedic</h4>
-                <p style="font-size:0.85rem; color:rgba(255,255,255,0.55); line-height:1.6; position:relative; z-index:1;">Pure Himalayan botanicals. Zero synthetic compounds. Nature's strongest formulas.</p>
+                <div class="feature-icon"><i class="fas fa-leaf"></i></div>
+                <h4 class="feature-title">100% Ayurvedic</h4>
+                <p class="feature-desc">Pure Himalayan botanicals. Zero synthetic compounds. Nature's strongest formulas.</p>
             </div>
-            <div class="tilt-card spotlight-card" style="background:rgba(255,255,255,0.02); border:1px solid rgba(212,175,55,0.08); border-radius:18px; padding:30px 24px; text-align:center; position:relative; overflow:hidden; transition:all 0.4s;">
+            <div class="tilt-card spotlight-card feature-card">
                 <div class="tilt-shine"></div>
-                <div style="width:56px; height:56px; border-radius:14px; background:rgba(212,175,55,0.08); border:1px solid rgba(212,175,55,0.18); display:flex; align-items:center; justify-content:center; margin:0 auto 16px; color:var(--gold-primary); font-size:1.3rem; position:relative; z-index:1;"><i class="fas fa-flask"></i></div>
-                <h4 style="font-size:1.05rem; color:#fff; margin-bottom:6px; text-transform:uppercase; font-family:var(--font-heading); font-weight:700; position:relative; z-index:1;">Lab Validated</h4>
-                <p style="font-size:0.85rem; color:rgba(255,255,255,0.55); line-height:1.6; position:relative; z-index:1;">Triple-tested purity. Every batch verified before it reaches your doorstep.</p>
+                <div class="feature-icon"><i class="fas fa-flask"></i></div>
+                <h4 class="feature-title">Lab Validated</h4>
+                <p class="feature-desc">Triple-tested purity. Every batch verified before it reaches your doorstep.</p>
             </div>
-            <div class="tilt-card spotlight-card" style="background:rgba(255,255,255,0.02); border:1px solid rgba(212,175,55,0.08); border-radius:18px; padding:30px 24px; text-align:center; position:relative; overflow:hidden; transition:all 0.4s;">
+            <div class="tilt-card spotlight-card feature-card">
                 <div class="tilt-shine"></div>
-                <div style="width:56px; height:56px; border-radius:14px; background:rgba(212,175,55,0.08); border:1px solid rgba(212,175,55,0.18); display:flex; align-items:center; justify-content:center; margin:0 auto 16px; color:var(--gold-primary); font-size:1.3rem; position:relative; z-index:1;"><i class="fas fa-user-doctor"></i></div>
-                <h4 style="font-size:1.05rem; color:#fff; margin-bottom:6px; text-transform:uppercase; font-family:var(--font-heading); font-weight:700; position:relative; z-index:1;">Free Consultation</h4>
-                <p style="font-size:0.85rem; color:rgba(255,255,255,0.55); line-height:1.6; position:relative; z-index:1;">Personalized guidance from certified Ayurvedic nutritionists. Always free.</p>
+                <div class="feature-icon"><i class="fas fa-user-doctor"></i></div>
+                <h4 class="feature-title">Free Consultation</h4>
+                <p class="feature-desc">Personalized guidance from certified Ayurvedic nutritionists. Always free.</p>
             </div>
         </div>
 
         <!-- CTA Buttons -->
-        <div style="text-align:center;">
+        <div class="cta-buttons-wrap" style="display:flex; flex-direction:column; align-items:center; gap:14px; text-align:center;">
             <a href="https://wa.me/919876543210?text=Hi%20Wolf%20Nutrition,%20I%20would%20like%20to%20start%20my%2090-day%20personalized%20challenge%20program%20please." target="_blank" class="btn-gold" style="padding:15px 38px; font-weight:700; font-size:0.95rem; border-radius:30px; margin-right:12px;">Start 90-Day Challenge</a>
             <a href="about.php" class="btn-outline-gold" style="padding:14px 38px; font-weight:700; font-size:0.95rem; border-radius:30px;">Our Story</a>
         </div>
@@ -395,7 +484,7 @@ try { $stmt = $pdo->prepare("SELECT * FROM blog_posts WHERE status = 1 ORDER BY 
                                     <span style="font-size:1.25rem; font-weight:800; color:var(--gold-primary); font-family:var(--font-heading);">₹<?php echo number_format($prod['min_price'],2); ?></span>
                                     <span style="font-size:0.82rem; color:rgba(255,255,255,0.35); text-decoration:line-through;">MRP ₹<?php echo number_format($prod['max_mrp'],2); ?></span>
                                 </div>
-                                <button class="btn-gold quick-add-btn" style="width:100%; padding:11px; font-size:0.82rem; border-radius:12px; font-weight:700;" data-product-id="<?php echo $prod['id']; ?>" data-variant-id="<?php echo $prod['default_variant_id']; ?>"><i class="fas fa-shopping-cart"></i> Quick Add</button>
+                                <button class="btn-gold quick-add-btn" style="width:100%; padding:11px; font-size:0.82rem; border-radius:12px; font-weight:700;" data-product-id="<?php echo $prod['id']; ?>" data-variant-id="<?php echo $prod['default_variant_id']; ?>" data-csrf="<?php echo generate_csrf_token(); ?>"><i class="fas fa-shopping-cart"></i> Quick Add</button>
                             </div>
                         </div>
                     <?php endforeach; else: ?>
@@ -500,20 +589,20 @@ if (!$featured && !empty($testimonials)) {
         <?php endif; ?>
 
         <!-- Trust Stats -->
-        <div style="display:flex; justify-content:center; gap:50px; margin-top:45px; padding-top:35px; border-top:1px solid rgba(255,255,255,0.05);">
-            <div style="text-align:center;">
-                <div style="font-size:1.6rem; font-weight:800; color:var(--gold-primary); font-family:var(--font-heading);">4.9/5</div>
-                <div style="font-size:0.7rem; color:rgba(255,255,255,0.4); text-transform:uppercase; letter-spacing:1px; font-weight:600;">Average Rating</div>
+        <div class="trust-stats-row">
+            <div class="trust-stat-item">
+                <div class="trust-stat-num">4.9/5</div>
+                <div class="trust-stat-label">Average Rating</div>
             </div>
-            <div style="width:1px; background:rgba(255,255,255,0.06);"></div>
-            <div style="text-align:center;">
-                <div style="font-size:1.6rem; font-weight:800; color:var(--gold-primary); font-family:var(--font-heading);">500+</div>
-                <div style="font-size:0.7rem; color:rgba(255,255,255,0.4); text-transform:uppercase; letter-spacing:1px; font-weight:600;">5-Star Reviews</div>
+            <div class="trust-stat-divider"></div>
+            <div class="trust-stat-item">
+                <div class="trust-stat-num">500+</div>
+                <div class="trust-stat-label">5-Star Reviews</div>
             </div>
-            <div style="width:1px; background:rgba(255,255,255,0.06);"></div>
-            <div style="text-align:center;">
-                <div style="font-size:1.6rem; font-weight:800; color:var(--gold-primary); font-family:var(--font-heading);">25K+</div>
-                <div style="font-size:0.7rem; color:rgba(255,255,255,0.4); text-transform:uppercase; letter-spacing:1px; font-weight:600;">Happy Customers</div>
+            <div class="trust-stat-divider"></div>
+            <div class="trust-stat-item">
+                <div class="trust-stat-num">25K+</div>
+                <div class="trust-stat-label">Happy Customers</div>
             </div>
         </div>
     </div>
@@ -584,7 +673,7 @@ if (!$featured && !empty($testimonials)) {
 <?php endif; ?>
 
 <!-- ═══ WHY SHOP WITH US ═══ -->
-<section style="padding:100px 0; background:radial-gradient(circle at 75% 50%,rgba(212,175,55,0.04) 0%,transparent 70%); overflow:hidden; position:relative; z-index:2;">
+<section class="why-shop-section" style="padding:100px 0; background:radial-gradient(circle at 75% 50%,rgba(212,175,55,0.04) 0%,transparent 70%); overflow:hidden; position:relative; z-index:2;">
     <div class="container">
         <div style="display:grid; grid-template-columns:1.2fr 1fr; gap:70px; align-items:center;">
             <!-- Phone Mockup -->
@@ -627,21 +716,19 @@ if (!$featured && !empty($testimonials)) {
                 </div>
             </div>
             <!-- Right Column -->
-            <div>
-                <span style="display:inline-block; font-size:0.85rem; color:var(--gold-primary); text-transform:uppercase; letter-spacing:2px; margin-bottom:10px; font-weight:700;">Designed for High Performance</span>
-                <h2 style="font-size:2.6rem; text-transform:uppercase; margin-bottom:22px; line-height:1.12; font-weight:800; font-family:var(--font-heading);">Unleash The Power Of Pure Wellness</h2>
-                <p style="font-size:1.02rem; color:rgba(255,255,255,0.65); line-height:1.7; margin-bottom:35px;">We combine ancient Ayurvedic secrets with modern sports science to deliver daily stacks that fuel strength and detox your liver.</p>
-                <div style="display:flex; flex-direction:column; gap:28px; margin-bottom:35px;">
+            <div class="perf-right-col">
+                <span class="perf-badge">Designed for High Performance</span>
+                <h2 class="perf-heading">Unleash The Power Of Pure Wellness</h2>
+                <p class="perf-subtext">We combine ancient Ayurvedic secrets with modern sports science to deliver daily stacks that fuel strength and detox your liver.</p>
+                <div class="perf-features">
                     <?php foreach([['fa-flask','100% Transparent Formulations','No hidden ingredients, zero fillers. Full disclosure of every premium extract.'],['fa-user-doctor','Free Certified Expert Guidance','Consult 1-on-1 with our certified health coaches for a personalized regimen.'],['fa-truck-fast','Prepaid Rewards & Fast Delivery','Free express shipping and additional prepaid cashbacks on all orders.']] as $b): ?>
-                    <div style="display:flex; gap:22px; align-items:flex-start;">
-                        <div style="width:52px; height:52px; background:rgba(212,175,55,0.06); border:1px solid rgba(212,175,55,0.18); border-radius:14px; display:flex; align-items:center; justify-content:center; color:var(--gold-primary); font-size:1.3rem; flex-shrink:0; box-shadow:var(--gold-glow); transition:all 0.3s;"><i class="fas <?php echo $b[0]; ?>"></i></div>
-                        <div><h4 style="font-size:1.15rem; color:#fff; margin-bottom:5px; text-transform:uppercase; letter-spacing:0.5px;"><?php echo $b[1]; ?></h4><p style="font-size:0.92rem; color:rgba(255,255,255,0.6); line-height:1.6;"><?php echo $b[2]; ?></p></div>
+                    <div class="perf-feat-row">
+                        <div class="perf-feat-icon"><i class="fas <?php echo $b[0]; ?>"></i></div>
+                        <div class="perf-feat-text"><h4><?php echo $b[1]; ?></h4><p><?php echo $b[2]; ?></p></div>
                     </div>
                     <?php endforeach; ?>
                 </div>
-                <div style="display:flex; gap:18px; flex-wrap:wrap;">
-                    <a href="category.php?slug=all" class="btn-gold" style="padding:15px 34px; font-size:0.92rem; font-weight:700;">Explore Products</a>
-                </div>
+                <a href="category.php?slug=all" class="btn-gold perf-cta">Explore Products</a>
             </div>
         </div>
     </div>

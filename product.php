@@ -140,28 +140,46 @@ if (empty($gallery)) $gallery = [$product['image_url']];
 @keyframes slideInToast{from{transform:translateX(100px);opacity:0;}to{transform:translateX(0);opacity:1;}}
 @keyframes slideOutToast{from{transform:translateX(0);opacity:1;}to{transform:translateX(100px);opacity:0;}}
 @media(max-width:900px){
-    .pd-grid{grid-template-columns:1fr; gap:30px;}
-    .pd-gallery-main{height:350px;}
+    body{overflow-x:hidden;}
+    #goldParticles{display:none !important;}
+    .pd-grid{grid-template-columns:1fr; gap:24px;}
+    .pd-gallery-main{height:320px;}
+    .pd-title{font-size:1.5rem;}
+    .pd-desc{font-size:0.88rem;}
     .review-summary{grid-template-columns:1fr;}
     .review-avg{border-right:none; border-bottom:1px solid rgba(255,255,255,0.06); padding-bottom:20px;}
     .pd-variants{flex-wrap:wrap;}
-    .pd-actions{flex-direction:column;}
+    .pd-actions{flex-direction:row;}
     .pd-qty{justify-content:center;}
     .pd-benefits{grid-template-columns:1fr;}
     .pd-tab-nav{overflow-x:auto; -webkit-overflow-scrolling:touch;}
     .pd-tab-btn{padding:12px 16px; font-size:0.82rem;}
+    .pd-disclaimer{flex-direction:row;}
+    .pd-related{padding:40px 0;}
+    .product-grid{grid-template-columns:repeat(2,1fr) !important; gap:14px !important;}
 }
 @media(max-width:600px){
-    .pd-gallery-main{height:280px; border-radius:14px;}
-    .pd-title{font-size:1.4rem;}
-    .pd-price-sale{font-size:1.6rem;}
+    .pd-gallery-main{height:260px; border-radius:14px;}
+    .pd-title{font-size:1.25rem; line-height:1.15;}
+    .pd-price-sale{font-size:1.5rem;}
+    .pd-price-mrp{font-size:0.9rem;}
     .pd-gallery-thumbs{gap:8px;}
-    .pd-thumb{width:60px; height:60px;}
+    .pd-thumb{width:56px; height:56px;}
+    .pd-variant{padding:8px 14px; font-size:0.82rem;}
+    .pd-actions{gap:10px;}
+    .pd-qty button{width:36px; height:38px;}
+    .pd-qty input{width:36px; font-size:0.9rem;}
+    .pd-benefit{font-size:0.75rem;}
+    .pd-tab-btn{padding:10px 12px; font-size:0.75rem;}
     .pd-disclaimer{flex-direction:column; gap:8px;}
-    .review-summary{padding:20px;}
-    .review-avg-num{font-size:2.2rem;}
-    .pd-write-review{padding:20px;}
+    .review-summary{padding:18px;}
+    .review-avg-num{font-size:2rem;}
+    .review-item{padding:18px 0;}
+    .review-text{font-size:0.82rem;}
+    .pd-write-review{padding:18px;}
     .pd-write-review > div[style*="grid-template-columns:1fr 1fr"]{grid-template-columns:1fr !important;}
+    .pd-related{margin-top:40px;}
+    .product-grid{grid-template-columns:1fr !important; gap:14px !important;}
 }
 </style>
 

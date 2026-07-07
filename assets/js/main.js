@@ -245,12 +245,14 @@ document.addEventListener('DOMContentLoaded', function() {
             e.preventDefault();
             const productId = e.target.dataset.productId;
             const variantId = e.target.dataset.variantId;
+            const csrfToken = e.target.dataset.csrf || '';
             
             const formData = new FormData();
             formData.append('action', 'add');
             formData.append('product_id', productId);
             formData.append('variant_id', variantId);
             formData.append('quantity', 1);
+            formData.append('csrf_token', csrfToken);
 
             fetch('cart_api.php', {
                 method: 'POST',

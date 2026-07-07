@@ -112,7 +112,32 @@ if ($cat_slug === 'liver-detox') {
     .cat-benefits{grid-template-columns:1fr;}
 }
 @media(max-width:600px){
-    .cat-hero-visual{width:180px;height:180px;}
+    #goldParticles{display:none !important;}
+    .cat-hero{padding:30px 16px;margin-top:10px;margin-bottom:30px;min-height:auto;}
+    .cat-hero-badge{font-size:0.6rem;letter-spacing:1.5px;padding:5px 14px;}
+    .cat-hero-title{font-size:1.6rem;letter-spacing:0.5px;}
+    .cat-hero-desc{font-size:0.82rem;line-height:1.55;}
+    .cat-hero-stats{gap:10px;margin-top:20px;}
+    .cat-hero-stat{padding:10px 14px;min-width:70px;}
+    .cat-hero-stat-num{font-size:1.1rem;}
+    .cat-hero-stat-label{font-size:0.52rem;}
+    .cat-hero-visual{width:140px;height:140px;}
+    .cat-hero-visual img{max-height:130px;}
+    .cat-benefits{grid-template-columns:1fr !important;gap:12px;margin-bottom:24px;}
+    .cat-benefit{padding:16px 14px;gap:12px;}
+    .cat-benefit-icon{width:38px;height:38px;font-size:0.9rem;border-radius:10px;}
+    .cat-benefit h5{font-size:0.78rem;}
+    .cat-benefit p{font-size:0.68rem;line-height:1.4;}
+    .filter-sidebar{position:static;padding:20px 16px;border-radius:14px;}
+    .filter-sidebar h3{font-size:0.95rem;margin-bottom:14px;}
+    .filter-input{padding:10px 12px;font-size:0.82rem;}
+    .filter-check{font-size:0.8rem;margin:12px 0;}
+    .product-grid{grid-template-columns:1fr !important;gap:16px !important;}
+    .product-card-image{height:180px !important;}
+    .product-card-info{padding:14px !important;}
+    .product-card-info h3{font-size:0.88rem !important;}
+    .empty-state{padding:40px 20px;}
+    .container > div[style*="grid-template-columns:260px"]{grid-template-columns:1fr !important;gap:16px !important;}
 }
 </style>
 
@@ -219,7 +244,7 @@ if ($cat_slug === 'liver-detox') {
                                     <span style="font-size:0.82rem; color:rgba(255,255,255,0.35); text-decoration:line-through;">MRP ₹<?php echo number_format($prod['max_mrp'],2); ?></span>
                                 </div>
                                 <?php if($prod['total_stock']>0): ?>
-                                    <button class="btn-gold quick-add-btn" style="width:100%; padding:11px; font-size:0.82rem; border-radius:12px; font-weight:700;" data-product-id="<?php echo $prod['id']; ?>" data-variant-id="<?php echo $prod['default_variant_id']; ?>"><i class="fas fa-shopping-cart"></i> Quick Add</button>
+                                    <button class="btn-gold quick-add-btn" style="width:100%; padding:11px; font-size:0.82rem; border-radius:12px; font-weight:700;" data-product-id="<?php echo $prod['id']; ?>" data-variant-id="<?php echo $prod['default_variant_id']; ?>" data-csrf="<?php echo generate_csrf_token(); ?>"><i class="fas fa-shopping-cart"></i> Quick Add</button>
                                 <?php else: ?>
                                     <button class="btn-gold" style="width:100%; padding:11px; font-size:0.82rem; border-radius:12px; background:rgba(255,255,255,0.1); cursor:not-allowed; box-shadow:none; color:rgba(255,255,255,0.4);" disabled>Out of Stock</button>
                                 <?php endif; ?>

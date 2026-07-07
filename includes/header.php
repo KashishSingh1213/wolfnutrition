@@ -144,10 +144,45 @@ if ($active_page === 'product.php' && isset($_GET['slug'])) {
 
     <!-- FontAwesome for Icons -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Razorpay Checkout SDK -->
+    <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
+    <!-- Header CSS -->
+    <link rel="stylesheet" href="assets/css/header-clean.css">
     <!-- Main Style CSS -->
     <link rel="stylesheet" href="assets/css/style.css">
 </head>
 <body>
+
+<script>
+// Mobile Menu
+document.addEventListener('DOMContentLoaded', function() {
+    var menuBtn = document.getElementById('mobileMenuBtn');
+    var mobileNav = document.getElementById('mobileNav');
+    var overlay = document.getElementById('mobileOverlay');
+    var closeBtn = document.getElementById('mobileCloseBtn');
+
+    function openMenu() {
+        mobileNav.classList.add('open');
+        overlay.classList.add('active');
+        document.body.style.overflow = 'hidden';
+    }
+    function closeMenu() {
+        mobileNav.classList.remove('open');
+        overlay.classList.remove('active');
+        document.body.style.overflow = '';
+    }
+
+    if (menuBtn) menuBtn.addEventListener('click', openMenu);
+    if (closeBtn) closeBtn.addEventListener('click', closeMenu);
+    if (overlay) overlay.addEventListener('click', closeMenu);
+
+    // Close on link click
+    var mobileLinks = document.querySelectorAll('.mobile-nav-links a');
+    mobileLinks.forEach(function(link) {
+        link.addEventListener('click', closeMenu);
+    });
+});
+</script>
 
     <!-- Premium Announcement Bar -->
     <div class="announcement-bar">
@@ -171,8 +206,8 @@ if ($active_page === 'product.php' && isset($_GET['slug'])) {
                 <div class="logo-text">WOLF <span>NUTRITION</span></div>
             </a>
 
-            <!-- Navigation -->
-            <nav>
+            <!-- Navigation (Desktop) -->
+            <nav class="desktop-nav">
                 <ul>
                     <li class="<?php echo $active_page === 'index.php' ? 'active' : ''; ?>">
                         <a href="index.php">Home</a>
@@ -213,14 +248,48 @@ if ($active_page === 'product.php' && isset($_GET['slug'])) {
                     <span class="icon-label">Cart</span>
                 </button>
                 <!-- Mobile Menu Toggle -->
-                <button class="mobile-menu-toggle" aria-label="Menu" onclick="document.querySelector('nav').classList.toggle('open'); document.querySelector('.mobile-menu-overlay').classList.toggle('active');">
+                <button class="mobile-menu-toggle" id="mobileMenuBtn" aria-label="Menu">
                     <span></span><span></span><span></span>
                 </button>
             </div>
         </div>
     </header>
-    <!-- Mobile Menu Overlay -->
-    <div class="mobile-menu-overlay" onclick="document.querySelector('nav').classList.remove('open'); this.classList.remove('active');"></div>
+
+    <!-- Mobile Menu -->
+    <div class="mobile-menu-overlay" id="mobileOverlay"></div>
+    <nav class="mobile-nav" id="mobileNav">
+        <div class="mobile-nav-header">
+            <a href="index.php" class="mobile-nav-logo">
+                <img src="assets/images/logo.png" alt="Wolf Nutrition">
+                <span>WOLF NUTRITION</span>
+            </a>
+            <button class="mobile-nav-close" id="mobileCloseBtn">
+                <i class="fas fa-times"></i>
+            </button>
+        </div>
+        <ul class="mobile-nav-links">
+            <li class="<?php echo $active_page === 'index.php' ? 'active' : ''; ?>">
+                <a href="index.php"><i class="fas fa-home"></i> Home</a>
+            </li>
+            <li class="<?php echo ($active_page === 'category.php' && isset($_GET['slug']) && $_GET['slug'] === 'vitality') ? 'active' : ''; ?>">
+                <a href="category.php?slug=vitality"><i class="fas fa-capsules"></i> Supplements</a>
+            </li>
+            <li class="<?php echo ($active_page === 'category.php' && isset($_GET['slug']) && $_GET['slug'] === 'liver-detox') ? 'active' : ''; ?>">
+                <a href="category.php?slug=liver-detox"><i class="fas fa-shield-halved"></i> Liver & Detox</a>
+            </li>
+            <li class="<?php echo $active_page === 'about.php' ? 'active' : ''; ?>">
+                <a href="about.php"><i class="fas fa-info-circle"></i> About Us</a>
+            </li>
+            <li class="<?php echo $active_page === 'contact.php' ? 'active' : ''; ?>">
+                <a href="contact.php"><i class="fas fa-envelope"></i> Contact</a>
+            </li>
+        </ul>
+        <div class="mobile-nav-footer">
+            <a href="<?php echo is_logged_in() ? 'my-account.php' : 'login.php'; ?>" class="btn-gold" style="width:100%; justify-content:center; padding:12px; text-decoration:none;">
+                <i class="fas fa-user-circle"></i> <?php echo is_logged_in() ? 'My Account' : 'Login / Register'; ?>
+            </a>
+        </div>
+    </nav>
 
     <!-- Search Overlay -->
     <div class="search-overlay">

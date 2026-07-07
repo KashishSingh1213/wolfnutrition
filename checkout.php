@@ -23,6 +23,9 @@ $totals = get_cart_totals($payment_method);
 
 $checkout_error = '';
 
+// Razorpay key for frontend
+$razorpay_key_id = getenv('RAZORPAY_KEY_ID');
+
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['place_order'])) {
     // CSRF Check
     if (!isset($_POST['csrf_token']) || !hash_equals($_SESSION['csrf_token'] ?? '', $_POST['csrf_token'])) {
@@ -44,6 +47,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['place_order'])) {
         if (!in_array($payment_method, $allowed_methods, true)) {
             $payment_method = 'UPI';
         }
+
+        // Razorpay verified payment ID
+        $razorpay_payment_id = isset($_POST['razorpay_payment_id']) ? trim($_POST['razorpay_payment_id']) : null;
+        $razorpay_order_id = isset($_POST['razorpay_order_id']) ? trim($_POST['razorpay_order_id']) : null;
     
     // Address selection from saved
     if ($user && isset($_POST['selected_address_id']) && $_POST['selected_address_id'] !== 'new') {
@@ -90,12 +97,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['place_order'])) {
             
             // Insert Order
             $stmt_o = $pdo->prepare("
-                INSERT INTO orders (user_id, order_number, subtotal, discount, shipping, total, payment_method, payment_status, customer_name, customer_email, customer_phone, shipping_address, pincode, note) 
-                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+                INSERT INTO orders (user_id, order_number, subtotal, discount, shipping, total, payment_method, payment_status, customer_name, customer_email, customer_phone, shipping_address, pincode, note, razorpay_payment_id) 
+                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
             ");
             $user_id = $user ? $user['id'] : null;
             
-            // Payment status is 'paid' for mock UPI/Card online gateway, 'pending' for COD
+            // Payment status: COD = pending, online = paid
             $pay_status = ($payment_method === 'COD') ? 'pending' : 'paid';
             
             $stmt_o->execute([
@@ -112,7 +119,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['place_order'])) {
                 $cust_phone,
                 $full_address,
                 $pincode,
-                $note
+                $note,
+                $razorpay_payment_id
             ]);
             
             $order_id = $pdo->lastInsertId();
@@ -183,6 +191,31 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['place_order'])) {
     } // End CSRF check
 }
 ?>
+
+<style>
+@media(max-width:900px){
+    body{overflow-x:hidden;}
+    .checkout-grid{grid-template-columns:1fr !important; gap:24px !important;}
+    .summary-sidebar{position:static !important;}
+    .section-header h2{font-size:1.5rem !important; letter-spacing:0.5px !important;}
+    .section-header p{font-size:0.85rem !important;}
+    .checkout-section-box{padding:20px !important; border-radius:14px !important;}
+    .checkout-section-box h3{font-size:1rem !important; margin-bottom:14px !important;}
+    .form-row{grid-template-columns:1fr !important; gap:14px !important;}
+    .form-control{padding:11px 14px !important; font-size:0.88rem !important;}
+    .form-group label{font-size:0.8rem !important;}
+    .payment-label{font-size:0.85rem !important; flex-wrap:wrap;}
+}
+@media(max-width:600px){
+    .container{padding:0 12px !important; width:95% !important;}
+    .checkout-section-box{padding:16px !important;}
+    .summary-sidebar{padding:18px !important; border-radius:14px !important;}
+    .summary-sidebar h3{font-size:1rem !important;}
+    .summary-line-item{font-size:0.85rem !important;}
+    .summary-total{font-size:1.05rem !important;}
+    .btn-gold{font-size:0.95rem !important; padding:14px !important;}
+}
+</style>
 
     <div class="container" style="margin-top: 40px; margin-bottom: 60px;">
         <div class="section-header">
@@ -273,36 +306,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['place_order'])) {
                         </div>
                     </div>
 
-                    <!-- Payment Method Selection -->
-                    <div class="checkout-section-box">
-                        <h3>Select Payment Method</h3>
-                        
-                        <div style="display:flex; flex-direction:column; gap:15px;">
-                            <!-- UPI payment -->
-                            <label style="display:flex; align-items:center; gap:12px; padding:15px; border:1px solid var(--border-color); border-radius:4px; background:var(--bg-primary); cursor:pointer;">
-                                <input type="radio" name="payment_method" value="UPI" <?php echo $payment_method === 'UPI' ? 'checked' : ''; ?> onchange="updatePaymentSelection(this)" style="accent-color:var(--gold-primary);">
-                                <span style="font-size:1rem; font-weight:700; color:#fff;">
-                                    <i class="fas fa-qrcode" style="color:var(--gold-primary); margin-right:10px;"></i> UPI Payment (Instant 10% auto discount on cart)
-                                </span>
-                            </label>
-                            
-                            <!-- Card payment -->
-                            <label style="display:flex; align-items:center; gap:12px; padding:15px; border:1px solid var(--border-color); border-radius:4px; background:var(--bg-primary); cursor:pointer;">
-                                <input type="radio" name="payment_method" value="CARD" <?php echo $payment_method === 'CARD' ? 'checked' : ''; ?> onchange="updatePaymentSelection(this)" style="accent-color:var(--gold-primary);">
-                                <span style="font-size:1rem; font-weight:700; color:#fff;">
-                                    <i class="fas fa-credit-card" style="color:var(--gold-primary); margin-right:10px;"></i> Credit / Debit Cards
-                                </span>
-                            </label>
-                            
-                            <!-- Cash on Delivery -->
-                            <label style="display:flex; align-items:center; gap:12px; padding:15px; border:1px solid var(--border-color); border-radius:4px; background:var(--bg-primary); cursor:pointer;">
-                                <input type="radio" name="payment_method" value="COD" <?php echo $payment_method === 'COD' ? 'checked' : ''; ?> onchange="updatePaymentSelection(this)" style="accent-color:var(--gold-primary);">
-                                <span style="font-size:1rem; font-weight:700; color:#fff;">
-                                    <i class="fas fa-truck-loading" style="color:var(--gold-primary); margin-right:10px;"></i> Cash on Delivery (COD) - ₹99 shipping applies
-                                </span>
-                            </label>
-                        </div>
-                    </div>
+                    <!-- Hidden payment method (always online for Razorpay) -->
+                    <input type="hidden" name="payment_method" value="UPI">
                 </div>
                 
                 <!-- Order Summary Sidebar -->
@@ -343,8 +348,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['place_order'])) {
                         <span id="summary-total-val">₹<?php echo number_format($totals['total'], 2); ?></span>
                     </div>
 
-                    <button type="submit" name="place_order" class="btn-gold" style="width:100%; margin-top:25px; padding:15px; font-size:1.1rem;">
-                        PLACE ORDER NOW
+                    <button type="button" name="place_order" class="btn-gold" id="place-order-btn" style="width:100%; margin-top:25px; padding:15px; font-size:1.1rem;">
+                        <i class="fas fa-lock" style="margin-right:8px;"></i> PAY NOW SECURELY
                     </button>
                     <p style="text-align:center; font-size:0.75rem; color:var(--text-muted); margin-top:10px;">
                         <i class="fas fa-shield-alt"></i> SSL secure payments. Formulated under strict FSSAI guidelines.
@@ -354,35 +359,145 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['place_order'])) {
         </form>
     </div>
 
-    <!-- Toggle Address and update shipping values script -->
     <script>
+        var razorpayKeyId = '<?php echo htmlspecialchars($razorpay_key_id); ?>';
+        var csrfToken = '<?php echo generate_csrf_token(); ?>';
+        var cartTotal = <?php echo $totals['total']; ?>;
+
+        // ── Razorpay Payment Flow ──
+        var placeOrderBtn = document.getElementById('place-order-btn');
+        if (placeOrderBtn) {
+            placeOrderBtn.addEventListener('click', function(e) {
+                e.preventDefault();
+                initRazorpayPayment();
+            });
+        }
+
+        function initRazorpayPayment() {
+            var form = document.getElementById('checkout-form');
+
+            // Basic client-side validation
+            var requiredFields = ['customer_name', 'customer_email', 'customer_phone', 'address_line1', 'city', 'state', 'pincode'];
+            for (var i = 0; i < requiredFields.length; i++) {
+                var field = form.querySelector('[name="' + requiredFields[i] + '"]');
+                if (field && !field.value.trim()) {
+                    field.focus();
+                    alert('Please fill in all required fields.');
+                    return;
+                }
+            }
+
+            // Create Razorpay order via server
+            var fd = new FormData();
+            fd.append('csrf_token', csrfToken);
+            fd.append('amount', cartTotal);
+            fd.append('receipt', 'WN-' + Date.now());
+
+            fetch('create_razorpay_order.php', { method: 'POST', body: fd })
+                .then(function(r) { return r.json(); })
+                .then(function(data) {
+                    if (!data.success) {
+                        alert(data.message || 'Failed to initialize payment.');
+                        return;
+                    }
+
+                    // Open Razorpay modal
+                    var options = {
+                        key: data.key_id,
+                        amount: data.amount,
+                        currency: data.currency,
+                        name: 'Wolf Nutrition',
+                        description: 'Order Payment',
+                        order_id: data.razorpay_order_id,
+                        handler: function(response) {
+                            // Payment successful — verify and submit
+                            verifyAndSubmit(response.razorpay_order_id, response.razorpay_payment_id, response.razorpay_signature);
+                        },
+                        prefill: {
+                            name: form.querySelector('[name="customer_name"]').value || '',
+                            email: form.querySelector('[name="customer_email"]').value || '',
+                            contact: form.querySelector('[name="customer_phone"]').value || ''
+                        },
+                        theme: {
+                            color: '#D4AF37'
+                        },
+                        modal: {
+                            ondismiss: function() {
+                                alert('Payment cancelled. Your order has not been placed.');
+                            }
+                        }
+                    };
+
+                    var rzp = new Razorpay(options);
+                    rzp.on('payment.failed', function(response) {
+                        alert('Payment failed: ' + (response.error.description || 'Please try again.'));
+                    });
+                    rzp.open();
+                })
+                .catch(function(err) {
+                    alert('Network error. Please try again.');
+                    console.error(err);
+                });
+        }
+
+        function verifyAndSubmit(orderId, paymentId, signature) {
+            var form = document.getElementById('checkout-form');
+
+            // Verify payment signature
+            var vd = new FormData();
+            vd.append('csrf_token', csrfToken);
+            vd.append('razorpay_order_id', orderId);
+            vd.append('razorpay_payment_id', paymentId);
+            vd.append('razorpay_signature', signature);
+
+            fetch('verify_razorpay.php', { method: 'POST', body: vd })
+                .then(function(r) { return r.json(); })
+                .then(function(data) {
+                    if (data.success) {
+                        // Add hidden fields and submit form
+                        var h1 = document.createElement('input');
+                        h1.type = 'hidden'; h1.name = 'razorpay_payment_id'; h1.value = paymentId;
+                        form.appendChild(h1);
+
+                        var h2 = document.createElement('input');
+                        h2.type = 'hidden'; h2.name = 'razorpay_order_id'; h2.value = orderId;
+                        form.appendChild(h2);
+
+                        var h3 = document.createElement('input');
+                        h3.type = 'hidden'; h3.name = 'razorpay_verified'; h3.value = '1';
+                        form.appendChild(h3);
+
+                        placeOrderBtn.disabled = true;
+                        placeOrderBtn.textContent = 'Processing...';
+                        form.submit();
+                    } else {
+                        alert(data.message || 'Payment verification failed. Please contact support.');
+                    }
+                })
+                .catch(function(err) {
+                    alert('Verification error. Please contact support.');
+                    console.error(err);
+                });
+        }
+
+        // ── Toggle Address Block ──
         function updatePaymentSelection(element) {
-            // Submit form to refresh calculations in php variables
-            const form = document.getElementById('checkout-form');
-            
-            // Create a dummy hidden input to simulate recalculating
-            const hiddenInput = document.createElement('input');
+            var form = document.getElementById('checkout-form');
+            var hiddenInput = document.createElement('input');
             hiddenInput.type = 'hidden';
             hiddenInput.name = 'recalculate';
             hiddenInput.value = '1';
             form.appendChild(hiddenInput);
-            
-            // Save state of input fields before reload
             form.submit();
         }
 
-        // Toggle visibility of new address block based on selection
-        const savedAddrRadios = document.querySelectorAll('input[name="selected_address_id"]');
-        const newAddressFormBox = document.getElementById('new-address-form-box');
+        var savedAddrRadios = document.querySelectorAll('input[name="selected_address_id"]');
+        var newAddressFormBox = document.getElementById('new-address-form-box');
 
         if (savedAddrRadios.length > 0 && newAddressFormBox) {
-            savedAddrRadios.forEach(radio => {
+            savedAddrRadios.forEach(function(radio) {
                 radio.addEventListener('change', function() {
-                    if (this.value === 'new') {
-                        newAddressFormBox.style.display = 'block';
-                    } else {
-                        newAddressFormBox.style.display = 'none';
-                    }
+                    newAddressFormBox.style.display = (this.value === 'new') ? 'block' : 'none';
                 });
             });
         }

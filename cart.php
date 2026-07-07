@@ -37,13 +37,38 @@ $totals = get_cart_totals();
 ?>
 
 <style>
+/* ── Cart Responsive ── */
+.cart-item-row{display:grid; grid-template-columns:1fr auto auto; gap:20px; align-items:center; padding:20px 0; border-bottom:1px solid rgba(255,255,255,0.05);}
+.cart-item-info{display:flex; gap:16px; align-items:center; overflow:hidden; min-width:0;}
+.cart-item-img{width:70px; height:70px; object-fit:contain; background:#000; border-radius:8px; border:1px solid var(--border-color); flex-shrink:0;}
+.cart-item-details{overflow:hidden; min-width:0;}
+.cart-item-name{font-size:1rem; font-weight:700; margin-bottom:4px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;}
+.cart-item-size{font-size:0.82rem; color:var(--text-muted);}
+.cart-item-price{font-size:0.9rem; color:var(--gold-primary); font-weight:600; margin-top:4px;}
+.cart-item-remove{background:none; border:none; color:var(--danger-color); font-size:0.78rem; cursor:pointer; padding:0; margin-top:6px;}
+.cart-item-qty{text-align:center; flex-shrink:0;}
+.cart-item-subtotal{text-align:right; font-weight:700; color:var(--text-primary); font-size:1.05rem; white-space:nowrap; flex-shrink:0;}
 @media(max-width:900px){
+    body{overflow-x:hidden;}
     .cart-grid{grid-template-columns:1fr !important; gap:24px !important;}
     .summary-sidebar{position:static !important;}
+    .cart-header-row{display:none !important;}
+    .section-header h2{font-size:1.5rem !important; letter-spacing:0.5px !important;}
+    .section-header{margin-bottom:20px !important;}
+    .cart-item-row{grid-template-columns:1fr auto; gap:12px; padding:16px 0;}
+    .cart-item-qty{grid-column:2;}
+    .cart-item-subtotal{grid-column:2; text-align:right;}
+    .cart-item-info{gap:12px;}
+    .cart-item-img{width:60px; height:60px;}
+    .cart-item-name{font-size:0.88rem; white-space:normal !important; line-height:1.3;}
 }
 @media(max-width:600px){
     .cart-grid{gap:16px !important;}
-    .summary-sidebar{padding:20px !important;}
+    .summary-sidebar{padding:20px !important;border-radius:14px !important;}
+    .cart-item-row{padding:14px 0;gap:10px;}
+    .cart-item-img{width:55px; height:55px;}
+    .cart-item-name{font-size:0.82rem;}
+    .cart-item-subtotal{font-size:0.9rem;}
 }
 </style>
 
@@ -64,46 +89,37 @@ $totals = get_cart_totals();
                 
                 <!-- Main Items List -->
                 <div>
-                    <div class="glass-card" style="padding:20px; border-radius:8px;">
-                        <table style="width:100%; border-collapse:collapse; text-align:left;">
-                            <thead>
-                                <tr style="border-bottom: 1px solid var(--border-color); color:var(--gold-muted); font-family:var(--font-heading); font-size:0.9rem; text-transform:uppercase;">
-                                    <th style="padding-bottom:15px;">Product Details</th>
-                                    <th style="padding-bottom:15px; text-align:center;">Quantity</th>
-                                    <th style="padding-bottom:15px; text-align:right;">Subtotal</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                <?php foreach ($cart_items as $key => $item): ?>
-                                    <tr style="border-bottom: 1px solid rgba(255,255,255,0.05);" data-key="<?php echo htmlspecialchars($key); ?>">
-                                        <!-- Product info -->
-                                        <td style="padding: 20px 0; display:flex; gap:20px; align-items:center;">
-                                            <img src="<?php echo htmlspecialchars($item['image']); ?>" alt="<?php echo htmlspecialchars($item['name']); ?>" style="width:70px; height:70px; object-fit:contain; background:#000; border-radius:4px; border:1px solid var(--border-color);">
-                                            <div>
-                                                <h4 style="font-size:1rem; font-weight:700; margin-bottom:5px;"><?php echo htmlspecialchars($item['name']); ?></h4>
-                                                <div style="font-size:0.85rem; color:var(--text-muted);"><?php echo htmlspecialchars($item['size']); ?></div>
-                                                <div style="font-size:0.9rem; color:var(--gold-primary); font-weight:600; margin-top:5px;">₹<?php echo number_format($item['price'], 2); ?></div>
-                                                <button type="button" onclick="removeCartItem('<?php echo htmlspecialchars($key); ?>')" style="background:none; border:none; color:var(--danger-color); font-size:0.8rem; cursor:pointer; padding:0; margin-top:8px;">
-                                                    <i class="fas fa-trash-alt"></i> Remove Item
-                                                </button>
-                                            </div>
-                                        </td>
-                                        <!-- Quantity controls -->
-                                        <td style="padding: 20px 0; text-align:center;">
-                                            <div style="display:inline-flex; align-items:center; border:1px solid var(--border-color); border-radius:3px; overflow:hidden;">
-                                                <button type="button" onclick="updateCartQty('<?php echo htmlspecialchars($key); ?>', <?php echo $item['qty'] - 1; ?>)" style="width:25px; height:25px; border:none; background:transparent; color:#fff; cursor:pointer;">-</button>
-                                                <span class="cart-qty-val" style="width:30px; text-align:center; font-weight:600;"><?php echo $item['qty']; ?></span>
-                                                <button type="button" onclick="updateCartQty('<?php echo htmlspecialchars($key); ?>', <?php echo $item['qty'] + 1; ?>)" style="width:25px; height:25px; border:none; background:transparent; color:#fff; cursor:pointer;">+</button>
-                                            </div>
-                                        </td>
-                                        <!-- Item subtotal -->
-                                        <td style="padding: 20px 0; text-align:right; font-weight:700; color:var(--text-primary); font-size:1.05rem;">
-                                            ₹<?php echo number_format($item['price'] * $item['qty'], 2); ?>
-                                        </td>
-                                    </tr>
-                                <?php endforeach; ?>
-                            </tbody>
-                        </table>
+                    <div class="glass-card" style="padding:10px 20px; border-radius:8px;">
+                        <div class="cart-header-row" style="display:grid; grid-template-columns:1fr auto auto; gap:20px; padding-bottom:12px; border-bottom:1px solid var(--border-color); color:var(--gold-muted); font-family:var(--font-heading); font-size:0.82rem; text-transform:uppercase; font-weight:700;">
+                            <span>Product Details</span>
+                            <span style="text-align:center;">Quantity</span>
+                            <span style="text-align:right;">Subtotal</span>
+                        </div>
+                        <?php foreach ($cart_items as $key => $item): ?>
+                            <div class="cart-item-row" data-key="<?php echo htmlspecialchars($key); ?>">
+                                    <div class="cart-item-info">
+                                    <img src="<?php echo htmlspecialchars($item['image']); ?>" alt="<?php echo htmlspecialchars($item['name']); ?>" class="cart-item-img">
+                                    <div class="cart-item-details">
+                                        <div class="cart-item-name"><?php echo htmlspecialchars($item['name']); ?></div>
+                                        <div class="cart-item-size"><?php echo htmlspecialchars($item['size']); ?></div>
+                                        <div class="cart-item-price">₹<?php echo number_format($item['price'], 2); ?></div>
+                                        <button type="button" onclick="removeCartItem('<?php echo htmlspecialchars($key); ?>')" class="cart-item-remove">
+                                            <i class="fas fa-trash-alt"></i> Remove
+                                        </button>
+                                    </div>
+                                </div>
+                                <div class="cart-item-qty">
+                                    <div style="display:inline-flex; align-items:center; border:1px solid var(--border-color); border-radius:6px; overflow:hidden;">
+                                        <button type="button" onclick="updateCartQty('<?php echo htmlspecialchars($key); ?>', <?php echo $item['qty'] - 1; ?>)" style="width:30px; height:30px; border:none; background:transparent; color:#fff; cursor:pointer; font-size:0.9rem;">-</button>
+                                        <span class="cart-qty-val" style="width:32px; text-align:center; font-weight:700; font-size:0.9rem;"><?php echo $item['qty']; ?></span>
+                                        <button type="button" onclick="updateCartQty('<?php echo htmlspecialchars($key); ?>', <?php echo $item['qty'] + 1; ?>)" style="width:30px; height:30px; border:none; background:transparent; color:#fff; cursor:pointer; font-size:0.9rem;">+</button>
+                                    </div>
+                                </div>
+                                <div class="cart-item-subtotal">
+                                    ₹<?php echo number_format($item['price'] * $item['qty'], 2); ?>
+                                </div>
+                            </div>
+                        <?php endforeach; ?>
                     </div>
                 </div>
 
