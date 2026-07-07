@@ -1,16 +1,26 @@
 # --------------------------------------------------------
-# ADMIN PANEL HARDENING
+# ADMIN PANEL HARDENING (Apache 2.4 compatible)
 # --------------------------------------------------------
 
-# Only allow specific HTTP methods
-<Limit GET POST HEAD>
-    Order Allow,Deny
-    Allow from all
-</Limit>
-<Limit DELETE PUT PATCH OPTIONS>
-    Order Deny,Allow
-    Deny from all
-</Limit>
+# Only allow GET, POST, HEAD methods
+<IfModule mod_authz_core.c>
+    <Limit GET POST HEAD>
+        Require all granted
+    </Limit>
+    <Limit DELETE PUT PATCH OPTIONS>
+        Require all denied
+    </Limit>
+</IfModule>
+<IfModule !mod_authz_core.c>
+    <Limit GET POST HEAD>
+        Order Allow,Deny
+        Allow from all
+    </Limit>
+    <Limit DELETE PUT PATCH OPTIONS>
+        Order Deny,Allow
+        Deny from all
+    </Limit>
+</IfModule>
 
 # Prevent caching of admin pages
 <IfModule mod_expires.c>
@@ -20,7 +30,7 @@
     ExpiresByType application/json "access plus 0 seconds"
 </IfModule>
 
-# Force no-cache headers (only if mod_headers is loaded)
+# Force no-cache headers
 <IfModule mod_headers.c>
     Header set Cache-Control "no-store, no-cache, must-revalidate, max-age=0"
     Header set Pragma "no-cache"
@@ -29,12 +39,22 @@
 
 # Block direct access to admin includes
 <FilesMatch "^(header|sidebar|footer)\.php$">
-    Order Allow,Deny
-    Deny from all
+    <IfModule mod_authz_core.c>
+        Require all denied
+    </IfModule>
+    <IfModule !mod_authz_core.c>
+        Order Allow,Deny
+        Deny from all
+    </IfModule>
 </FilesMatch>
 
 # Block access to upload handler
 <Files "upload_handler.php">
-    Order Deny,Allow
-    Deny from all
+    <IfModule mod_authz_core.c>
+        Require all denied
+    </IfModule>
+    <IfModule !mod_authz_core.c>
+        Order Deny,Allow
+        Deny from all
+    </IfModule>
 </Files>

@@ -6,14 +6,24 @@ RewriteEngine On
 
 # Block access to .env file
 <Files ".env">
-    Order Allow,Deny
-    Deny from all
+    <IfModule mod_authz_core.c>
+        Require all denied
+    </IfModule>
+    <IfModule !mod_authz_core.c>
+        Order Allow,Deny
+        Deny from all
+    </IfModule>
 </Files>
 
 # Block access to config/log/backup files
 <FilesMatch "\.(env|ini|log|sql|bak|config|dist|fla|psd|swp)$">
-    Order Allow,Deny
-    Deny from all
+    <IfModule mod_authz_core.c>
+        Require all denied
+    </IfModule>
+    <IfModule !mod_authz_core.c>
+        Order Allow,Deny
+        Deny from all
+    </IfModule>
 </FilesMatch>
 
 # Block access to hidden files (.git, etc)
@@ -22,7 +32,7 @@ RewriteEngine On
 </IfModule>
 
 # --------------------------------------------------------
-# SECURITY HEADERS (only if mod_headers is loaded)
+# SECURITY HEADERS
 # --------------------------------------------------------
 <IfModule mod_headers.c>
     Header always set X-Frame-Options "DENY"
