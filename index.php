@@ -3,13 +3,14 @@ require_once __DIR__ . '/includes/header.php';
 try { $stmt = $pdo->prepare("SELECT * FROM categories WHERE is_active = 1 ORDER BY display_order ASC"); $stmt->execute(); $categories = $stmt->fetchAll(); } catch (PDOException $e) { $categories = []; }
 $products_by_category = [];
 foreach ($categories as $cat) {
-    $stmt = $pdo->prepare("SELECT p.*, MIN(pv.price) as max_mrp, MIN(pv.sale_price) as min_price, pv.id as default_variant_id FROM products p JOIN product_variants pv ON p.id = pv.product_id WHERE p.category_id = ? AND p.is_active = 1 AND pv.is_default = 1 GROUP BY p.id");
+    $stmt = $pdo->prepare("SELECT p.*, pv.price as max_mrp, pv.sale_price as min_price, pv.id as default_variant_id FROM products p JOIN product_variants pv ON p.id = pv.product_id WHERE p.category_id = ? AND p.is_active = 1 AND pv.is_default = 1 GROUP BY p.id");
     $stmt->execute([$cat['id']]); $products_by_category[$cat['slug']] = $stmt->fetchAll();
 }
 try { $stmt = $pdo->prepare("SELECT * FROM bundles WHERE status = 1 LIMIT 1"); $stmt->execute(); $bundle = $stmt->fetch(); } catch (PDOException $e) { $bundle = null; }
 $certs = get_certificates();
 $testimonials = get_testimonials(false, 5);
 try { $stmt = $pdo->prepare("SELECT * FROM blog_posts WHERE status = 1 ORDER BY published_at DESC"); $stmt->execute(); $blogs = $stmt->fetchAll(); if (count($blogs) > 3) $blogs = array_slice($blogs, 0, 3); } catch (PDOException $e) { $blogs = []; }
+try { $stmt = $pdo->prepare("SELECT p.*, pv.price as max_mrp, pv.sale_price as min_price, pv.size_capsules FROM products p JOIN product_variants pv ON p.id = pv.product_id AND pv.is_default = 1 WHERE p.is_active = 0 ORDER BY p.id ASC"); $stmt->execute(); $coming_soon = $stmt->fetchAll(); } catch (PDOException $e) { $coming_soon = []; }
 ?>
 
 <style>
@@ -249,96 +250,6 @@ try { $stmt = $pdo->prepare("SELECT * FROM blog_posts WHERE status = 1 ORDER BY 
     </div>
 </div>
 
-<!-- ═══ BOLD STATEMENT ═══ -->
-<section style="padding:80px 0 60px; position:relative; z-index:2; overflow:hidden;">
-    <div style="position:absolute; top:50%; left:50%; transform:translate(-50%,-50%); width:600px; height:600px; background:radial-gradient(circle,rgba(212,175,55,0.06) 0%,transparent 60%); pointer-events:none;"></div>
-    <div class="container">
-        <div style="text-align:center; margin-bottom:50px;">
-            <span style="display:inline-block; font-size:0.68rem; font-weight:800; letter-spacing:2.5px; background:var(--gold-gradient); color:#080C10; padding:6px 18px; border-radius:20px; text-transform:uppercase; margin-bottom:22px;">Our Philosophy</span>
-            <h2 style="font-size:clamp(2.2rem,5vw,3.8rem); font-family:var(--font-heading); font-weight:800; text-transform:uppercase; line-height:1.08; color:#fff; margin-bottom:18px;">
-                Ancient Wisdom.<br>
-                <span style="background:var(--gold-gradient); -webkit-background-clip:text; -webkit-text-fill-color:transparent;">Modern Results.</span>
-            </h2>
-            <p style="font-size:1.05rem; color:rgba(255,255,255,0.6); max-width:620px; margin:0 auto; line-height:1.8;">We engineer complete Ayurvedic performance systems. 90 days of consistent discipline for total cellular rejuvenation.</p>
-        </div>
-
-        <!-- 3 Feature Cards -->
-        <div class="feature-grid" style="display:grid; grid-template-columns:repeat(3,1fr); gap:24px; margin-bottom:40px;">
-            <div class="tilt-card spotlight-card feature-card">
-                <div class="tilt-shine"></div>
-                <div class="feature-icon"><i class="fas fa-leaf"></i></div>
-                <h4 class="feature-title">100% Ayurvedic</h4>
-                <p class="feature-desc">Pure Himalayan botanicals. Zero synthetic compounds. Nature's strongest formulas.</p>
-            </div>
-            <div class="tilt-card spotlight-card feature-card">
-                <div class="tilt-shine"></div>
-                <div class="feature-icon"><i class="fas fa-flask"></i></div>
-                <h4 class="feature-title">Lab Validated</h4>
-                <p class="feature-desc">Triple-tested purity. Every batch verified before it reaches your doorstep.</p>
-            </div>
-            <div class="tilt-card spotlight-card feature-card">
-                <div class="tilt-shine"></div>
-                <div class="feature-icon"><i class="fas fa-user-doctor"></i></div>
-                <h4 class="feature-title">Free Consultation</h4>
-                <p class="feature-desc">Personalized guidance from certified Ayurvedic nutritionists. Always free.</p>
-            </div>
-        </div>
-
-        <!-- CTA Buttons -->
-        <div class="cta-buttons-wrap" style="display:flex; flex-direction:column; align-items:center; gap:14px; text-align:center;">
-            <a href="https://wa.me/919779450455?text=Hi%20Wolf%20Nutrition,%20I%20would%20like%20to%20start%20my%2090-day%20personalized%20challenge%20program%20please." target="_blank" rel="noopener noreferrer" class="btn-gold" style="padding:15px 38px; font-weight:700; font-size:0.95rem; border-radius:30px; margin-right:12px;">Start 90-Day Challenge</a>
-            <a href="about.php" class="btn-outline-gold" style="padding:14px 38px; font-weight:700; font-size:0.95rem; border-radius:30px;">Our Story</a>
-        </div>
-    </div>
-</section>
-
-<!-- Divider -->
-<div class="divider-wave" style="position:relative; z-index:2;"><svg viewBox="0 0 1200 50" preserveAspectRatio="none"><path d="M0,0 L1200,0 L1200,25 Q900,50 600,25 Q300,0 0,25 Z" fill="rgba(212,175,55,0.03)"/></svg></div>
-
-<!-- ═══ COUNTERS ═══ -->
-<section style="padding:50px 0; position:relative; z-index:2;">
-    <div class="container">
-        <div style="display:grid; grid-template-columns:repeat(4,1fr); gap:20px;">
-
-            <!-- Counter 1 -->
-            <div class="tilt-card" style="background:linear-gradient(135deg,rgba(212,175,55,0.08) 0%,rgba(8,12,16,0.95) 100%); border:1px solid rgba(212,175,55,0.15); border-radius:20px; padding:35px 20px; text-align:center; position:relative; overflow:hidden; transition:all 0.4s;">
-                <div style="position:absolute; top:-30px; right:-30px; width:100px; height:100px; background:radial-gradient(circle,rgba(212,175,55,0.12) 0%,transparent 70%); pointer-events:none;"></div>
-                <div style="width:50px; height:50px; border-radius:50%; background:var(--gold-gradient); display:flex; align-items:center; justify-content:center; margin:0 auto 16px; color:#080C10; font-size:1.1rem; box-shadow:0 8px 24px rgba(212,175,55,0.25);"><i class="fas fa-users"></i></div>
-                <div style="font-size:2.6rem; font-weight:800; font-family:var(--font-heading); background:var(--gold-gradient); -webkit-background-clip:text; -webkit-text-fill-color:transparent; line-height:1; margin-bottom:8px;" class="counter-num" data-target="25000">0</div>
-                <div style="font-size:0.7rem; color:rgba(255,255,255,0.5); text-transform:uppercase; letter-spacing:1.5px; font-weight:600;">Happy Customers</div>
-            </div>
-
-            <!-- Counter 2 -->
-            <div class="tilt-card" style="background:linear-gradient(135deg,rgba(212,175,55,0.08) 0%,rgba(8,12,16,0.95) 100%); border:1px solid rgba(212,175,55,0.15); border-radius:20px; padding:35px 20px; text-align:center; position:relative; overflow:hidden; transition:all 0.4s;">
-                <div style="position:absolute; top:-30px; right:-30px; width:100px; height:100px; background:radial-gradient(circle,rgba(212,175,55,0.12) 0%,transparent 70%); pointer-events:none;"></div>
-                <div style="width:50px; height:50px; border-radius:50%; background:var(--gold-gradient); display:flex; align-items:center; justify-content:center; margin:0 auto 16px; color:#080C10; font-size:1.1rem; box-shadow:0 8px 24px rgba(212,175,55,0.25);"><i class="fas fa-star"></i></div>
-                <div style="font-size:2.6rem; font-weight:800; font-family:var(--font-heading); background:var(--gold-gradient); -webkit-background-clip:text; -webkit-text-fill-color:transparent; line-height:1; margin-bottom:8px;" class="counter-num" data-target="98">0</div>
-                <div style="font-size:0.7rem; color:rgba(255,255,255,0.5); text-transform:uppercase; letter-spacing:1.5px; font-weight:600;">% Satisfaction</div>
-            </div>
-
-            <!-- Counter 3 -->
-            <div class="tilt-card" style="background:linear-gradient(135deg,rgba(212,175,55,0.08) 0%,rgba(8,12,16,0.95) 100%); border:1px solid rgba(212,175,55,0.15); border-radius:20px; padding:35px 20px; text-align:center; position:relative; overflow:hidden; transition:all 0.4s;">
-                <div style="position:absolute; top:-30px; right:-30px; width:100px; height:100px; background:radial-gradient(circle,rgba(212,175,55,0.12) 0%,transparent 70%); pointer-events:none;"></div>
-                <div style="width:50px; height:50px; border-radius:50%; background:var(--gold-gradient); display:flex; align-items:center; justify-content:center; margin:0 auto 16px; color:#080C10; font-size:1.1rem; box-shadow:0 8px 24px rgba(212,175,55,0.25);"><i class="fas fa-leaf"></i></div>
-                <div style="font-size:2.6rem; font-weight:800; font-family:var(--font-heading); background:var(--gold-gradient); -webkit-background-clip:text; -webkit-text-fill-color:transparent; line-height:1; margin-bottom:8px;" class="counter-num" data-target="100">0</div>
-                <div style="font-size:0.7rem; color:rgba(255,255,255,0.5); text-transform:uppercase; letter-spacing:1.5px; font-weight:600;">% Ayurvedic</div>
-            </div>
-
-            <!-- Counter 4 -->
-            <div class="tilt-card" style="background:linear-gradient(135deg,rgba(212,175,55,0.08) 0%,rgba(8,12,16,0.95) 100%); border:1px solid rgba(212,175,55,0.15); border-radius:20px; padding:35px 20px; text-align:center; position:relative; overflow:hidden; transition:all 0.4s;">
-                <div style="position:absolute; top:-30px; right:-30px; width:100px; height:100px; background:radial-gradient(circle,rgba(212,175,55,0.12) 0%,transparent 70%); pointer-events:none;"></div>
-                <div style="width:50px; height:50px; border-radius:50%; background:var(--gold-gradient); display:flex; align-items:center; justify-content:center; margin:0 auto 16px; color:#080C10; font-size:1.1rem; box-shadow:0 8px 24px rgba(212,175,55,0.25);"><i class="fas fa-truck-fast"></i></div>
-                <div style="font-size:2.6rem; font-weight:800; font-family:var(--font-heading); background:var(--gold-gradient); -webkit-background-clip:text; -webkit-text-fill-color:transparent; line-height:1; margin-bottom:8px;" class="counter-num" data-target="50">0</div>
-                <div style="font-size:0.7rem; color:rgba(255,255,255,0.5); text-transform:uppercase; letter-spacing:1.5px; font-weight:600;">Pincode Delivery</div>
-            </div>
-
-        </div>
-    </div>
-</section>
-
-<!-- Divider -->
-<div class="divider-wave"><svg viewBox="0 0 1200 50" preserveAspectRatio="none"><path d="M0,0 L1200,0 L1200,25 Q900,50 600,25 Q300,0 0,25 Z" fill="rgba(212,175,55,0.03)"/></svg></div>
-
 <!-- ═══ CATEGORIES ═══ -->
 <section style="padding:70px 0; position:relative; z-index:2; background:radial-gradient(ellipse at 50% 50%,rgba(212,175,55,0.03) 0%,transparent 60%);">
     <div class="container">
@@ -377,11 +288,11 @@ try { $stmt = $pdo->prepare("SELECT * FROM blog_posts WHERE status = 1 ORDER BY 
                 <!-- Content Side -->
                 <div class="cat-card-content" style="padding:35px 40px; display:flex; flex-direction:column; justify-content:center; position:relative;">
                     <div style="width:44px; height:44px; border-radius:12px; background:rgba(212,175,55,0.08); border:1px solid rgba(212,175,55,0.15); display:flex; align-items:center; justify-content:center; color:var(--gold-primary); font-size:1.1rem; margin-bottom:16px;"><i class="fas fa-shield-halved"></i></div>
-                    <h3 style="color:#fff; font-family:var(--font-heading); font-size:1.5rem; font-weight:800; text-transform:uppercase; letter-spacing:0.5px; margin:0 0 8px;">Liver & Detox Stack</h3>
+                    <h3 style="color:#fff; font-family:var(--font-heading); font-size:1.5rem; font-weight:800; text-transform:uppercase; letter-spacing:0.5px; margin:0 0 8px;">Liver Support & Detox Stack</h3>
                     <p style="color:rgba(255,255,255,0.55); font-size:0.9rem; line-height:1.6; margin:0 0 20px; max-width:450px;">Kutki, Milk Thistle, and Kalmegh. Complete liver cleanse, toxin removal, and digestive enzyme optimization.</p>
                     <div style="display:flex; align-items:center; gap:20px;">
                         <span style="display:inline-flex; align-items:center; gap:8px; color:var(--gold-primary); font-size:0.85rem; font-weight:700; text-transform:uppercase; letter-spacing:0.5px;">Explore Stack <i class="fas fa-arrow-right"></i></span>
-                        <span style="font-size:0.78rem; color:rgba(255,255,255,0.35);">From ₹546</span>
+                        <span style="font-size:0.78rem; color:rgba(255,255,255,0.35);">From ₹1,275</span>
                     </div>
                 </div>
                 <!-- Image Side -->
@@ -498,6 +409,159 @@ try { $stmt = $pdo->prepare("SELECT * FROM blog_posts WHERE status = 1 ORDER BY 
         <?php endforeach; ?>
     </div>
 </section>
+
+<!-- ═══ BOLD STATEMENT ═══ -->
+<section style="padding:80px 0 60px; position:relative; z-index:2; overflow:hidden;">
+    <div style="position:absolute; top:50%; left:50%; transform:translate(-50%,-50%); width:600px; height:600px; background:radial-gradient(circle,rgba(212,175,55,0.06) 0%,transparent 60%); pointer-events:none;"></div>
+    <div class="container">
+        <div style="text-align:center; margin-bottom:50px;">
+            <span style="display:inline-block; font-size:0.68rem; font-weight:800; letter-spacing:2.5px; background:var(--gold-gradient); color:#080C10; padding:6px 18px; border-radius:20px; text-transform:uppercase; margin-bottom:22px;">Our Philosophy</span>
+            <h2 style="font-size:clamp(2.2rem,5vw,3.8rem); font-family:var(--font-heading); font-weight:800; text-transform:uppercase; line-height:1.08; color:#fff; margin-bottom:18px;">
+                Ancient Wisdom.<br>
+                <span style="background:var(--gold-gradient); -webkit-background-clip:text; -webkit-text-fill-color:transparent;">Modern Results.</span>
+            </h2>
+            <p style="font-size:1.05rem; color:rgba(255,255,255,0.6); max-width:620px; margin:0 auto; line-height:1.8;">We engineer complete Ayurvedic performance systems. 90 days of consistent discipline for total cellular rejuvenation.</p>
+        </div>
+
+        <!-- 3 Feature Cards -->
+        <div class="feature-grid" style="display:grid; grid-template-columns:repeat(3,1fr); gap:24px; margin-bottom:40px;">
+            <div class="tilt-card spotlight-card feature-card">
+                <div class="tilt-shine"></div>
+                <div class="feature-icon"><i class="fas fa-leaf"></i></div>
+                <h4 class="feature-title">100% Ayurvedic</h4>
+                <p class="feature-desc">Pure Himalayan botanicals. Zero synthetic compounds. Nature's strongest formulas.</p>
+            </div>
+            <div class="tilt-card spotlight-card feature-card">
+                <div class="tilt-shine"></div>
+                <div class="feature-icon"><i class="fas fa-flask"></i></div>
+                <h4 class="feature-title">Lab Validated</h4>
+                <p class="feature-desc">Triple-tested purity. Every batch verified before it reaches your doorstep.</p>
+            </div>
+            <div class="tilt-card spotlight-card feature-card">
+                <div class="tilt-shine"></div>
+                <div class="feature-icon"><i class="fas fa-user-doctor"></i></div>
+                <h4 class="feature-title">Free Consultation</h4>
+                <p class="feature-desc">Personalized guidance from certified Ayurvedic nutritionists. Always free.</p>
+            </div>
+        </div>
+
+        <!-- CTA Buttons -->
+        <div class="cta-buttons-wrap" style="display:flex; flex-direction:column; align-items:center; gap:14px; text-align:center;">
+            <a href="https://wa.me/919779450455?text=Hi%20Wolf%20Nutrition,%20I%20would%20like%20to%20start%20my%2090-day%20personalized%20challenge%20program%20please." target="_blank" rel="noopener noreferrer" class="btn-gold" style="padding:15px 38px; font-weight:700; font-size:0.95rem; border-radius:30px; margin-right:12px;">Start 90-Day Challenge</a>
+            <a href="about.php" class="btn-outline-gold" style="padding:14px 38px; font-weight:700; font-size:0.95rem; border-radius:30px;">Our Story</a>
+        </div>
+    </div>
+</section>
+
+<!-- Divider -->
+<div class="divider-wave" style="position:relative; z-index:2;"><svg viewBox="0 0 1200 50" preserveAspectRatio="none"><path d="M0,0 L1200,0 L1200,25 Q900,50 600,25 Q300,0 0,25 Z" fill="rgba(212,175,55,0.03)"/></svg></div>
+
+<!-- ═══ COUNTERS ═══ -->
+<section style="padding:50px 0; position:relative; z-index:2;">
+    <div class="container">
+        <div style="display:grid; grid-template-columns:repeat(4,1fr); gap:20px;">
+
+            <!-- Counter 1 -->
+            <div class="tilt-card" style="background:linear-gradient(135deg,rgba(212,175,55,0.08) 0%,rgba(8,12,16,0.95) 100%); border:1px solid rgba(212,175,55,0.15); border-radius:20px; padding:35px 20px; text-align:center; position:relative; overflow:hidden; transition:all 0.4s;">
+                <div style="position:absolute; top:-30px; right:-30px; width:100px; height:100px; background:radial-gradient(circle,rgba(212,175,55,0.12) 0%,transparent 70%); pointer-events:none;"></div>
+                <div style="width:50px; height:50px; border-radius:50%; background:var(--gold-gradient); display:flex; align-items:center; justify-content:center; margin:0 auto 16px; color:#080C10; font-size:1.1rem; box-shadow:0 8px 24px rgba(212,175,55,0.25);"><i class="fas fa-users"></i></div>
+                <div style="font-size:2.6rem; font-weight:800; font-family:var(--font-heading); background:var(--gold-gradient); -webkit-background-clip:text; -webkit-text-fill-color:transparent; line-height:1; margin-bottom:8px;" class="counter-num" data-target="25000">0</div>
+                <div style="font-size:0.7rem; color:rgba(255,255,255,0.5); text-transform:uppercase; letter-spacing:1.5px; font-weight:600;">Happy Customers</div>
+            </div>
+
+            <!-- Counter 2 -->
+            <div class="tilt-card" style="background:linear-gradient(135deg,rgba(212,175,55,0.08) 0%,rgba(8,12,16,0.95) 100%); border:1px solid rgba(212,175,55,0.15); border-radius:20px; padding:35px 20px; text-align:center; position:relative; overflow:hidden; transition:all 0.4s;">
+                <div style="position:absolute; top:-30px; right:-30px; width:100px; height:100px; background:radial-gradient(circle,rgba(212,175,55,0.12) 0%,transparent 70%); pointer-events:none;"></div>
+                <div style="width:50px; height:50px; border-radius:50%; background:var(--gold-gradient); display:flex; align-items:center; justify-content:center; margin:0 auto 16px; color:#080C10; font-size:1.1rem; box-shadow:0 8px 24px rgba(212,175,55,0.25);"><i class="fas fa-star"></i></div>
+                <div style="font-size:2.6rem; font-weight:800; font-family:var(--font-heading); background:var(--gold-gradient); -webkit-background-clip:text; -webkit-text-fill-color:transparent; line-height:1; margin-bottom:8px;" class="counter-num" data-target="98">0</div>
+                <div style="font-size:0.7rem; color:rgba(255,255,255,0.5); text-transform:uppercase; letter-spacing:1.5px; font-weight:600;">% Satisfaction</div>
+            </div>
+
+            <!-- Counter 3 -->
+            <div class="tilt-card" style="background:linear-gradient(135deg,rgba(212,175,55,0.08) 0%,rgba(8,12,16,0.95) 100%); border:1px solid rgba(212,175,55,0.15); border-radius:20px; padding:35px 20px; text-align:center; position:relative; overflow:hidden; transition:all 0.4s;">
+                <div style="position:absolute; top:-30px; right:-30px; width:100px; height:100px; background:radial-gradient(circle,rgba(212,175,55,0.12) 0%,transparent 70%); pointer-events:none;"></div>
+                <div style="width:50px; height:50px; border-radius:50%; background:var(--gold-gradient); display:flex; align-items:center; justify-content:center; margin:0 auto 16px; color:#080C10; font-size:1.1rem; box-shadow:0 8px 24px rgba(212,175,55,0.25);"><i class="fas fa-leaf"></i></div>
+                <div style="font-size:2.6rem; font-weight:800; font-family:var(--font-heading); background:var(--gold-gradient); -webkit-background-clip:text; -webkit-text-fill-color:transparent; line-height:1; margin-bottom:8px;" class="counter-num" data-target="100">0</div>
+                <div style="font-size:0.7rem; color:rgba(255,255,255,0.5); text-transform:uppercase; letter-spacing:1.5px; font-weight:600;">% Ayurvedic</div>
+            </div>
+
+            <!-- Counter 4 -->
+            <div class="tilt-card" style="background:linear-gradient(135deg,rgba(212,175,55,0.08) 0%,rgba(8,12,16,0.95) 100%); border:1px solid rgba(212,175,55,0.15); border-radius:20px; padding:35px 20px; text-align:center; position:relative; overflow:hidden; transition:all 0.4s;">
+                <div style="position:absolute; top:-30px; right:-30px; width:100px; height:100px; background:radial-gradient(circle,rgba(212,175,55,0.12) 0%,transparent 70%); pointer-events:none;"></div>
+                <div style="width:50px; height:50px; border-radius:50%; background:var(--gold-gradient); display:flex; align-items:center; justify-content:center; margin:0 auto 16px; color:#080C10; font-size:1.1rem; box-shadow:0 8px 24px rgba(212,175,55,0.25);"><i class="fas fa-truck-fast"></i></div>
+                <div style="font-size:2.6rem; font-weight:800; font-family:var(--font-heading); background:var(--gold-gradient); -webkit-background-clip:text; -webkit-text-fill-color:transparent; line-height:1; margin-bottom:8px;" class="counter-num" data-target="50">0</div>
+                <div style="font-size:0.7rem; color:rgba(255,255,255,0.5); text-transform:uppercase; letter-spacing:1.5px; font-weight:600;">Pincode Delivery</div>
+            </div>
+
+        </div>
+    </div>
+</section>
+
+<!-- ═══ COMING SOON ═══ -->
+<?php if (!empty($coming_soon)): ?>
+<section style="padding:80px 0; position:relative; z-index:2; background:linear-gradient(180deg,rgba(212,175,55,0.04) 0%,rgba(8,12,16,1) 50%,rgba(212,175,55,0.04) 100%); overflow:hidden;">
+    <!-- Animated background lines -->
+    <div style="position:absolute; inset:0; overflow:hidden; pointer-events:none;">
+        <div style="position:absolute; top:20%; left:-10%; width:120%; height:1px; background:linear-gradient(90deg,transparent,rgba(212,175,55,0.15),transparent); transform:rotate(-3deg);"></div>
+        <div style="position:absolute; bottom:25%; left:-10%; width:120%; height:1px; background:linear-gradient(90deg,transparent,rgba(212,175,55,0.1),transparent); transform:rotate(2deg);"></div>
+    </div>
+    <div class="container">
+        <!-- Section Header -->
+        <div style="text-align:center; margin-bottom:60px;">
+            <div style="display:inline-flex; align-items:center; gap:10px; margin-bottom:18px;">
+                <div style="width:40px; height:1px; background:var(--gold-gradient);"></div>
+                <span style="display:inline-block; font-size:0.65rem; font-weight:800; letter-spacing:3px; color:var(--gold-primary); text-transform:uppercase; background:rgba(212,175,55,0.08); border:1px solid rgba(212,175,55,0.2); padding:6px 18px; border-radius:20px;">Launching Soon</span>
+                <div style="width:40px; height:1px; background:var(--gold-gradient);"></div>
+            </div>
+            <h2 style="font-size:clamp(2rem,4vw,3.2rem); font-family:var(--font-heading); font-weight:800; text-transform:uppercase; color:#fff; margin-bottom:12px;">
+                Coming <span style="background:var(--gold-gradient); -webkit-background-clip:text; -webkit-text-fill-color:transparent;">Soon</span>
+            </h2>
+            <p style="font-size:0.95rem; color:rgba(255,255,255,0.5); max-width:520px; margin:0 auto; line-height:1.7;">Next-generation supplements in development. Be the first to experience the future of performance nutrition.</p>
+        </div>
+
+        <!-- Coming Soon Cards -->
+        <div style="display:grid; grid-template-columns:repeat(<?php echo count($coming_soon) > 1 ? '2' : '1'; ?>, 1fr); gap:30px; max-width:900px; margin:0 auto;">
+            <?php foreach ($coming_soon as $cs): ?>
+            <div class="tilt-card" style="position:relative; background:rgba(255,255,255,0.02); border:1px solid rgba(212,175,55,0.15); border-radius:24px; overflow:hidden; transition:all 0.5s;">
+                <!-- Gold top accent -->
+                <div style="position:absolute; top:0; left:0; right:0; height:3px; background:var(--gold-gradient); z-index:2;"></div>
+
+                <!-- Coming Soon badge -->
+                <div style="position:absolute; top:20px; right:20px; z-index:3; background:linear-gradient(135deg,#d4af37 0%,#b8960c 100%); color:#080C10; font-size:0.6rem; font-weight:800; letter-spacing:1.5px; text-transform:uppercase; padding:6px 14px; border-radius:20px; box-shadow:0 4px 15px rgba(212,175,55,0.3);">
+                    Coming Soon
+                </div>
+
+                <!-- Image Area -->
+                <div style="height:280px; background:radial-gradient(circle at center,rgba(212,175,55,0.08) 0%,rgba(8,12,16,0.98) 80%); display:flex; align-items:center; justify-content:center; position:relative; overflow:hidden;">
+                    <div style="position:absolute; inset:0; background:repeating-linear-gradient(45deg,transparent,transparent 20px,rgba(212,175,55,0.02) 20px,rgba(212,175,55,0.02) 40px); pointer-events:none;"></div>
+                    <img src="<?php echo htmlspecialchars($cs['image_url']); ?>" alt="<?php echo htmlspecialchars($cs['name']); ?>" style="max-height:200px; max-width:80%; object-fit:contain; filter:drop-shadow(0 20px 50px rgba(212,175,55,0.15)); opacity:0.9; transition:transform 0.5s ease; position:relative; z-index:1;">
+                    <!-- Lock overlay -->
+                    <div style="position:absolute; bottom:16px; left:50%; transform:translateX(-50%); background:rgba(8,12,16,0.8); border:1px solid rgba(212,175,55,0.2); border-radius:30px; padding:8px 20px; display:flex; align-items:center; gap:6px; z-index:2;">
+                        <i class="fas fa-lock" style="color:var(--gold-primary); font-size:0.7rem;"></i>
+                        <span style="font-size:0.65rem; color:rgba(255,255,255,0.5); text-transform:uppercase; letter-spacing:1px; font-weight:600;">Available Soon</span>
+                    </div>
+                </div>
+
+                <!-- Content -->
+                <div style="padding:28px 30px 30px;">
+                    <h3 style="font-family:var(--font-heading); font-size:1.15rem; font-weight:800; color:#fff; text-transform:uppercase; letter-spacing:0.5px; margin-bottom:10px; line-height:1.3;"><?php echo htmlspecialchars($cs['name']); ?></h3>
+                    <p style="font-size:0.82rem; color:rgba(255,255,255,0.45); line-height:1.6; margin-bottom:20px;"><?php echo htmlspecialchars($cs['short_description']); ?></p>
+                    <div style="display:flex; align-items:center; justify-content:space-between;">
+                        <div>
+                            <span style="font-size:1.4rem; font-weight:800; color:var(--gold-primary); font-family:var(--font-heading);">₹<?php echo number_format($cs['min_price'],0); ?></span>
+                            <span style="font-size:0.78rem; color:rgba(255,255,255,0.3); text-decoration:line-through; margin-left:8px;">₹<?php echo number_format($cs['max_mrp'],0); ?></span>
+                        </div>
+                        <button class="btn-gold" style="padding:10px 22px; font-size:0.75rem; border-radius:30px; font-weight:700; letter-spacing:0.5px; cursor:not-allowed; opacity:0.7;" disabled>
+                            <i class="fas fa-bell"></i> Notify Me
+                        </button>
+                    </div>
+                </div>
+            </div>
+            <?php endforeach; ?>
+        </div>
+    </div>
+</section>
+<?php endif; ?>
 
 <!-- ═══ SOCIAL PROOF ═══ -->
 <?php if (!empty($testimonials)): ?>
