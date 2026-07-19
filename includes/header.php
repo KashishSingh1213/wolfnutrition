@@ -296,7 +296,7 @@ document.addEventListener('DOMContentLoaded', function() {
                         <a href="category.php?slug=vitality">Supplements</a>
                     </li>
                     <li class="<?php echo ($active_page === 'category.php' && isset($_GET['slug']) && $_GET['slug'] === 'liver-detox') ? 'active' : ''; ?>">
-                        <a href="category.php?slug=liver-detox">Liver & Detox</a>
+                        <a href="category.php?slug=liver-detox">Liver Support & Detox</a>
                     </li>
                     <li class="<?php echo $active_page === 'about.php' ? 'active' : ''; ?>">
                         <a href="about.php">About Us</a>
@@ -355,7 +355,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 <a href="category.php?slug=vitality"><i class="fas fa-capsules"></i> Supplements</a>
             </li>
             <li class="<?php echo ($active_page === 'category.php' && isset($_GET['slug']) && $_GET['slug'] === 'liver-detox') ? 'active' : ''; ?>">
-                <a href="category.php?slug=liver-detox"><i class="fas fa-shield-halved"></i> Liver & Detox</a>
+                <a href="category.php?slug=liver-detox"><i class="fas fa-shield-halved"></i> Liver Support & Detox</a>
             </li>
             <li class="<?php echo $active_page === 'about.php' ? 'active' : ''; ?>">
                 <a href="about.php"><i class="fas fa-info-circle"></i> About Us</a>
