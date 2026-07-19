@@ -33,12 +33,11 @@ try {
     }
 
     $stmt = $pdo->prepare("
-        SELECT p.id, p.name, p.slug, p.image_url, c.name as category_name, MIN(pv.sale_price) as min_price
+        SELECT p.id, p.name, p.slug, p.image_url, c.name as category_name, dv.sale_price as min_price
         FROM products p
         LEFT JOIN categories c ON p.category_id = c.id
-        LEFT JOIN product_variants pv ON p.id = pv.product_id
+        LEFT JOIN product_variants dv ON p.id = dv.product_id AND dv.is_default = 1
         WHERE p.is_active = 1 AND (p.name LIKE ? OR p.description LIKE ? OR c.name LIKE ?)
-        GROUP BY p.id
         LIMIT 5
     ");
     $stmt->execute([$searchTerm, $searchTerm, $searchTerm]);
