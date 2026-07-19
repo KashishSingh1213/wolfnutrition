@@ -13,7 +13,7 @@ if ($cat_slug !== 'all') {
     if (!$category) { $cat_slug = 'all'; }
 }
 
-$sql = "SELECT p.*, MIN(pv.price) as max_mrp, MIN(pv.sale_price) as min_price, pv.id as default_variant_id, SUM(pv.stock_qty) as total_stock FROM products p JOIN product_variants pv ON p.id = pv.product_id WHERE p.is_active = 1";
+$sql = "SELECT p.*, dv.price as max_mrp, dv.sale_price as min_price, dv.id as default_variant_id, SUM(pv.stock_qty) as total_stock FROM products p JOIN product_variants dv ON p.id = dv.product_id AND dv.is_default = 1 JOIN product_variants pv ON p.id = pv.product_id WHERE p.is_active = 1";
 $params = [];
 if ($category) { $sql .= " AND p.category_id = ? "; $params[] = $category['id']; }
 $sql .= " GROUP BY p.id HAVING min_price >= ? AND min_price <= ? ";
