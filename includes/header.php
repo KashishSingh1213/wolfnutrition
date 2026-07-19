@@ -9,8 +9,9 @@ $active_page = basename($_SERVER['PHP_SELF']);
 // Dynamic SEO & Metatag Engine
 $seo_title = "Wolf Nutrition | Premium Ayurvedic Performance & Vitality Stacks";
 $seo_desc = "Wolf Nutrition merges ancient Ayurvedic wisdom with modern sports science. Buy certified Shilajit, Ashwagandha, and Kutki stacks for stamina and liver support.";
-$seo_keywords = "wolf nutrition, ayurvedic stamina gainer, shilajit capsules india, liver support kutki, wolftox liver detox, test boost ayurvedic";
-$canonical_url = "http://" . $_SERVER['HTTP_HOST'] . $_SERVER['REQUEST_URI'];
+$seo_keywords = "wolf nutrition, ayurvedic supplements india, shilajit capsules, ashwagandha, liver support kutki, wolftox liver detox, wolfpack vitality, ayurvedic stamina gainer, veggie capsules fssai certified";
+$seo_og_type = "website";
+$canonical_url = ((isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] === 'on') ? "https" : "http") . "://" . $_SERVER['HTTP_HOST'] . $_SERVER['REQUEST_URI'];
 
 if ($active_page === 'product.php' && isset($_GET['slug'])) {
     $prod_slug = $_GET['slug'];
@@ -48,6 +49,7 @@ if ($active_page === 'product.php' && isset($_GET['slug'])) {
         $seo_desc = htmlspecialchars(substr($blog_excerpt, 0, 160));
         $seo_keywords = htmlspecialchars($blog_seo['category_tag']) . ", wolf nutrition, ayurvedic, wellness, blog";
         $blog_og_image = !empty($blog_seo['cover_image']) ? $blog_seo['cover_image'] : 'assets/images/logo.png';
+        $seo_og_type = "article";
     }
 }
 ?>
@@ -66,30 +68,44 @@ if ($active_page === 'product.php' && isset($_GET['slug'])) {
     <link rel="canonical" href="<?php echo $canonical_url; ?>">
 
     <!-- Open Graph / Facebook / Instagram -->
-    <meta property="og:type" content="article">
+    <meta property="og:type" content="<?php echo $seo_og_type; ?>">
     <meta property="og:url" content="<?php echo $canonical_url; ?>">
     <meta property="og:title" content="<?php echo $seo_title; ?>">
     <meta property="og:description" content="<?php echo $seo_desc; ?>">
-    <meta property="og:image" content="http://<?php echo $_SERVER['HTTP_HOST']; ?>/wolfnutrition/<?php echo isset($blog_og_image) ? $blog_og_image : 'assets/images/logo.png'; ?>">
+    <meta property="og:image" content="<?php echo ((isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] === 'on') ? 'https' : 'http') . '://' . $_SERVER['HTTP_HOST'] . '/wolfnutrition/' . (isset($blog_og_image) ? $blog_og_image : 'assets/images/logo.png'); ?>">
     <meta property="og:image:width" content="1200">
     <meta property="og:image:height" content="630">
+    <meta property="og:site_name" content="Wolf Nutrition">
+    <meta property="og:locale" content="en_IN">
 
     <!-- Twitter -->
-    <meta property="twitter:card" content="summary_large_image">
-    <meta property="twitter:url" content="<?php echo $canonical_url; ?>">
-    <meta property="twitter:title" content="<?php echo $seo_title; ?>">
-    <meta property="twitter:description" content="<?php echo $seo_desc; ?>">
-    <meta property="twitter:image" content="http://<?php echo $_SERVER['HTTP_HOST']; ?>/wolfnutrition/<?php echo isset($blog_og_image) ? $blog_og_image : 'assets/images/logo.png'; ?>">
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:url" content="<?php echo $canonical_url; ?>">
+    <meta name="twitter:title" content="<?php echo $seo_title; ?>">
+    <meta name="twitter:description" content="<?php echo $seo_desc; ?>">
+    <meta name="twitter:image" content="<?php echo ((isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] === 'on') ? 'https' : 'http') . '://' . $_SERVER['HTTP_HOST'] . '/wolfnutrition/' . (isset($blog_og_image) ? $blog_og_image : 'assets/images/logo.png'); ?>">
+
+    <!-- Mobile Browser Theme Color -->
+    <meta name="theme-color" content="#080C10">
+
+    <!-- Preconnect for Performance -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link rel="preconnect" href="https://cdnjs.cloudflare.com" crossorigin>
+    <link rel="dns-prefetch" href="https://checkout.razorpay.com">
 
     <!-- JSON-LD Structured Data for Search Engine rich snippets -->
     <script type="application/ld+json">
     <?php
+    $site_base = ((isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] === 'on') ? 'https' : 'http') . '://' . $_SERVER['HTTP_HOST'] . '/wolfnutrition';
+    $logo_url = $site_base . '/assets/images/logo.png';
+
     if ($active_page === 'product.php' && isset($prod_seo)) {
         echo json_encode([
             "@context" => "https://schema.org/",
             "@type" => "Product",
             "name" => $prod_seo['name'],
-            "image" => "http://" . $_SERVER['HTTP_HOST'] . "/wolfnutrition/assets/images/logo.png",
+            "image" => $logo_url,
             "description" => $seo_desc,
             "brand" => [
                 "@type" => "Brand",
@@ -110,7 +126,7 @@ if ($active_page === 'product.php' && isset($_GET['slug'])) {
             "@type" => "BlogPosting",
             "headline" => $blog_seo['title'],
             "description" => $seo_desc,
-            "image" => !empty($blog_seo['cover_image']) ? "http://" . $_SERVER['HTTP_HOST'] . "/wolfnutrition/" . $blog_seo['cover_image'] : "http://" . $_SERVER['HTTP_HOST'] . "/wolfnutrition/assets/images/logo.png",
+            "image" => !empty($blog_seo['cover_image']) ? $site_base . '/' . $blog_seo['cover_image'] : $logo_url,
             "author" => [
                 "@type" => "Organization",
                 "name" => "Wolf Nutrition"
@@ -120,19 +136,83 @@ if ($active_page === 'product.php' && isset($_GET['slug'])) {
                 "name" => "Wolf Nutrition",
                 "logo" => [
                     "@type" => "ImageObject",
-                    "url" => "http://" . $_SERVER['HTTP_HOST'] . "/wolfnutrition/assets/images/logo.png"
+                    "url" => $logo_url
                 ]
             ],
-            "datePublished" => date('c', strtotime($post['published_at'])),
+            "datePublished" => date('c', strtotime($blog_seo['published_at'] ?? 'now')),
             "mainEntityOfPage" => $canonical_url
+        ], JSON_UNESCAPED_SLASHES | JSON_PRETTY_PRINT);
+    } elseif ($active_page === 'index.php') {
+        echo json_encode([
+            "@context" => "https://schema.org",
+            "@graph" => [
+                [
+                    "@type" => "WebSite",
+                    "name" => "Wolf Nutrition",
+                    "url" => $site_base,
+                    "potentialAction" => [
+                        "@type" => "SearchAction",
+                        "target" => [
+                            "@type" => "EntryPoint",
+                            "urlTemplate" => $site_base . "/search_api.php?q={search_term_string}"
+                        ],
+                        "query-input" => "required name=search_term_string"
+                    ]
+                ],
+                [
+                    "@type" => "Organization",
+                    "name" => "Wolf Nutrition",
+                    "url" => $site_base,
+                    "logo" => $logo_url,
+                    "description" => "Premium Ayurvedic supplements for vitality, stamina, and liver support. 100% Ayurvedic, FSSAI certified, lab-tested formulations.",
+                    "foundingDate" => "2024",
+                    "contactPoint" => [
+                        "@type" => "ContactPoint",
+                        "telephone" => "+91-9779450455",
+                        "contactType" => "customer service",
+                        "availableLanguage" => "English"
+                    ],
+                    "sameAs" => [
+                        "https://instagram.com/wolfnutrition",
+                        "https://facebook.com/wolfnutrition"
+                    ],
+                    "address" => [
+                        "@type" => "PostalAddress",
+                        "addressCountry" => "IN"
+                    ]
+                ],
+                [
+                    "@type" => "WebPage",
+                    "@id" => $canonical_url,
+                    "name" => $seo_title,
+                    "description" => $seo_desc,
+                    "isPartOf" => [
+                        "@type" => "WebSite",
+                        "name" => "Wolf Nutrition",
+                        "url" => $site_base
+                    ],
+                    "breadcrumb" => [
+                        "@type" => "BreadcrumbList",
+                        "itemListElement" => [
+                            [
+                                "@type" => "ListItem",
+                                "position" => 1,
+                                "name" => "Home",
+                                "item" => $site_base
+                            ]
+                        ]
+                    ]
+                ]
+            ]
         ], JSON_UNESCAPED_SLASHES | JSON_PRETTY_PRINT);
     } else {
         echo json_encode([
             "@context" => "https://schema.org",
             "@type" => "Organization",
             "name" => "Wolf Nutrition",
-            "url" => "http://" . $_SERVER['HTTP_HOST'] . "/wolfnutrition",
-            "logo" => "http://" . $_SERVER['HTTP_HOST'] . "/wolfnutrition/assets/images/logo.png",
+            "url" => $site_base,
+            "logo" => $logo_url,
+            "description" => "Premium Ayurvedic supplements for vitality, stamina, and liver support.",
             "sameAs" => [
                 "https://facebook.com/wolfnutrition",
                 "https://instagram.com/wolfnutrition"
@@ -193,7 +273,7 @@ document.addEventListener('DOMContentLoaded', function() {
             <a href="#"><i class="fas fa-tags" style="color:var(--gold-primary);"></i> Wolfpack Combo Offer: Buy 2 products together, Save 10% automatically!</a>
         </div>
         <div class="announcement-item">
-            <a href="#"><i class="fas fa-leaf" style="color:var(--gold-primary);"></i> 100% Ayurvedic Sourced | FSSAI Certified Wholesaler | Veggie Capsules</a>
+            <a href="#"><i class="fas fa-leaf" style="color:var(--gold-primary);"></i> 100% Ayurvedic Sourced | FSSAI Certified | Veggie Capsules</a>
         </div>
     </div>
 
@@ -201,8 +281,8 @@ document.addEventListener('DOMContentLoaded', function() {
     <header id="mainHeader">
         <div class="container header-container">
             <!-- Logo -->
-            <a href="index.php" class="logo">
-                <img src="assets/images/logo.png" alt="Wolf Nutrition">
+            <a href="index.php" class="logo" aria-label="Wolf Nutrition - Home">
+                <img src="assets/images/logo.png" alt="Wolf Nutrition - Premium Ayurvedic Supplements">
                 <div class="logo-text">WOLF <span>NUTRITION</span></div>
             </a>
 
@@ -259,8 +339,8 @@ document.addEventListener('DOMContentLoaded', function() {
     <div class="mobile-menu-overlay" id="mobileOverlay"></div>
     <nav class="mobile-nav" id="mobileNav">
         <div class="mobile-nav-header">
-            <a href="index.php" class="mobile-nav-logo">
-                <img src="assets/images/logo.png" alt="Wolf Nutrition">
+            <a href="index.php" class="mobile-nav-logo" aria-label="Wolf Nutrition - Home">
+                <img src="assets/images/logo.png" alt="Wolf Nutrition Logo">
                 <span>WOLF NUTRITION</span>
             </a>
             <button class="mobile-nav-close" id="mobileCloseBtn">

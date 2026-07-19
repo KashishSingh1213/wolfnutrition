@@ -8,7 +8,7 @@ $certs = get_certificates();
     <div class="container" style="margin-top: 40px; margin-bottom: 60px;">
         <div class="section-header">
             <h2>Quality & Trust Certificates</h2>
-            <p>100% verified wholesaler registrations and ingredient test reports</p>
+            <p>100% verified registrations and ingredient test reports</p>
         </div>
 
         <!-- Certificates Gallery Grid -->

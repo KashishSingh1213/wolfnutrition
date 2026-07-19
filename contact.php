@@ -273,7 +273,7 @@ $csrf_token = $_SESSION['contact_csrf'];
                         <option value="Order & Delivery" style="background:#121212;">Order & Delivery</option>
                         <option value="Product Inquiry" style="background:#121212;">Product Inquiry</option>
                         <option value="Return & Refund" style="background:#121212;">Return & Refund</option>
-                        <option value="Wholesale / Business" style="background:#121212;">Wholesale / Business</option>
+                        <option value="Business Inquiry" style="background:#121212;">Business Inquiry</option>
                         <option value="Free Dietitian Consult" style="background:#121212;">Free Dietitian Consult</option>
                         <option value="Other" style="background:#121212;">Other</option>
                     </select>
@@ -300,9 +300,9 @@ $csrf_token = $_SESSION['contact_csrf'];
             <div class="contact-info-card tilt-card spotlight-card">
                 <div class="tilt-shine"></div>
                 <h3><i class="fas fa-address-card" style="color:var(--gold-primary); margin-right:8px;"></i> Support Coordinates</h3>
-                <div class="contact-info-row"><div class="contact-info-icon"><i class="fas fa-envelope"></i></div><div class="contact-info-text"><h5>Email Us</h5><p>support@wolfnutrition.in</p></div></div>
-                <div class="contact-info-row"><div class="contact-info-icon"><i class="fas fa-phone-alt"></i></div><div class="contact-info-text"><h5>Call Us</h5><p>+91 98765 43210</p></div></div>
-                <div class="contact-info-row"><div class="contact-info-icon"><i class="fas fa-map-marker-alt"></i></div><div class="contact-info-text"><h5>Visit Us</h5><p>Kaki Pind, Hoshiarpur Road, Rama Mandi, Jalandhar, Punjab - 144005</p></div></div>
+                <div class="contact-info-row"><div class="contact-info-icon"><i class="fas fa-envelope"></i></div><div class="contact-info-text"><h5>Email Us</h5><p>wolfnutritionwp@gmail.com</p></div></div>
+                <div class="contact-info-row"><div class="contact-info-icon"><i class="fas fa-phone-alt"></i></div><div class="contact-info-text"><h5>Call Us</h5><p>+91 9779450455</p></div></div>
+                <div class="contact-info-row"><div class="contact-info-icon"><i class="fas fa-map-marker-alt"></i></div><div class="contact-info-text"><h5>Visit Us</h5><p>Shop 1, Bhatia Market, Kaki Pind, Hoshiarpur Road, Rama Mandi, Jalandhar 144005</p></div></div>
             </div>
 
             <div class="contact-info-card tilt-card spotlight-card">

@@ -9,8 +9,8 @@ require_once __DIR__ . '/functions.php';
             <div class="footer-grid">
                 <!-- About Info -->
                 <div class="footer-about">
-                    <a href="index.php" class="logo" style="margin-bottom: 15px;">
-                        <img src="assets/images/logo.png" alt="Wolf Nutrition Logo">
+                    <a href="index.php" class="logo" style="margin-bottom: 15px;" aria-label="Wolf Nutrition - Home">
+                        <img src="assets/images/logo.png" alt="Wolf Nutrition - Premium Ayurvedic Supplements">
                     </a>
                     <p>Ancient Ayurvedic wisdom engineered for modern male peak performance. Clean, raw formulations with zero hidden fillers.</p>
                 </div>
@@ -69,9 +69,9 @@ require_once __DIR__ . '/functions.php';
                 </div>
                 <!-- Social Icons -->
                 <div class="footer-socials">
-                    <a href="https://instagram.com" class="social-icon" target="_blank" rel="noopener noreferrer"><i class="fab fa-instagram"></i></a>
-                    <a href="https://facebook.com" class="social-icon" target="_blank" rel="noopener noreferrer"><i class="fab fa-facebook-f"></i></a>
-                    <a href="https://twitter.com" class="social-icon" target="_blank" rel="noopener noreferrer"><i class="fab fa-twitter"></i></a>
+                    <a href="https://instagram.com/wolfnutrition" class="social-icon" target="_blank" rel="noopener noreferrer" aria-label="Follow Wolf Nutrition on Instagram"><i class="fab fa-instagram"></i></a>
+                    <a href="https://facebook.com/wolfnutrition" class="social-icon" target="_blank" rel="noopener noreferrer" aria-label="Follow Wolf Nutrition on Facebook"><i class="fab fa-facebook-f"></i></a>
+                    <a href="https://twitter.com/wolfnutrition" class="social-icon" target="_blank" rel="noopener noreferrer" aria-label="Follow Wolf Nutrition on Twitter"><i class="fab fa-twitter"></i></a>
                 </div>
             </div>
         </div>

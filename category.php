@@ -27,7 +27,7 @@ switch ($sort) {
 }
 try { $stmt = $pdo->prepare($sql); $stmt->execute($params); $products = $stmt->fetchAll(); } catch (PDOException $e) { $products = []; }
 
-$hero_img = 'assets/images/products/wolfpack_wolftox_combo.png';
+$hero_img = 'assets/images/products/wolfpack_shoot.png';
 $hero_badge = 'Wolf Nutrition Stacks';
 $hero_title = $category ? htmlspecialchars($category['name']) : 'All Supplements';
 $hero_desc = $category ? htmlspecialchars($category['description']) : 'Explore the full premium range of wellness stacks.';
@@ -35,6 +35,7 @@ $hero_stat1 = ['100%', 'Ayurvedic']; $hero_stat2 = ['FSSAI', 'Certified']; $hero
 
 if ($cat_slug === 'liver-detox') {
     $hero_img = 'assets/images/products/wolftox.png'; $hero_badge = 'Organic Cleansing';
+    $hero_title = 'Liver Support & Detox';
     $hero_stat1 = ['60', 'Capsules']; $hero_stat2 = ['Liver', 'Detox']; $hero_stat3 = ['100%', 'Veggie'];
 } elseif ($cat_slug === 'vitality') {
     $hero_img = 'assets/images/products/wolfpack.png'; $hero_badge = 'Active Performance';
@@ -58,7 +59,7 @@ if ($cat_slug === 'liver-detox') {
 .cat-hero-stat-label{font-size:0.6rem;color:rgba(255,255,255,0.45);text-transform:uppercase;letter-spacing:1px;margin-top:4px;font-weight:600;}
 .cat-hero-visual{position:relative;width:260px;height:260px;display:flex;align-items:center;justify-content:center;flex-shrink:0;}
 .cat-hero-visual::before{content:'';position:absolute;width:200px;height:200px;border-radius:50%;background:radial-gradient(circle,var(--gold-primary) 0%,transparent 70%);opacity:0.1;filter:blur(30px);z-index:1;}
-.cat-hero-visual img{height:100%;max-height:240px;object-fit:contain;z-index:2;filter:drop-shadow(0 20px 40px rgba(8,12,16,0.7));animation:catFloat 5s ease-in-out infinite;}
+.cat-hero-visual img{height:100%;max-height:240px;object-fit:contain;z-index:2;filter:drop-shadow(0 20px 40px rgba(8,12,16,0.7));animation:catFloat 5s ease-in-out infinite;mix-blend-mode:multiply;}
 @keyframes catFloat{0%,100%{transform:translateY(0) rotate(0deg)}50%{transform:translateY(-12px) rotate(1.5deg)}}
 
 /* ── Benefits ── */
@@ -229,7 +230,7 @@ if ($cat_slug === 'liver-detox') {
                             <?php if($prod['total_stock']<=0): ?><span class="badge-soldout">Sold Out</span><?php endif; ?>
                             <div class="tilt-shine"></div>
                             <div class="product-card-image" style="height:240px; background:radial-gradient(circle at center,rgba(212,175,55,0.06) 0%,rgba(8,12,16,0.95) 80%); padding:20px; display:flex; align-items:center; justify-content:center;">
-                                <img src="<?php echo htmlspecialchars($prod['image_url']); ?>" alt="<?php echo htmlspecialchars($prod['name']); ?>" style="max-height:100%; max-width:100%; object-fit:contain; filter:drop-shadow(0 12px 25px rgba(8,12,16,0.5)); transition:transform 0.4s ease;">
+                                <img src="<?php echo htmlspecialchars($prod['image_url']); ?>" alt="<?php echo htmlspecialchars($prod['name']); ?>" style="max-height:100%; max-width:100%; object-fit:contain; filter:drop-shadow(0 12px 25px rgba(8,12,16,0.5)); transition:transform 0.4s ease; mix-blend-mode:multiply;">
                             </div>
                             <div style="padding:20px;">
                                 <a href="product.php?slug=<?php echo $prod['slug']; ?>" style="text-decoration:none;">

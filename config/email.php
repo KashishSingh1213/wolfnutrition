@@ -7,7 +7,7 @@ define('BREVO_API_KEY', getenv('BREVO_API_KEY') ?: '');
 define('BREVO_API_URL', 'https://api.brevo.com/v3/smtp/email');
 define('SENDER_EMAIL', getenv('SENDER_EMAIL') ?: 'noreply@wolfnutrition.in');
 define('SENDER_NAME', getenv('SENDER_NAME') ?: 'Wolf Nutrition');
-define('SUPPORT_EMAIL', getenv('SUPPORT_EMAIL') ?: 'support@wolfnutrition.in');
+define('SUPPORT_EMAIL', getenv('SUPPORT_EMAIL') ?: 'wolfnutritionwp@gmail.com');
 
 /**
  * Send email via Brevo SMTP API
@@ -83,7 +83,7 @@ function build_contact_confirmation_html($name) {
                 <p style="margin:0 0 6px;font-size:13px;color:#D4AF37;font-weight:700;text-transform:uppercase;letter-spacing:1px;">What happens next?</p>
                 <p style="margin:0;font-size:14px;color:rgba(255,255,255,0.6);line-height:1.5;">1. Our team reviews your query<br>2. We prepare a detailed response<br>3. You receive a reply within 24 hours</p>
             </td></tr></table>
-            <p style="color:rgba(255,255,255,0.5);font-size:13px;line-height:1.5;margin:0;">Need urgent help? Chat on <a href="https://wa.me/919876543210" style="color:#D4AF37;text-decoration:none;font-weight:700;">WhatsApp</a> or call <strong style="color:#D4AF37;">+91 98765 43210</strong>.</p>
+            <p style="color:rgba(255,255,255,0.5);font-size:13px;line-height:1.5;margin:0;">Need urgent help? Chat on <a href="https://wa.me/919779450455" style="color:#D4AF37;text-decoration:none;font-weight:700;">WhatsApp</a> or call <strong style="color:#D4AF37;">+91 9779450455</strong>.</p>
         </td></tr>
         <tr><td style="background:rgba(255,255,255,0.02);padding:20px 35px;border-top:1px solid rgba(255,255,255,0.05);text-align:center;">
             <p style="margin:0;font-size:12px;color:rgba(255,255,255,0.35);">&copy; ' . $year . ' Wolf Nutrition. All rights reserved. FSSAI Reg No: 22126022000063</p>

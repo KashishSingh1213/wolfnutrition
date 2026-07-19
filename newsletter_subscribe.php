@@ -108,7 +108,7 @@ function build_newsletter_welcome_html($name) {
                     &#x2714; No spam — only gains
                 </p>
             </td></tr></table>
-            <p style="color:rgba(255,255,255,0.5);font-size:13px;line-height:1.5;margin:0;">Have questions? Reply to this email or chat on <a href="https://wa.me/919876543210" style="color:#D4AF37;text-decoration:none;font-weight:700;">WhatsApp</a>.</p>
+            <p style="color:rgba(255,255,255,0.5);font-size:13px;line-height:1.5;margin:0;">Have questions? Reply to this email or chat on <a href="https://wa.me/919779450455" style="color:#D4AF37;text-decoration:none;font-weight:700;">WhatsApp</a>.</p>
         </td></tr>
         <tr><td style="background:rgba(255,255,255,0.02);padding:20px 35px;border-top:1px solid rgba(255,255,255,0.05);text-align:center;">
             <p style="margin:0;font-size:12px;color:rgba(255,255,255,0.35);">&copy; ' . $year . ' Wolf Nutrition. All rights reserved. FSSAI Reg No: 22126022000063</p>
