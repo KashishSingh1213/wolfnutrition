@@ -35,7 +35,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['submit_review'])) {
     else { $pdo->prepare("INSERT INTO reviews (product_id,user_id,user_name,rating,title,review_text,is_approved) VALUES (?,?,?,?, ?,?,0)")->execute([$product['id'],$uid,$rn,$rs,$rt,$rb]); $review_success = "Review submitted! Pending approval."; }
 }
 
-$stmt = $pdo->prepare("SELECT p.*, MIN(pv.price) as max_mrp, MIN(pv.sale_price) as min_price, pv.id as default_variant_id FROM products p JOIN product_variants pv ON p.id = pv.product_id WHERE p.category_id = ? AND p.id != ? AND p.is_active = 1 GROUP BY p.id LIMIT 3");
+$stmt = $pdo->prepare("SELECT p.*, dv.price as max_mrp, dv.sale_price as min_price, dv.id as default_variant_id FROM products p JOIN product_variants dv ON p.id = dv.product_id AND dv.is_default = 1 WHERE p.category_id = ? AND p.id != ? AND p.is_active = 1 LIMIT 3");
 $stmt->execute([$product['category_id'], $product['id']]); $related = $stmt->fetchAll();
 
 $gallery = array_filter(explode(',', $product['image_gallery']));
