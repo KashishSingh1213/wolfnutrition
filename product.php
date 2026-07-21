@@ -3,9 +3,10 @@ require_once __DIR__ . '/includes/header.php';
 $slug = isset($_GET['slug']) ? trim($_GET['slug']) : '';
 if (empty($slug)) { header("Location: index.php"); exit(); }
 
-$stmt = $pdo->prepare("SELECT p.*, c.name as category_name, c.slug as category_slug FROM products p LEFT JOIN categories c ON p.category_id = c.id WHERE p.slug = ? AND p.is_active = 1");
+$stmt = $pdo->prepare("SELECT p.*, c.name as category_name, c.slug as category_slug FROM products p LEFT JOIN categories c ON p.category_id = c.id WHERE p.slug = ?");
 $stmt->execute([$slug]); $product = $stmt->fetch();
 if (!$product) { header("Location: index.php"); exit(); }
+$is_coming_soon = !$product['is_active'];
 
 $stmt = $pdo->prepare("SELECT * FROM product_variants WHERE product_id = ? ORDER BY price ASC");
 $stmt->execute([$product['id']]); $variants = $stmt->fetchAll();
@@ -245,6 +246,17 @@ if (empty($gallery)) $gallery = [$product['image_url']];
             </div>
 
             <!-- Quantity & Add to Cart -->
+            <?php if ($is_coming_soon): ?>
+                <div style="background:linear-gradient(135deg, rgba(212,175,55,0.1) 0%, rgba(212,175,55,0.05) 100%); border:1px solid rgba(212,175,55,0.3); border-radius:12px; padding:16px 20px; display:flex; align-items:center; gap:12px;">
+                    <div style="width:40px; height:40px; border-radius:50%; background:var(--gold-gradient); display:flex; align-items:center; justify-content:center; color:#080C10; flex-shrink:0;">
+                        <i class="fas fa-clock"></i>
+                    </div>
+                    <div>
+                        <div style="font-weight:700; color:var(--gold-primary); font-size:0.95rem;">Coming Soon</div>
+                        <div style="font-size:0.82rem; color:rgba(255,255,255,0.5);">This product is launching soon. Stay tuned!</div>
+                    </div>
+                </div>
+            <?php else: ?>
             <div class="pd-actions">
                 <div class="pd-qty">
                     <button type="button" onclick="changeQty(-1)">-</button>
@@ -257,6 +269,7 @@ if (empty($gallery)) $gallery = [$product['image_url']];
                     <button style="flex:1; background:rgba(255,255,255,0.1); color:rgba(255,255,255,0.4); border:none; border-radius:12px; font-size:0.95rem; font-weight:700; cursor:not-allowed;" disabled>Out of Stock</button>
                 <?php endif; ?>
             </div>
+            <?php endif; ?>
 
             <!-- Benefits -->
             <div class="pd-benefits">
@@ -291,6 +304,7 @@ if (empty($gallery)) $gallery = [$product['image_url']];
     </div>
 
     <!-- ═══ REVIEWS ═══ -->
+    <?php if (!$is_coming_soon): ?>
     <div class="pd-reviews">
         <div style="display:flex; align-items:center; gap:12px; margin-bottom:30px;">
             <div style="width:42px; height:42px; border-radius:12px; background:rgba(212,175,55,0.08); border:1px solid rgba(212,175,55,0.15); display:flex; align-items:center; justify-content:center; color:var(--gold-primary);"><i class="fas fa-comments"></i></div>
@@ -352,6 +366,7 @@ if (empty($gallery)) $gallery = [$product['image_url']];
             </form>
         </div>
     </div>
+    <?php endif; ?>
 
     <!-- ═══ RELATED ═══ -->
     <?php if (!empty($related)): ?>

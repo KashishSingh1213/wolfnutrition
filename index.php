@@ -1,16 +1,18 @@
 <?php
 require_once __DIR__ . '/includes/header.php';
-try { $stmt = $pdo->prepare("SELECT * FROM categories WHERE is_active = 1 ORDER BY display_order ASC"); $stmt->execute(); $categories = $stmt->fetchAll(); } catch (PDOException $e) { $categories = []; }
+try { $stmt = $pdo->prepare("SELECT * FROM categories WHERE is_active = 1 ORDER BY display_order ASC"); $stmt->execute(); $all_categories = $stmt->fetchAll(); } catch (PDOException $e) { $all_categories = []; }
+$categories = [];
 $products_by_category = [];
-foreach ($categories as $cat) {
+foreach ($all_categories as $cat) {
     $stmt = $pdo->prepare("SELECT p.*, pv.price as max_mrp, pv.sale_price as min_price, pv.id as default_variant_id FROM products p JOIN product_variants pv ON p.id = pv.product_id WHERE p.category_id = ? AND p.is_active = 1 AND pv.is_default = 1 GROUP BY p.id");
     $stmt->execute([$cat['id']]); $products_by_category[$cat['slug']] = $stmt->fetchAll();
+    if (!empty($products_by_category[$cat['slug']])) { $categories[] = $cat; }
 }
 try { $stmt = $pdo->prepare("SELECT * FROM bundles WHERE status = 1 LIMIT 1"); $stmt->execute(); $bundle = $stmt->fetch(); } catch (PDOException $e) { $bundle = null; }
 $certs = get_certificates();
 $testimonials = get_testimonials(false, 5);
 try { $stmt = $pdo->prepare("SELECT * FROM blog_posts WHERE status = 1 ORDER BY published_at DESC"); $stmt->execute(); $blogs = $stmt->fetchAll(); if (count($blogs) > 3) $blogs = array_slice($blogs, 0, 3); } catch (PDOException $e) { $blogs = []; }
-try { $stmt = $pdo->prepare("SELECT p.*, pv.price as max_mrp, pv.sale_price as min_price, pv.size_capsules FROM products p JOIN product_variants pv ON p.id = pv.product_id AND pv.is_default = 1 WHERE p.is_active = 0 ORDER BY p.id ASC"); $stmt->execute(); $coming_soon = $stmt->fetchAll(); } catch (PDOException $e) { $coming_soon = []; }
+try { $stmt = $pdo->prepare("SELECT p.*, pv.id as variant_id, pv.price as max_mrp, pv.sale_price as min_price, pv.size_capsules, pv.sku FROM products p JOIN product_variants pv ON p.id = pv.product_id WHERE p.is_active = 0 ORDER BY p.id ASC, pv.is_default DESC"); $stmt->execute(); $coming_soon = $stmt->fetchAll(); } catch (PDOException $e) { $coming_soon = []; }
 ?>
 
 <style>
@@ -61,6 +63,11 @@ try { $stmt = $pdo->prepare("SELECT p.*, pv.price as max_mrp, pv.sale_price as m
     .hero-mobile-content p{font-size:0.8rem;}
     .hero-mobile-banner{padding:35px 20px;}
 }
+
+/* ── Coming Soon Grid ── */
+.coming-soon-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:30px;max-width:1100px;margin:0 auto;}
+@media(max-width:1024px){.coming-soon-grid{grid-template-columns:repeat(2,1fr) !important;max-width:700px;}}
+@media(max-width:600px){.coming-soon-grid{grid-template-columns:1fr !important;max-width:400px;gap:20px !important;}}
 
 /* ── Marquee ── */
 @keyframes marqueeScroll{0%{transform:translateX(0)}100%{transform:translateX(-50%)}}
@@ -520,9 +527,10 @@ try { $stmt = $pdo->prepare("SELECT p.*, pv.price as max_mrp, pv.sale_price as m
         </div>
 
         <!-- Coming Soon Cards -->
-        <div style="display:grid; grid-template-columns:repeat(<?php echo count($coming_soon) > 1 ? '2' : '1'; ?>, 1fr); gap:30px; max-width:900px; margin:0 auto;">
+        <div class="coming-soon-grid">
             <?php foreach ($coming_soon as $cs): ?>
-            <div class="tilt-card" style="position:relative; background:rgba(255,255,255,0.02); border:1px solid rgba(212,175,55,0.15); border-radius:24px; overflow:hidden; transition:all 0.5s;">
+            <a href="product.php?slug=<?php echo htmlspecialchars($cs['slug']); ?>" style="text-decoration:none;">
+            <div class="tilt-card" style="position:relative; background:rgba(255,255,255,0.02); border:1px solid rgba(212,175,55,0.15); border-radius:24px; overflow:hidden; transition:all 0.5s; cursor:pointer;">
                 <!-- Gold top accent -->
                 <div style="position:absolute; top:0; left:0; right:0; height:3px; background:var(--gold-gradient); z-index:2;"></div>
 
@@ -532,31 +540,33 @@ try { $stmt = $pdo->prepare("SELECT p.*, pv.price as max_mrp, pv.sale_price as m
                 </div>
 
                 <!-- Image Area -->
-                <div style="height:280px; background:radial-gradient(circle at center,rgba(212,175,55,0.08) 0%,rgba(8,12,16,0.98) 80%); display:flex; align-items:center; justify-content:center; position:relative; overflow:hidden;">
+                <div style="height:350px; background:radial-gradient(circle at center,rgba(212,175,55,0.08) 0%,rgba(8,12,16,0.98) 80%); display:flex; align-items:center; justify-content:center; position:relative; overflow:hidden;">
                     <div style="position:absolute; inset:0; background:repeating-linear-gradient(45deg,transparent,transparent 20px,rgba(212,175,55,0.02) 20px,rgba(212,175,55,0.02) 40px); pointer-events:none;"></div>
-                    <img src="<?php echo htmlspecialchars($cs['image_url']); ?>" alt="<?php echo htmlspecialchars($cs['name']); ?>" style="max-height:200px; max-width:80%; object-fit:contain; filter:drop-shadow(0 20px 50px rgba(212,175,55,0.15)); opacity:0.9; transition:transform 0.5s ease; position:relative; z-index:1;">
+                    <img src="<?php echo htmlspecialchars($cs['image_url']); ?>" alt="<?php echo htmlspecialchars($cs['name']); ?>" style="max-height:280px; max-width:90%; object-fit:contain; filter:drop-shadow(0 20px 50px rgba(212,175,55,0.15)); opacity:0.9; transition:transform 0.5s ease; position:relative; z-index:1;">
                     <!-- Lock overlay -->
                     <div style="position:absolute; bottom:16px; left:50%; transform:translateX(-50%); background:rgba(8,12,16,0.8); border:1px solid rgba(212,175,55,0.2); border-radius:30px; padding:8px 20px; display:flex; align-items:center; gap:6px; z-index:2;">
                         <i class="fas fa-lock" style="color:var(--gold-primary); font-size:0.7rem;"></i>
-                        <span style="font-size:0.65rem; color:rgba(255,255,255,0.5); text-transform:uppercase; letter-spacing:1px; font-weight:600;">Available Soon</span>
+                        <span style="font-size:0.65rem; color:rgba(255,255,255,0.5); text-transform:uppercase; letter-spacing:1px; font-weight:600;">View Details</span>
                     </div>
                 </div>
 
                 <!-- Content -->
                 <div style="padding:28px 30px 30px;">
-                    <h3 style="font-family:var(--font-heading); font-size:1.15rem; font-weight:800; color:#fff; text-transform:uppercase; letter-spacing:0.5px; margin-bottom:10px; line-height:1.3;"><?php echo htmlspecialchars($cs['name']); ?></h3>
+                    <h3 style="font-family:var(--font-heading); font-size:1.15rem; font-weight:800; color:#fff; text-transform:uppercase; letter-spacing:0.5px; margin-bottom:4px; line-height:1.3;"><?php echo htmlspecialchars($cs['name']); ?></h3>
+                    <p style="font-size:0.75rem; color:var(--gold-primary); font-weight:700; margin-bottom:8px; letter-spacing:0.5px;"><?php echo htmlspecialchars($cs['size_capsules']); ?></p>
                     <p style="font-size:0.82rem; color:rgba(255,255,255,0.45); line-height:1.6; margin-bottom:20px;"><?php echo htmlspecialchars($cs['short_description']); ?></p>
                     <div style="display:flex; align-items:center; justify-content:space-between;">
                         <div>
                             <span style="font-size:1.4rem; font-weight:800; color:var(--gold-primary); font-family:var(--font-heading);">₹<?php echo number_format($cs['min_price'],0); ?></span>
                             <span style="font-size:0.78rem; color:rgba(255,255,255,0.3); text-decoration:line-through; margin-left:8px;">₹<?php echo number_format($cs['max_mrp'],0); ?></span>
                         </div>
-                        <button class="btn-gold" style="padding:10px 22px; font-size:0.75rem; border-radius:30px; font-weight:700; letter-spacing:0.5px; cursor:not-allowed; opacity:0.7;" disabled>
-                            <i class="fas fa-bell"></i> Notify Me
-                        </button>
+                        <span style="display:inline-flex; align-items:center; gap:6px; color:var(--gold-primary); font-size:0.75rem; font-weight:700; letter-spacing:0.5px;">
+                            View Details <i class="fas fa-arrow-right"></i>
+                        </span>
                     </div>
                 </div>
             </div>
+            </a>
             <?php endforeach; ?>
         </div>
     </div>

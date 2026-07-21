@@ -326,12 +326,25 @@ INSERT INTO `products` (`id`, `name`, `slug`, `short_description`, `description`
  'Ultra-pure whey protein isolate for muscle recovery, growth, and daily protein supplementation.', 
  'WOLFPRO delivers ultra-pure whey protein isolate sourced from grass-fed cows. Each serving provides a complete amino acid profile with minimal lactose, perfect for post-workout recovery and daily protein needs.', 
  4, 
- 'assets/images/products/wolfpro.png', 
- 'assets/images/products/wolfpro.png', 
+ 'assets/images/products/189873.png',
+ 'assets/images/products/189873.png',
  'Ultra-Pure Isolate: 27g protein per serving with 90%+ protein content and minimal carbs and fats.\nFast Absorption: Micro-filtered whey isolate for rapid amino acid delivery to muscles.\nMuscle Recovery: Rich in BCAAs and essential amino acids to support post-workout repair.\nClean Label: No added sugar, no artificial colors, no fillers. Informed Sport certified.', 
  'Whey Protein Isolate (from Grass-Fed Cows), Natural Cocoa Flavor (for Chocolate variant), Sunflower Lecithin (emulsifier), Steviol Glycosides (natural sweetener).', 
  'Mix 1 scoop (30g) with 200-250ml of cold water or milk. Shake or blend for 20-30 seconds. Best consumed within 30 minutes after exercise or as a meal supplement.', 
  'Not a substitute for a balanced diet. Do not exceed recommended daily intake. Keep in a cool, dry place away from direct sunlight. Once opened, consume within 60 days.', 
+ 0),
+(5,
+ 'WOLFPRO - Premium Protein Isolate (2kg)',
+ 'wolfpro-premium-protein-isolate-2kg',
+ 'Ultra-pure whey protein isolate for muscle recovery, growth, and daily protein supplementation.',
+ 'WOLFPRO delivers ultra-pure whey protein isolate sourced from grass-fed cows. Each serving provides a complete amino acid profile with minimal lactose, perfect for post-workout recovery and daily protein needs.',
+ 4,
+ 'assets/images/products/189874.png',
+ 'assets/images/products/189874.png',
+ 'Ultra-Pure Isolate: 27g protein per serving with 90%+ protein content and minimal carbs and fats.\nFast Absorption: Micro-filtered whey isolate for rapid amino acid delivery to muscles.\nMuscle Recovery: Rich in BCAAs and essential amino acids to support post-workout repair.\nClean Label: No added sugar, no artificial colors, no fillers. Informed Sport certified.',
+ 'Whey Protein Isolate (from Grass-Fed Cows), Natural Cocoa Flavor (for Chocolate variant), Sunflower Lecithin (emulsifier), Steviol Glycosides (natural sweetener).',
+ 'Mix 1 scoop (30g) with 200-250ml of cold water or milk. Shake or blend for 20-30 seconds. Best consumed within 30 minutes after exercise or as a meal supplement.',
+ 'Not a substitute for a balanced diet. Do not exceed recommended daily intake. Keep in a cool, dry place away from direct sunlight. Once opened, consume within 60 days.',
  0);
 
 -- Seed Product Variants
@@ -342,7 +355,7 @@ INSERT INTO `product_variants` (`id`, `product_id`, `sku`, `size_capsules`, `pri
 (4, 2, 'WT60', '60 Veggie Capsules', 1499.00, 999.00, 120, 0),
 (5, 3, 'WB60', '60 Veggie Capsules', 1799.00, 1499.00, 0, 1),
 (6, 4, 'WP1KG', '1kg', 2999.00, 2499.00, 0, 1),
-(7, 4, 'WP2KG', '2kg', 4999.00, 4199.00, 0, 0);
+(7, 5, 'WP2KG', '2kg', 4999.00, 4199.00, 0, 0);
 
 -- Seed Bundles
 INSERT INTO `bundles` (`id`, `title`, `slug`, `description`, `banner_image`, `combo_price`, `discount_percent`, `status`, `display_order`) VALUES

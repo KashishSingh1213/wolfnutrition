@@ -7,16 +7,18 @@ $min_price = isset($_GET['min_price']) ? (float)$_GET['min_price'] : 0;
 $max_price = isset($_GET['max_price']) ? (float)$_GET['max_price'] : 5000;
 
 $category = null;
+$is_coming_soon = ($cat_slug === 'coming-soon');
 if ($cat_slug !== 'all') {
-    $stmt = $pdo->prepare("SELECT * FROM categories WHERE slug = ? AND is_active = 1");
+    $stmt = $pdo->prepare("SELECT * FROM categories WHERE slug = ?");
     $stmt->execute([$cat_slug]); $category = $stmt->fetch();
-    if (!$category) { $cat_slug = 'all'; }
+    if (!$category && !$is_coming_soon) { $cat_slug = 'all'; }
 }
 
-$sql = "SELECT p.*, dv.price as max_mrp, dv.sale_price as min_price, dv.id as default_variant_id, SUM(pv.stock_qty) as total_stock FROM products p JOIN product_variants dv ON p.id = dv.product_id AND dv.is_default = 1 JOIN product_variants pv ON p.id = pv.product_id WHERE p.is_active = 1";
-$params = [];
+$active_filter = $is_coming_soon ? 0 : 1;
+$sql = "SELECT p.*, dv.price as max_mrp, dv.sale_price as min_price, dv.id as default_variant_id, (SELECT SUM(pv.stock_qty) FROM product_variants pv WHERE pv.product_id = p.id) as total_stock FROM products p JOIN product_variants dv ON p.id = dv.product_id AND dv.is_default = 1 WHERE p.is_active = ?";
+$params = [$active_filter];
 if ($category) { $sql .= " AND p.category_id = ? "; $params[] = $category['id']; }
-$sql .= " GROUP BY p.id HAVING min_price >= ? AND min_price <= ? ";
+$sql .= " HAVING min_price >= ? AND min_price <= ? ";
 $params[] = $min_price; $params[] = $max_price;
 if ($in_stock) { $sql .= " AND total_stock > 0 "; }
 switch ($sort) {
@@ -40,6 +42,10 @@ if ($cat_slug === 'liver-detox') {
 } elseif ($cat_slug === 'vitality') {
     $hero_img = 'assets/images/products/wolfpack.png'; $hero_badge = 'Active Performance';
     $hero_stat1 = ['60', 'Capsules']; $hero_stat2 = ['T-Level', 'Booster']; $hero_stat3 = ['Shilajit', 'Pure'];
+} elseif ($is_coming_soon) {
+    $hero_img = 'assets/images/products/wolfpack.png'; $hero_badge = 'Launching Soon';
+    $hero_title = 'Coming Soon'; $hero_desc = 'Next-generation supplements in development. Be the first to experience the future of performance nutrition.';
+    $hero_stat1 = ['6', 'Products']; $hero_stat2 = ['Coming', 'Soon']; $hero_stat3 = ['100%', 'Ayurvedic'];
 }
 ?>
 
@@ -171,6 +177,10 @@ if ($cat_slug === 'liver-detox') {
             <div class="cat-benefit tilt-card spotlight-card"><div class="tilt-shine"></div><div class="cat-benefit-icon"><i class="fas fa-shield-halved"></i></div><div><h5>Hepatic Cleanse</h5><p>Optimizes detox enzymes, purges heavy metals.</p></div></div>
             <div class="cat-benefit tilt-card spotlight-card"><div class="tilt-shine"></div><div class="cat-benefit-icon"><i class="fas fa-apple-whole"></i></div><div><h5>Digestive Booster</h5><p>Enhances bile secretion, eases bloating.</p></div></div>
             <div class="cat-benefit tilt-card spotlight-card"><div class="tilt-shine"></div><div class="cat-benefit-icon"><i class="fas fa-filter"></i></div><div><h5>Cellular Shield</h5><p>Protects liver tissue using Kutki and Kasani.</p></div></div>
+        <?php elseif ($is_coming_soon): ?>
+            <div class="cat-benefit tilt-card spotlight-card"><div class="tilt-shine"></div><div class="cat-benefit-icon"><i class="fas fa-fire-flame-curved"></i></div><div><h5>Thermo Burners</h5><p>Natural fat burners for lean body composition.</p></div></div>
+            <div class="cat-benefit tilt-card spotlight-card"><div class="tilt-shine"></div><div class="cat-benefit-icon"><i class="fas fa-dumbbell"></i></div><div><h5>Mass Gainers</h5><p>Advanced formulas for serious size and power.</p></div></div>
+            <div class="cat-benefit tilt-card spotlight-card"><div class="tilt-shine"></div><div class="cat-benefit-icon"><i class="fas fa-flask"></i></div><div><h5>Pure Extracts</h5><p>Premium isolates and herbal supplements.</p></div></div>
         <?php else: ?>
             <div class="cat-benefit tilt-card spotlight-card"><div class="tilt-shine"></div><div class="cat-benefit-icon"><i class="fas fa-certificate"></i></div><div><h5>Certified Pure</h5><p>FSSAI, GMP manufacturing laboratory seals.</p></div></div>
             <div class="cat-benefit tilt-card spotlight-card"><div class="tilt-shine"></div><div class="cat-benefit-icon"><i class="fas fa-leaf"></i></div><div><h5>100% Organic</h5><p>Raw extracts in clean vegan capsules.</p></div></div>
@@ -244,7 +254,9 @@ if ($cat_slug === 'liver-detox') {
                                     <span style="font-size:1.25rem; font-weight:800; color:var(--gold-primary); font-family:var(--font-heading);">₹<?php echo number_format($prod['min_price'],2); ?></span>
                                     <span style="font-size:0.82rem; color:rgba(255,255,255,0.35); text-decoration:line-through;">MRP ₹<?php echo number_format($prod['max_mrp'],2); ?></span>
                                 </div>
-                                <?php if($prod['total_stock']>0): ?>
+                                <?php if($is_coming_soon): ?>
+                                    <a href="product.php?slug=<?php echo $prod['slug']; ?>" class="btn-gold" style="width:100%; padding:11px; font-size:0.82rem; border-radius:12px; font-weight:700; text-align:center; text-decoration:none;"><i class="fas fa-eye"></i> View Details</a>
+                                <?php elseif($prod['total_stock']>0): ?>
                                     <button class="btn-gold quick-add-btn" style="width:100%; padding:11px; font-size:0.82rem; border-radius:12px; font-weight:700;" data-product-id="<?php echo $prod['id']; ?>" data-variant-id="<?php echo $prod['default_variant_id']; ?>" data-csrf="<?php echo generate_csrf_token(); ?>"><i class="fas fa-shopping-cart"></i> Quick Add</button>
                                 <?php else: ?>
                                     <button class="btn-gold" style="width:100%; padding:11px; font-size:0.82rem; border-radius:12px; background:rgba(255,255,255,0.1); cursor:not-allowed; box-shadow:none; color:rgba(255,255,255,0.4);" disabled>Out of Stock</button>
